@@ -1,7 +1,7 @@
 import React from 'react';
 import Home from './Home';
 import fetch from '../../core/fetch';
-import Layout from '../../components/Layout';
+import Layout from '../../components/Layout/Layout.js';
 
 export default {
 
@@ -9,7 +9,7 @@ export default {
 
   async action() {
     return {
-      title: 'React Starter Kit',
+      title: 'Home',
       component: <Layout><Home /></Layout>,
     };
   },
