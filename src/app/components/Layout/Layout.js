@@ -12,6 +12,9 @@ class Layout extends React.Component {
     return (
       <div>
         <Header />
+        <div className={s['mdl-card']}>
+          <i className={s['material-icons']}>face</i>
+        </div>
         {this.props.children}
       </div>
     );
