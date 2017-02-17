@@ -65,5 +65,5 @@ app.listen(port, host, (err) => {
   }
 
   const prettyHost = host || 'localhost';
-  console.log(`The server is running at http://${prettyHost}:${port}`);
+  console.log(`The server is running at http://${prettyHost}:${port}/`);
 });
