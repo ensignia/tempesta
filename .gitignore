@@ -9,3 +9,6 @@ stats.json
 ncp-debug.log
 npm-debug.log
 .idea
+
+# Secret stuff
+secrets.env

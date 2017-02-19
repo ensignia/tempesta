@@ -12,6 +12,7 @@ import webpack from 'webpack';
 import extend from 'extend';
 import AssetsPlugin from 'assets-webpack-plugin';
 import OfflinePlugin from 'offline-plugin';
+import ParseEnv from './lib/parse-env.js';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
@@ -240,6 +241,11 @@ const clientConfig = extend(true, {}, config, {
       __DEV__: isDebug,
     }),
 
+    // Replace env variables with env file
+    new webpack.DefinePlugin(
+      ParseEnv(path.resolve(__dirname, '../secrets.env')),
+    ),
+
     // Emit a file with assets paths
     // https://github.com/sporto/assets-webpack-plugin#options
     new AssetsPlugin({
@@ -336,6 +342,11 @@ const serverConfig = extend(true, {}, config, {
       'process.env.BROWSER': false,
       __DEV__: isDebug,
     }),
+
+    // Replace env variables with env file
+    new webpack.DefinePlugin(
+      ParseEnv(path.resolve(__dirname, '../secrets.env')),
+    ),
 
     // Do not create separate chunks of the server bundle
     // https://webpack.github.io/docs/list-of-plugins.html#limitchunkcountplugin
