@@ -31,7 +31,7 @@ const parseEnvFile = (file) => {
     const lineParts = strippedLine.match(/^(export )?([^=]+)=(.+?)$/);
 
     // map 'NAME=value' to {NAME: value}
-    environmentObject[lineParts[2]] = lineParts[3];
+    if (lineParts != null) environmentObject[lineParts[2]] = lineParts[3];
   });
 
   return environmentObject;

@@ -4,7 +4,7 @@ import Data from './data.js';
 const weather = Router();
 const data = new Data();
 
-data.load();
+//data.load();
 
 weather.get('/', (req, res) => {
   res.status(200).json({ test: 'hi' });
