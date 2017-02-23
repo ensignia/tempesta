@@ -10,6 +10,29 @@ const DEFAULT_CENTER = {
   lng: 0.5,
 };
 
+// Normalizes the coords that tiles repeat across the x axis (horizontally)
+// like the standard Google map tiles.
+function getNormalizedCoord(coord, zoom) {
+  let y = coord.y; // eslint-disable-line prefer-const
+  let x = coord.x;
+
+  // tile range in one direction range is dependent on zoom level
+  // 0 = 1 tile, 1 = 2 tiles, 2 = 4 tiles, 3 = 8 tiles, etc
+  const tileRange = 1 << zoom; // eslint-disable-line no-bitwise
+
+  // don't repeat across y-axis (vertically)
+  if (y < 0 || y >= tileRange) {
+    return null;
+  }
+
+  // repeat across x-axis
+  if (x < 0 || x >= tileRange) {
+    x = ((x % tileRange) + tileRange) % tileRange;
+  }
+
+  return { x, y };
+}
+
 class MapView extends React.Component {
   static propTypes = {
     center: PropTypes.shape({
@@ -38,6 +61,7 @@ class MapView extends React.Component {
     this.requestLocation = this.requestLocation.bind(this);
     this.updateLocation = this.updateLocation.bind(this);
     this.createMapOptions = this.createMapOptions.bind(this);
+    this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
 
     if (!this.props.center) { // If a center was given to us, then use that
       this.requestLocation();
@@ -46,6 +70,26 @@ class MapView extends React.Component {
 
   componentWillUnmount() {
     // empty
+  }
+
+  onGoogleApiLoaded(google) {
+    this.testMapType = new google.maps.ImageMapType({
+      getTileUrl(coord, zoom) {
+        const normalizedCoord = getNormalizedCoord(coord, zoom);
+        if (!normalizedCoord) {
+          return null;
+        }
+        const bound = 2 ** zoom;
+        return `/api/map/gfs/${zoom}/${normalizedCoord.x}/${bound - normalizedCoord.y - 1}/tile.png`;
+      },
+      tileSize: new google.maps.Size(256, 256),
+      maxZoom: 9,
+      minZoom: 0,
+      radius: 1738000,
+      name: 'Test',
+    });
+
+    google.map.overlayMapTypes.insertAt(0, this.testMapType);
   }
 
   requestLocation() {
@@ -89,6 +133,8 @@ class MapView extends React.Component {
         defaultCenter={DEFAULT_CENTER}
         center={this.state.center}
         options={this.createMapOptions}
+        yesIWantToUseGoogleMapApiInternals
+        onGoogleApiLoaded={this.onGoogleApiLoaded}
       >
         {markers}
       </GoogleMapReact>

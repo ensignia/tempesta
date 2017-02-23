@@ -62,7 +62,5 @@ module.exports = function parseEnv(envFile) {
     }
   });
 
-  console.log(combinedEnv);
-
   return combinedEnv;
 };
