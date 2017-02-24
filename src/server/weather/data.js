@@ -15,9 +15,9 @@ const DATA_DIRECTORY = '../data';
 
 const isWin = /^win/.test(os.platform());
 
+/** Returns JSON representation of grib2 file from grib2json library */
 function gribParser(filePath, options) {
   return new Promise((resolve, reject) => {
-    console.log(path.join(__dirname, `../lib/grib2json/bin/grib2json${isWin ? '.cmd' : ''}`));
     grib2json(filePath, {
       scriptPath: path.join(__dirname, `../lib/grib2json/bin/grib2json${isWin ? '.cmd' : ''}`),
       ...options,
@@ -28,6 +28,7 @@ function gribParser(filePath, options) {
   });
 }
 
+/** Checks if file exists. Returns promise */
 function fsExists(file) {
   return new Promise(resolve => {
     fs.access(file, fs.F_OK, error => resolve(!error));
@@ -39,11 +40,15 @@ function floorMod(a, n) {
   return a - (n * (Math.floor(a / n)));
 }
 
-function tile2long(x,z) {
+/** Converts a google maps tile number to the longitude value
+of its upper left corner */
+function tile2long(x, z) {
   return (((x / (2 ** z)) * 360) - 180);
 }
 
-function tile2lat(y,z) {
+/** Converts a google maps tile number to the latitude value
+of its upper left corner */
+function tile2lat(y, z) {
   const n = Math.PI - (2 * Math.PI * (y / (2 ** z)));
   return ((180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
 }
@@ -120,6 +125,7 @@ class Data {
     return [];
   }
 
+  /** Download data from url into output if not exists */
   static async download(url, output) {
     try {
       const exists = await fsExists(output);
@@ -142,6 +148,7 @@ class Data {
     return null;
   }
 
+  /** Parses a block of data into a 2D array of data points */
   static parseData(data) {
     const header = data.header;
     const originX = header.lo1; // the grid's origin (e.g., 0.0E, 90.0N)
@@ -154,7 +161,7 @@ class Data {
     const date = new Date(header.refTime);
     date.setHours(date.getHours() + header.forecastTime);
 
-    // Scan mode 0 assumed. Longitude increases from oriignX, and latitude decreases from originY
+    // Scan mode 0 assumed. Longitude increases from originX, and latitude decreases from originY
     // http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table3-4.shtml
     const grid = [];
     let index = 0;
@@ -214,6 +221,8 @@ class Data {
   }
 
   async getTile(dataSource, layer, tileX, tileY, tileZ) {
+    // libs: pureImage
+    // images need alpha component
     if (!this[dataSource]) throw new Error('Data source not yet loaded');
 
     const data = this[dataSource][layer];
@@ -226,8 +235,10 @@ class Data {
 
         const startLong = tile2long(tileX, tileZ);
         const endLong = tile2long(tileX + 1, tileZ);
-        const startLat = tile2long(tileY, tileZ);
-        const endLat = tile2long(tileY + 1, tileZ);
+        const startLat = tile2lat(tileY, tileZ);
+        const endLat = tile2lat(tileY + 1, tileZ);
+
+        console.log(startLong + endLong + startLat + endLat);
 
         const image = pureimage.make(256, 256);
         const ctx = image.getContext('2d');
