@@ -10,11 +10,11 @@ const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
 const router = Router();
 
 const data = new Data();
-//data.load();
+data.load();
 
 router.get('/map/gfs/:z/:x/:y/tile.png', async (req, res) => {
   try {
-    const path = await data.getTile('gfs', 'cape', req.params.x, req.params.y, req.params.z);
+    const path = await data.getTile('gfs', 'cape', parseInt(req.params.x, 10), parseInt(req.params.y, 10), parseInt(req.params.z, 10));
 
     res.writeHead(200, {
       'Content-Type': 'image/png',

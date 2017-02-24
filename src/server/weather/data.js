@@ -250,7 +250,7 @@ class Data {
     if (!exists) fs.mkdirSync(path.join(dataDir, 'tiles'));
 
     const gfsAvailable = await Data.getGfsAvailable();
-    const latestGfsFile = gfsAvailable[gfsAvailable.length - 1];
+    const latestGfsFile = gfsAvailable[gfsAvailable.length - 2];
 
     const filePath = await Data.downloadGfs(latestGfsFile.year, latestGfsFile.month, latestGfsFile.day, latestGfsFile.modelCycle, '000');
     console.log(filePath);
