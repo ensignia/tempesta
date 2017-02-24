@@ -11,7 +11,7 @@ const NAM_BASE_URL = 'https://nomads.ncdc.noaa.gov/data/meso-eta-hi/';
 const HRRR_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/';
 const GFS_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/';
 
-const DATA_DIRECTORY = './data';
+const DATA_DIRECTORY = '../data';
 
 const isWin = /^win/.test(os.platform());
 
