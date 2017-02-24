@@ -1,1 +1,28 @@
 @import '../variables.css';
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li {
+    float: left;
+    display: block;
+    text-align: center;
+    line-height: 48px;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li div{
+  position: relative;
+}
+
+li div span{
+  display: block;
+  /*position: absolute;*/
+}
+
+/*Add inner bottom shadow -Words from God*/

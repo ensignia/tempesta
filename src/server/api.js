@@ -10,7 +10,7 @@ const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
 const router = Router();
 
 const data = new Data();
-data.load();
+//data.load();
 
 router.get('/map/gfs/:z/:x/:y/tile.png', async (req, res) => {
   try {
