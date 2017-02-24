@@ -98,6 +98,55 @@ class Data {
     return await Data.download(url, output);
   }
 
+  static async getHrrrAvailable() {
+    try {
+      const response = await fetch(HRRR_BASE_URL);
+      const data = await response.text();
+
+      const hrrrDirRegex = /"hrrr\.(\d{4})(\d{2})(\d{2})\/"/g;
+
+      const result = [];
+      const dirResult = [];
+      let matches = hrrrDirRegex.exec(data);
+      while (matches) {
+        dirResult.push({
+          year: matches[1],
+          month: matches[2],
+          day: matches[3],
+        });
+        matches = hrrrDirRegex.exec(data);
+      }
+
+      dirResult.forEach(async (date) => {
+        const dayResponse = await fetch(`${HRRR_BASE_URL}hrrr.${date.year}${date.month}${date.day}`);
+        const dayData = await dayResponse.text();
+
+        const dayResultSet = new Set();
+        const hrrrDayRegex = /hrrr\.t(\d{2})z/;
+        let dayMatches = hrrrDayRegex.exec(dayData);
+        while (dayMatches) {
+          dayResultSet.add(dayMatches[1]);
+          dayMatches = hrrrDayRegex.exec(dayData);
+        }
+
+        dayResultSet.forEach((modelCycle) => {
+          result.push({
+            year: date.year,
+            month: date.month,
+            day: date.day,
+            modelCycle,
+          });
+        });
+      });
+
+      return result;
+    } catch (e) {
+      console.log(e);
+    }
+
+    return [];
+  }
+
   static async getGfsAvailable() {
     try {
       const response = await fetch(GFS_BASE_URL);
