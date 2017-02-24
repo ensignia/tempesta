@@ -37,6 +37,15 @@ function floorMod(a, n) {
   return a - (n * (Math.floor(a / n)));
 }
 
+function tile2long(x,z) {
+  return (((x / (2 ** z)) * 360) - 180);
+}
+
+function tile2lat(y,z) {
+  const n = Math.PI - (2 * Math.PI * (y / (2 ** z)));
+  return ((180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
+}
+
 class Data {
 
   constructor() {
@@ -212,6 +221,11 @@ class Data {
     if (!exists) {
       await new Promise((resolve, reject) => {
         console.log(`Generating tile ${tileX}/${tileY}/${tileZ}`);
+
+        const startLong = tile2long(tileX, tileZ);
+        const endLong = tile2long(tileX + 1, tileZ);
+        const startLat = tile2long(tileY, tileZ);
+        const endLat = tile2long(tileY + 1, tileZ);
 
         const image = pureimage.make(256, 256);
         const ctx = image.getContext('2d');
