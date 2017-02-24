@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './WeatherMap.css';
 import MapView from './MapView.js';
+import MapControls from './MapControls.js';
 
 class WeatherMap extends React.Component {
   static propTypes = {
@@ -15,6 +16,7 @@ class WeatherMap extends React.Component {
     return (
       <div className={s.weatherMap}>
         <MapView markers={markers} />
+        <MapControls />
       </div>
     );
   }
