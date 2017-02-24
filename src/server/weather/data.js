@@ -17,6 +17,7 @@ const isWin = /^win/.test(os.platform());
 
 function gribParser(filePath, options) {
   return new Promise((resolve, reject) => {
+    console.log(path.join(__dirname, `../lib/grib2json/bin/grib2json${isWin ? '.cmd' : ''}`));
     grib2json(filePath, {
       scriptPath: path.join(__dirname, `../lib/grib2json/bin/grib2json${isWin ? '.cmd' : ''}`),
       ...options,
@@ -33,6 +34,7 @@ function fsExists(file) {
   });
 }
 
+/** Returns the modulus of floor division a / n */
 function floorMod(a, n) {
   return a - (n * (Math.floor(a / n)));
 }
@@ -232,7 +234,7 @@ class Data {
 
         for (let yPixel = 0; yPixel < 256; yPixel += 1) {
           for (let xPixel = 0; xPixel < 256; xPixel += 1) {
-            const pixelData = data.getNearest((xPixel / 256) * 10, (yPixel / 256) * 10);
+            const pixelData = data.getNearest((xPixel / 256) * 360, (yPixel / 256) * 90);
             const val = 0x00222288 + (pixelData << 16); // eslint-disable-line no-bitwise
             ctx.compositePixel(xPixel, yPixel, val);
           }
