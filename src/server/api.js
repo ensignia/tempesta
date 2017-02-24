@@ -2,13 +2,17 @@
 import { Router } from 'express';
 import fs from 'fs';
 import Data from './weather/data.js';
+import fetch from '../app/core/fetch';
+import { api } from '../config.js';
 
-const api = Router();
+const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
+
+const router = Router();
 
 const data = new Data();
 data.load();
 
-api.get('/map/gfs/:z/:x/:y/tile.png', async (req, res) => {
+router.get('/map/gfs/:z/:x/:y/tile.png', async (req, res) => {
   try {
     const path = await data.getTile('gfs', 'cape', req.params.x, req.params.y, req.params.z);
 
@@ -23,4 +27,17 @@ api.get('/map/gfs/:z/:x/:y/tile.png', async (req, res) => {
   }
 });
 
-export default api;
+router.get('/weather/:latitude,:longitude', async (req, res) => {
+  try {
+    const response = await fetch(`${DARK_SKY_BASE_URL}${api.darksky}/${req.params.latitude},${req.params.longitude}?exclude=[minutely,hourly]`);
+    const json = await response.json();
+
+    res.status(200).json(json);
+  } catch (error) {
+    console.log(error);
+    // something went wrong
+    res.status(500).json({ error: 'Failed to get data' });
+  }
+})
+
+export default router;

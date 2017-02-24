@@ -13,6 +13,8 @@ export const api = {
   google: {
     maps: process.env.GOOGLE_MAPS_API_KEY,
   },
+
+  darksky: process.env.DARK_SKY_API_KEY,
 };
 
 export const auth = {
