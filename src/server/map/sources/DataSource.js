@@ -121,7 +121,7 @@ class DataSource {
       // check lat/lon is within coverage bounds
       if (grib2lat < originLatitude || grib2lat > gridLatitudeBound
         || grib2long < originLongitude || grib2long > gridLongitudeBound) {
-        return 0x000000FF;
+        return 0;
       }
 
       // convert grib2 lat/lon to grid indices
@@ -131,6 +131,50 @@ class DataSource {
       // return simple value
       return grid[y][x];
     }
+
+    // averages four surrounding data points
+    function simpleNeighborAverage(latitude, longitude) {
+      // translate server standard lat/lon to grib2 header coordinates
+      // see map/readme.md for rationale
+      // assumes grib2 uses coordinate system rooted at top-left (90,0)
+      // TODO move conversion to its own method
+      const grib2lat = (-latitude) + 180;
+      const grib2long = longitude + 180;
+
+      // check lat/lon is within coverage bounds
+      if (grib2lat < originLatitude || grib2lat > gridLatitudeBound
+        || grib2long < originLongitude || grib2long > gridLongitudeBound) {
+        return 0;
+      }
+
+      // convert grib2 lat/lon to grid indices
+      const yFloor = Math.floor((grib2lat - 90) * 2);
+      const xFloor = Math.floor((grib2long) * 2);
+      const yCeil = Math.ceil((grib2lat - 90) * 2);
+      const xCeil = Math.ceil((grib2long) * 2);
+
+      if (grid[yCeil] != null) {
+        return (grid[yFloor][xFloor] + grid[yFloor][xCeil]
+          + grid[yCeil][xFloor] + grid[yCeil][xCeil]) / 4;
+      }
+      return grid[yFloor][xFloor];
+    }
+
+    /* function bilinearInterpolation(latitude, longitude) {
+      // translate server standard lat/lon to grib2 header coordinates
+      // see map/readme.md for rationale
+      // assumes grib2 uses coordinate system rooted at top-left (90,0)
+      // TODO move conversion to its own method
+      const grib2lat = (-latitude) + 180;
+      const grib2long = longitude + 180;
+
+      // check lat/lon is within coverage bounds
+      if (grib2lat < originLatitude || grib2lat > gridLatitudeBound
+        || grib2long < originLongitude || grib2long > gridLongitudeBound) {
+        return 0x000000FF;
+      }
+      return 0;
+    } */
 
     return {
       header,
@@ -144,7 +188,9 @@ class DataSource {
       gridLongitudeBound,
       date,
       grid,
-      simpleDiscreteMapping };
+      simpleDiscreteMapping,
+      simpleNeighborAverage,
+    };
   }
 
   isLoaded() {

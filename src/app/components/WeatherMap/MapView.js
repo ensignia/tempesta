@@ -50,7 +50,7 @@ class MapView extends React.Component {
   };
 
   static defaultProps = {
-    zoom: 11,
+    zoom: 3,
     theme: MapView.Theme.LIGHT,
   };
 
@@ -79,7 +79,7 @@ class MapView extends React.Component {
         if (!normalizedCoord) {
           return null;
         }
-        return `/api/map/gfs/cape/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
+        return `/api/map/gfs/windshear/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
       },
       tileSize: new google.maps.Size(256, 256),
       maxZoom: 9,
