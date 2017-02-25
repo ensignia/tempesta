@@ -8,6 +8,12 @@ export const analytics = {
 
 };
 
+export const server = {
+
+  dataDirectory: '../data',
+
+};
+
 export const api = {
   // https://developers.google.com/maps/
   google: {

@@ -1,3 +1,13 @@
+/**
+
+DEPRECATED :D
+Move stuff to map/
+map/Data is entry point
+
+layers/CapeLayer now contains tile rendering for CAPE
+
+**/
+
 /* eslint-disable no-console */
 import grib2json from 'grib2json';
 import path from 'path';

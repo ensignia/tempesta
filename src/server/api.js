@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { Router } from 'express';
 import fs from 'fs';
-import Data from './weather/data.js';
+import Data from './map/Data.js';
 import fetch from '../app/core/fetch';
 import { api } from '../config.js';
 
@@ -10,16 +10,24 @@ const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
 const router = Router();
 
 const data = new Data();
-data.load();
 
-router.get('/map/gfs/:z/:x/:y/tile.png', async (req, res) => {
+router.get('/map/:dataSource/:layer/:z/:x/:y/tile.png', async (req, res) => {
   try {
-    const path = await data.getTile('gfs', 'cape', parseInt(req.params.x, 10), parseInt(req.params.y, 10), parseInt(req.params.z, 10));
+    const path = await data.getTile(
+      req.params.dataSource.toLowerCase(),
+      req.params.layer.toLowerCase(),
+      parseInt(req.params.x, 10),
+      parseInt(req.params.y, 10),
+      parseInt(req.params.z, 10));
 
-    res.writeHead(200, {
-      'Content-Type': 'image/png',
-    });
-    fs.createReadStream(path).pipe(res);
+    if (path != null) {
+      res.writeHead(200, {
+        'Content-Type': 'image/png',
+      });
+      fs.createReadStream(path).pipe(res);
+    } else {
+      res.status(500).end();
+    }
   } catch (error) {
     console.log(error);
     // something went wrong
