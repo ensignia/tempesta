@@ -1,8 +1,13 @@
 import path from 'path';
 import DataSource from './DataSource.js';
+import fetch from '../../../app/core/fetch';
 import { server } from '../../../config.js';
 
 const HRRR_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/';
+
+function padLeft(number, zeroes, str) {
+  return Array((zeroes - String(number).length) + 1).join(str || '0') + number;
+}
 
 class HrrrDataSource extends DataSource {
 
@@ -19,7 +24,7 @@ class HrrrDataSource extends DataSource {
    */
    // Data available http://www.nco.ncep.noaa.gov/pmb/products/hrrr/hrrr.t00z.wrfsfcf00.grib2.shtml
   static getURL(year, month, day, modelCycle, forecastHour) {
-    return `${HRRR_BASE_URL}hrrr.${year}${month}${day}/hrrr.t${modelCycle}z.wrfsfcf${forecastHour}.grib2`;
+    return `${HRRR_BASE_URL}hrrr.${padLeft(year, 4)}${padLeft(month, 2)}${padLeft(day, 2)}/hrrr.t${padLeft(modelCycle, 2)}z.wrfsfcf${padLeft(forecastHour, 2)}.grib2`;
   }
 
   static async download(year, month, day, modelCycle, forecastHour) {
@@ -48,12 +53,12 @@ class HrrrDataSource extends DataSource {
         matches = hrrrDirRegex.exec(data);
       }
 
-      dirResult.forEach(async (date) => {
+      for (const date of dirResult) {
         const dayResponse = await fetch(`${HRRR_BASE_URL}hrrr.${date.year}${date.month}${date.day}`);
         const dayData = await dayResponse.text();
 
         const dayResultSet = new Set();
-        const hrrrDayRegex = /hrrr\.t(\d{2})z/;
+        const hrrrDayRegex = /"hrrr\.t(\d{2})z/g;
         let dayMatches = hrrrDayRegex.exec(dayData);
         while (dayMatches) {
           dayResultSet.add(dayMatches[1]);
@@ -62,13 +67,13 @@ class HrrrDataSource extends DataSource {
 
         dayResultSet.forEach((modelCycle) => {
           result.push({
-            year: date.year,
-            month: date.month,
-            day: date.day,
-            modelCycle,
+            year: parseInt(date.year, 10),
+            month: parseInt(date.month, 10),
+            day: parseInt(date.day, 10),
+            modelCycle: parseInt(modelCycle, 10),
           });
         });
-      });
+      }
 
       return result;
     } catch (e) {
@@ -79,12 +84,15 @@ class HrrrDataSource extends DataSource {
   }
 
   async load() {
+    console.log('Loading HRRR Data');
+
     const available = await HrrrDataSource.getAvailable();
 
     // Use latest data
     const latest = available[available.length - 1];
-    for (let hour = 0; hour < 190; hour += 3) {
-      // TODO: leftpad nums
+
+    for (let hour = 0; hour < 3; hour += 3) {
+      console.log(`Loading HRRR data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${hour}`);
       const filePath = await HrrrDataSource.download(
         latest.year,
         latest.month,
@@ -99,9 +107,12 @@ class HrrrDataSource extends DataSource {
         //surfaceValue: 10, // Grib2 surface value, equals to --fv 10
       });
 
-      this.data[hour] = data[0];
+      this.data[hour] = {
+        cape: data[0],
+      };
     }
 
+    console.log('Loaded HRRR Data');
     this.loaded = true;
   }
 
