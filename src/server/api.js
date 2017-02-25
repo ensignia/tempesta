@@ -38,9 +38,9 @@ router.get('/map/:dataSource/:layer/:z/:x/:y/tile.png', async (req, res) => {
 router.get('/weather/:latitude,:longitude', async (req, res) => {
   try {
     const response = await fetch(`${DARK_SKY_BASE_URL}${api.darksky}/${req.params.latitude},${req.params.longitude}?exclude=[minutely,hourly]`);
-    const json = await response.json();
 
-    res.status(200).json(json);
+    res.status(200);
+    response.body.pipe(res);
   } catch (error) {
     console.log(error);
     // something went wrong

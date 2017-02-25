@@ -1,8 +1,9 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './WeatherOverview.css';
-import cx from 'classnames';
 import fetch from '../../core/fetch';
+
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 class WeatherOverview extends React.Component {
   static propTypes = {
@@ -13,7 +14,7 @@ class WeatherOverview extends React.Component {
     super();
 
     this.state = {
-      data: [],
+      daily: [],
     };
 
     this.getData = this.getData.bind(this);
@@ -24,40 +25,31 @@ class WeatherOverview extends React.Component {
     this.getData();
   }
 
-  getData() {
-    const data = [{name: "Monday", icon: "2"}, {name: "Tuesday", icon: "8" }, {name: "Wednesday", icon: "15" }, {name: "Thursday", icon: "18" }, {name: "Friday", icon: "19" }];
-    this.setState({ data: data });
+  async getData() {
+    const response = await fetch('/api/weather/0.5,0.5');
+    const json = await response.json();
 
-    // fetch("/api/weather/0.5,0.5").then(function(data) {
-    //   console.log(data);
-    // }).error(function(err) {
-    //
-    // });
+    this.setState({ daily: json.daily.data });
   }
 
   render() {
-    const date = new Date();
-    const today = date.getDay();
-
     const days = [];
-    this.state.data.forEach(function(day) {
-      days.push(<li><div className={s.icon}><img src={`/WeatherIcons/${day.icon}.svg`} width="38" height="38" alt="SunnyDemo" /><span>{day.name}</span></div></li>);
-    })
+    this.state.daily.forEach((day) => {
+      // day is a darksky data point object, look here for details https://darksky.net/dev/docs/response#data-point
+      const dayName = dayNames[new Date(day.time * 1000).getDay()];
+      const dayIconName = day.icon;
+
+      days.push(<li><div key={day.time} className={dayIconName}><img src={`/WeatherIcons/${day.icon}.svg`} width="38" height="38" alt="lol" /><span>{dayName}</span></div></li>);
+    });
 
     return (
-            <div role="overview">
-              <ul>
-                {days}
-              </ul>
-            </div>
-        );
+      <div>
+        <ul>
+          {days}
+        </ul>
+      </div>
+    );
   }
 }
-
-// <li><div><img src={"/WeatherIcons/8.svg"} width="38" height="38" alt="CloudyDemo" /></div></li>
-// <li><div><img src={"/WeatherIcons/15.svg"} width="38" height="38" alt="LightDemo" /></div></li>
-// <li><div><img src={"/WeatherIcons/18.svg"} width="38" height="38" alt="RainDemo" /></div></li>
-// <li><div><img src={"/WeatherIcons/19.svg"} width="38" height="38" alt="WindDemo" /></div></li>
-// <li><div><img src={"/WeatherIcons/23.svg"} width="38" height="38" alt="SnowDemo" /></div></li>
 
 export default withStyles(s)(WeatherOverview);
