@@ -78,15 +78,31 @@ class GfsDataSource extends DataSource {
         latest.modelCycle,
         hour);
 
-      const data = await DataSource.parseGribFile(filePath, {
+      const capeData = await DataSource.parseGribFile(filePath, {
         category: 7, // Grib2 category number, equals to --fc 1
         parameter: 6, // Grib2 parameter number, equals to --fp 7
         surfaceType: 1, // Grib2 surface type, equals to --fs 103
         //surfaceValue: 10, // Grib2 surface value, equals to --fv 10
       });
 
+      const windUData = await DataSource.parseGribFile(filePath, {
+        category: 2, // Grib2 category number, equals to --fc 1
+        parameter: 2, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
+        surfaceType: 100, // Isobar surface
+        surfaceValue: 100000,
+      });
+
+      const windVData = await DataSource.parseGribFile(filePath, {
+        category: 2, // Grib2 category number, equals to --fc 1
+        parameter: 3, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
+        surfaceType: 100, // Isobar surface
+        surfaceValue: 100000,
+      });
+
       this.data[hour] = {
-        cape: data[0],
+        cape: capeData[0],
+        windU: windUData[0],
+        windV: windVData[0],
       };
     }
 
