@@ -203,7 +203,10 @@ class Data {
     return null;
   }
 
-  /** Parses JSON into into a 2D array of data points */
+  /** Parses JSON for single weather metric into an object encapsulating
+  all available data for that metric. The returned object consists of a 2D
+  grid of data points, headers, lat/lon details, and functions for obtaining
+  values for given coordinates. */
   static parseData(JSONdata) {
     const header = JSONdata.header;
     const originX = header.lo1; // the grid's origin (e.g., 0.0E, 90.0N)
@@ -228,7 +231,8 @@ class Data {
       grid[y] = row;
     }
 
-    function bilinearInterpolation(pixelLon, pixelLat) {
+    // pixel gets the value of the data square it is inside of
+    function simpleDiscreteMapping(pixelLat, pixelLon) {
       // translate longitude and latitude into 360x720 CAPE grid
       const x = Math.floor((pixelLon + 180) * 2);
       const y = Math.floor((-pixelLat + 90) * 2);
@@ -247,7 +251,7 @@ class Data {
       numY,
       date,
       grid,
-      bilinearInterpolation };
+      simpleDiscreteMapping };
   }
 
   async load() {
@@ -298,7 +302,7 @@ class Data {
     if (!this[dataSource]) throw new Error('Data source not yet loaded');
 
     // get pointer to correct data grid
-    const data = this[dataSource][layer];
+    const dataArray = this[dataSource][layer];
     const tilePath = path.join(__dirname, DATA_DIRECTORY, `tiles/gfs-${tileX}-${tileY}-${tileZ}.png`);
 
     // if tile not exists, generate
@@ -328,7 +332,7 @@ class Data {
             const pixelLatitude = topLatitude - (angularPixelHeight * yPixel);
             const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
-            const pixelData = data.bilinearInterpolation(pixelLongitude, pixelLatitude);
+            const pixelData = dataArray.simpleDiscreteMapping(pixelLongitude, pixelLatitude);
             const val = 0x00000088 + (pixelData * (2 ** 24)); // eslint-disable-line no-
             ctx.compositePixel(xPixel, yPixel, val);
           }
