@@ -38,6 +38,6 @@ router.get('/weather/:latitude,:longitude', async (req, res) => {
     // something went wrong
     res.status(500).json({ error: 'Failed to get data' });
   }
-})
+});
 
 export default router;

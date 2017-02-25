@@ -7,6 +7,7 @@ import os from 'os';
 import pureimage from 'pureimage';
 import fetch from '../../app/core/fetch';
 
+
 const NAM_BASE_URL = 'https://nomads.ncdc.noaa.gov/data/meso-eta-hi/';
 const HRRR_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/';
 const GFS_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/';
@@ -35,11 +36,6 @@ function fsExists(file) {
   });
 }
 
-/** Returns the modulus of floor division a / n */
-function floorMod(a, n) {
-  return a - (n * (Math.floor(a / n)));
-}
-
 /** Converts a google maps tile number to the longitude value
 of its upper left corner */
 function tile2long(x, z) {
@@ -53,8 +49,8 @@ function tile2lat(y, z) {
   return ((180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
 }
 
-class Data {
 
+class Data {
   constructor() {
     this.data = {};
   }
@@ -197,9 +193,9 @@ class Data {
     return null;
   }
 
-  /** Parses a block of data into a 2D array of data points */
-  static parseData(data) {
-    const header = data.header;
+  /** Parses JSON into into a 2D array of data points */
+  static parseData(JSONdata) {
+    const header = JSONdata.header;
     const originX = header.lo1; // the grid's origin (e.g., 0.0E, 90.0N)
     const originY = header.la1;
     const deltaX = header.dx; // distance between grid points (e.g., 2.5 deg lon, 2.5 deg lat)
@@ -217,43 +213,59 @@ class Data {
     for (let y = 0; y < numY; y += 1) {
       const row = [];
       for (let x = 0; x < numX; x += 1, index += 1) {
-        row[x] = data.data[index];
+        row[x] = JSONdata.data[index];
       }
       grid[y] = row;
     }
 
-    function getNearest(lon, lat) {
-      // calculate longitude index in wrapped range [0, 360]
-      const x = floorMod(lon - originX, 360) / deltaX;
-      // calculate latitude index in direction +90 to -90
-      const y = (originY - lat) / deltaY;
+    function bilinearInterpolation(pixelLon, pixelLat) {
+      // translate longitude and latitude into 360x720 CAPE grid
+      const x = Math.floor((pixelLon + 180) * 2);
+      const y = Math.floor((-pixelLat + 90) * 2);
 
-      // TODO: Add bilinear interpolation instead of nearest?
-      return grid[y] ? grid[y][x] : null;
+      let returnValue = Math.floor((((grid[y][x] + grid[y + 1][x + 1]) / 2) / 2000) * 256);
+      if (returnValue > 256) returnValue = 256;
+      return returnValue;
     }
 
-    return { header, originX, originY, deltaX, deltaY, numX, numY, date, grid, getNearest };
+    return { header,
+      originX,
+      originY,
+      deltaX,
+      deltaY,
+      numX,
+      numY,
+      date,
+      grid,
+      bilinearInterpolation };
   }
 
   async load() {
     const fnt = pureimage.registerFont('public/server/SourceSansPro-Regular.ttf', 'Source Sans Pro');
     fnt.loadSync();
 
+    // make data directory if not exists
     const dataDir = path.join(__dirname, DATA_DIRECTORY);
     let exists = await fsExists(dataDir);
     if (!exists) fs.mkdirSync(dataDir);
 
+    // make grib directory if not exists
     exists = await fsExists(path.join(dataDir, 'grib'));
     if (!exists) fs.mkdirSync(path.join(dataDir, 'grib'));
 
+    // make tiles directory if not exists
     exists = await fsExists(path.join(dataDir, 'tiles'));
     if (!exists) fs.mkdirSync(path.join(dataDir, 'tiles'));
 
+    // check for latest available gfs grib2 file
     const gfsAvailable = await Data.getGfsAvailable();
     const latestGfsFile = gfsAvailable[gfsAvailable.length - 2];
 
+    // download newest grib file if not downloaded already
     const filePath = await Data.downloadGfs(latestGfsFile.year, latestGfsFile.month, latestGfsFile.day, latestGfsFile.modelCycle, '000');
     console.log(filePath);
+
+    // parse grib file into JSON with given options
     const result = await gribParser(filePath, {
       names: true, // (default false): Return descriptive names too
       data: true, // (default false): Return data, not just headers
@@ -263,7 +275,8 @@ class Data {
       //surfaceValue: 10, // Grib2 surface value, equals to --fv 10
     });
 
-    // Ground level CAPE
+    // ground level CAPE
+    // parse JSON returned by gribParser into 2d array
     this.gfs = {
       cape: Data.parseData(result[0]),
     };
@@ -274,28 +287,39 @@ class Data {
     // images need alpha component
     if (!this[dataSource]) throw new Error('Data source not yet loaded');
 
+    // get pointer to correct data grid
     const data = this[dataSource][layer];
     const tilePath = path.join(__dirname, DATA_DIRECTORY, `tiles/gfs-${tileX}-${tileY}-${tileZ}.png`);
 
+    // if tile not exists, generate
     const exists = await fsExists(tilePath);
     if (!exists) {
       await new Promise((resolve, reject) => {
         console.log(`Generating tile ${tileX}/${tileY}/${tileZ}`);
 
-        const startLong = tile2long(tileX, tileZ);
-        const endLong = tile2long(tileX + 1, tileZ);
-        const startLat = tile2lat(tileY, tileZ);
-        const endLat = tile2lat(tileY + 1, tileZ);
+        // longitude and latitude of upper-left, bottom-right tile corners
+        // latitude: NORTH-SOUTH, y coordinate
+        // longitude: WEST-EAST, x coordinate
+        const leftLongitude = tile2long(tileX, tileZ);
+        const rightLongitude = tile2long(tileX + 1, tileZ);
+        const topLatitude = tile2lat(tileY, tileZ);
+        const bottomLatitude = tile2lat(tileY + 1, tileZ);
 
-        console.log(startLong + endLong + startLat + endLat);
+        const angularTileWidth = Math.abs(rightLongitude - leftLongitude);
+        const angularTileHeight = Math.abs(topLatitude - bottomLatitude);
+        const angularPixelWidth = angularTileWidth / 256;
+        const angularPixelHeight = angularTileHeight / 256;
 
         const image = pureimage.make(256, 256);
         const ctx = image.getContext('2d');
 
         for (let yPixel = 0; yPixel < 256; yPixel += 1) {
           for (let xPixel = 0; xPixel < 256; xPixel += 1) {
-            const pixelData = data.getNearest((xPixel / 256) * 360, (yPixel / 256) * 90);
-            const val = 0x00222288 + (pixelData << 16); // eslint-disable-line no-bitwise
+            const pixelLatitude = topLatitude - (angularPixelHeight * yPixel);
+            const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
+
+            const pixelData = data.bilinearInterpolation(pixelLongitude, pixelLatitude);
+            const val = 0x00000088 + (pixelData * (2 ** 24)); // eslint-disable-line no-
             ctx.compositePixel(xPixel, yPixel, val);
           }
         }
