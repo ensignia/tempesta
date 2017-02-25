@@ -79,8 +79,7 @@ class MapView extends React.Component {
         if (!normalizedCoord) {
           return null;
         }
-        const bound = 2 ** zoom;
-        return `/api/map/gfs/cape/${zoom}/${normalizedCoord.x}/${bound - normalizedCoord.y - 1}/tile.png`;
+        return `/api/map/gfs/cape/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
       },
       tileSize: new google.maps.Size(256, 256),
       maxZoom: 9,

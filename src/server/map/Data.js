@@ -3,6 +3,7 @@ import pureimage from 'pureimage';
 import path from 'path';
 import fs from 'fs';
 import CapeLayer from './layers/CapeLayer.js';
+import WindShearLayer from './layers/WindShearLayer.js';
 import GfsDataSource from './sources/GfsDataSource.js';
 // import HrrrDataSource from './sources/HrrrDataSource.js';
 // import NamDataSource from './sources/NamDataSource.js';
@@ -48,6 +49,7 @@ class Data {
     });
 
     this.registerLayer('cape', new CapeLayer());
+    this.registerLayer('windshear', new WindShearLayer());
     this.registerDataSource('gfs', new GfsDataSource());
     // this.registerDataSource('hrrr', new HrrrDataSource());
     // this.registerDataSource('nam', new NamDataSource());

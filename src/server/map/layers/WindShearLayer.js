@@ -6,11 +6,11 @@ import Layer from './Layer.js';
 class CapeLayer extends Layer {
 
   async isSupportedSource(dataSourceName) {
-    return dataSourceName === 'gfs' || dataSourceName === 'hrrr';
+    return dataSourceName === 'gfs';
   }
 
   async getTile(outputPath, dataSource, tileX, tileY, tileZ) {
-    console.log(`Generating CAPE tile for ${tileX}/${tileY}/${tileZ}`);
+    console.log(`Generating Wind Shear tile for ${tileX}/${tileY}/${tileZ}`);
 
     const data = dataSource.getData('cape', 0);
 
@@ -36,14 +36,10 @@ class CapeLayer extends Layer {
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
         const pixelData = data.bilinearInterpolation(pixelLongitude, pixelLatitude);
-        const val = 0x00000088 + (pixelData * (2 ** 24)); // eslint-disable-line no-
+        const val = 0x00000088 + (pixelData << 8); // eslint-disable-line
         ctx.compositePixel(xPixel, yPixel, val);
       }
     }
-
-    ctx.fillStyle = 'rgba(200, 200, 200, 1)';
-    ctx.setFont('Source Sans Pro', 20);
-    ctx.fillText(`Tile ${tileX}/${tileY}/${tileZ}`, 10, 50);
 
     return await new Promise(resolve => {
       pureimage.encodePNG(image, fs.createWriteStream(outputPath), err => resolve(!err));
