@@ -7,11 +7,6 @@ import fetch from '../../../app/core/fetch';
 
 const isWin = /^win/.test(os.platform());
 
-/** Returns the modulus of floor division a / n */
-function floorMod(a, n) {
-  return a - (n * (Math.floor(a / n)));
-}
-
 /** Returns JSON representation of grib2 file from grib2json library */
 async function gribParser(filePath, options) {
   return await new Promise((resolve, reject) => {
@@ -77,49 +72,79 @@ class DataSource {
   /** HELPER: Parses a block of grib2 data into a 2D array of data points */
   static parseGribData(data) {
     const header = data.header;
-    const originX = header.lo1; // the grid's origin (e.g., 0.0E, 90.0N)
-    const originY = header.la1;
-    const deltaX = header.dx; // distance between grid points (e.g., 2.5 deg lon, 2.5 deg lat)
-    const deltaY = header.dy;
-    const numX = header.nx; // number of grid points W-E and N-S (e.g., 144 x 73)
-    const numY = header.ny;
+    // the grid's origin (e.g., 0.0E, 90.0N)
+    const originLatitude = header.la1;
+    const originLongitude = header.lo1;
+    // angular resolution of grid, i.e. angular deltaY and deltaX between grid points
+    const angularGridResY = header.dy;
+    const angularGridResX = header.dx;
+    // number of grid points N-S and W-E (e.g., 144 x 73)
+    const gridHeightNum = header.ny;
+    const gridWidthNum = header.nx;
+    // bottom and right bounds of data
+    const gridLatitudeBound = originLatitude + Math.floor(gridHeightNum * angularGridResY);
+    const gridLongitudeBound = originLongitude + Math.floor(gridWidthNum * angularGridResX);
+
+    // console.log('Grid origin: ' + originLatitude + ', ' + originLongitude);
+    // console.log('Angular grid resolution ' + angularGridResY + ', ' + angularGridResX);
+    // console.log('Grid size ' + gridHeightNum + ', ' + gridWidthNum);
+    // console.log('Grid bound: ' + gridLatitudeBound + ', ' + gridLongitudeBound);
 
     const date = new Date(header.refTime);
     date.setHours(date.getHours() + header.forecastTime);
 
-    // Scan mode 0 assumed. Longitude increases from originX, and latitude decreases from originY
+    // TODO if the bounds are wrong, the scan mode might not be 000
+    // Scan mode 000 assumed. Longitude increases from originLongitude and latitude
+    // decreases from originLatitude. This implies origin at top left corner of
+    // coverage area. Values stored in row order.
     // http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table3-4.shtml
     const grid = [];
     let index = 0;
-    for (let y = 0; y < numY; y += 1) {
+    for (let y = 0; y < gridHeightNum; y += 1) {
       const row = [];
-      for (let x = 0; x < numX; x += 1, index += 1) {
+      for (let x = 0; x < gridWidthNum; x += 1, index += 1) {
         row[x] = data.data[index];
       }
       grid[y] = row;
     }
 
-    function bilinearInterpolation(pixelLon, pixelLat) {
-      // translate longitude and latitude into 360x720 CAPE grid
-      const x = Math.floor((pixelLon + 180) * 2);
-      const y = Math.floor((-pixelLat + 90) * 2);
+    // latitude between 90(N) and -90(S), longitude between -180(W) and 180(E)
+    // grid origin assumed at google(0,0) i.e. lat,long(90,-180)
+    function simpleDiscreteMapping(latitude, longitude) {
+      // translate server standard lat/lon to grib2 header coordinates
+      // see map/readme.md for rationale
+      // assumes grib2 uses coordinate system rooted at top-left (90,0)
+      // TODO move conversion to its own method
+      const grib2lat = (-latitude) + 180;
+      const grib2long = longitude + 180;
 
-      let returnValue = Math.floor((((grid[y][x] + grid[y + 1][x + 1]) / 2) / 2000) * 256);
-      if (returnValue > 256) returnValue = 256;
-      return returnValue;
+      // check lat/lon is within coverage bounds
+      if (grib2lat < originLatitude || grib2lat > gridLatitudeBound
+        || grib2long < originLongitude || grib2long > gridLongitudeBound) {
+        return 0x000000FF;
+      }
+
+      // convert grib2 lat/lon to grid indices
+      const y = Math.floor((grib2lat - 90) * 2);
+      const x = Math.floor((grib2long) * 2);
+
+      // return simple value
+      return grid[y][x];
     }
 
     return {
       header,
-      originX,
-      originY,
-      deltaX,
-      deltaY,
-      numX,
-      numY,
+      originLatitude,
+      originLongitude,
+      angularGridResY,
+      angularGridResX,
+      gridHeightNum,
+      gridWidthNum,
+      gridLatitudeBound,
+      gridLongitudeBound,
       date,
       grid,
-      bilinearInterpolation };
+      simpleDiscreteMapping };
   }
 
   isLoaded() {

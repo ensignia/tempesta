@@ -20,6 +20,8 @@ const DATA_DIR = path.join(__dirname, server.dataDirectory);
 const TILES_DIR = path.join(DATA_DIR, 'tiles');
 const GRIB_DIR = path.join(DATA_DIR, 'grib');
 
+/** Data objects track available data sources and data layers. Tile data
+requests are passed on to the appropriate Layer object. */
 class Data {
   constructor() {
     this.registerLayer = this.registerLayer.bind(this);
@@ -65,6 +67,7 @@ class Data {
     this.sources[dataSourceName] = dataSource;
   }
 
+  /** Passes the tile data request on to the correct Layer */
   async getTile(dataSourceName, layerName, tileX, tileY, tileZ) {
     const tilePath = path.join(__dirname, server.dataDirectory, `tiles/${dataSourceName}-${layerName}-${tileX}-${tileY}-${tileZ}.png`);
     const exists = await fsExists(tilePath);
@@ -83,6 +86,7 @@ class Data {
         return null;
       }
 
+      // call data layer, providing output path and correct data source
       await layer.getTile(tilePath, dataSource, tileX, tileY, tileZ);
     }
 

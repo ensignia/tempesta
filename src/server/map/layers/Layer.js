@@ -1,4 +1,10 @@
+import Colorer from '../rendering/Colorer.js';
+
 class Layer {
+
+  constructor() {
+    this.colorer = new Colorer();
+  }
 
   /** Converts a google maps tile number to the longitude value
   of its upper left corner */
