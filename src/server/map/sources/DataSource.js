@@ -175,15 +175,30 @@ class DataSource {
       }
 
       // precise lat/long in grid scale
+      // TODO this works for a 360x720 grid
       const y = (grib2lat - 90) * 2;
       const x = grib2long * 2;
 
-      // enclosing data points in grid scale lat/long (note y1 is north, )
+      // enclosing data points in grid scale lat/long (note y1 is north )
       const y1 = Math.floor(y);
       const y0 = Math.ceil(y);
       const x0 = Math.floor(x);
       const x1 = Math.ceil(x);
 
+      /* eslint-disable brace-style */ // fak u Ryan :)
+      // no interpolation
+      if (Number.isInteger(y) && Number.isInteger(x)) {
+        return grid[y][x];
+      }
+      // linear interpolation west -> east
+      else if (Number.isInteger(y)) {
+        return grid[y0][x0] + ((x - x0) * ((grid[y0][x1] - grid[y0][x0]) / (x1 - x0)));
+      }
+      // linear interpolation south -> north
+      else if (Number.isInteger(x)) {
+        return grid[y0][x0] + ((y - y0) * ((grid[y1][x0] - grid[y0][x0]) / (y1 - y0)));
+      }
+      // bilinear interpolation west -> east, south -> north
       const y1x = grid[y1][x0] + ((x - x0) * ((grid[y1][x1] - grid[y1][x0]) / (x1 - x0)));
       const y0x = grid[y0][x0] + ((x - x0) * ((grid[y0][x1] - grid[y0][x0]) / (x1 - x0)));
       const yx = y0x + ((y - y0) * ((y1x - y0x) / (y1 - y0)));

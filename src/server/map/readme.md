@@ -67,3 +67,12 @@
     index format. *This smooths out the data at any level of zoom. It's important
     to understand that at high levels of zoom, the data is ESTIMATED based on
     certain assumptions*.
+
+### WEATHER INDICATORS
+1. **Storm prediction center**
+  1. *convective outlooks*: http://www.spc.noaa.gov/products/outlook/
+  2. *convective watches*: http://www.spc.noaa.gov/products/watch/
+  3. *mesoscale discussions*: http://www.spc.noaa.gov/products/md/
+2. **Global Forecast System**
+3. **HRRR**
+4 **NAM**?
