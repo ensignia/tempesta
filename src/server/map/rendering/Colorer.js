@@ -1,19 +1,19 @@
 class Colorer {
 
   render(dataValue, normalizationRange, scaleBottom, scaleTop, isContinuous, opacity) {
-    const normValue = dataValue > normalizationRange
-                  ? 1 : dataValue / normalizationRange;
+    /* eslint-disable no-bitwise */
 
-    if (isContinuous === true) {
-      const opacityCoefficient = 0.3 + (0.7 * normValue);
+    const normValue = dataValue > normalizationRange ? 1 : dataValue / normalizationRange;
+    const opacityCoefficient = isContinuous ? 0.3 + (0.7 * normValue) : 0.7;
 
-      return ((scaleTop * normValue) & scaleTop) // eslint-disable-line no-bitwise
-            + ((scaleBottom * (1 - normValue)) & scaleBottom) // eslint-disable-line no-bitwise
-            + (opacity * opacityCoefficient);
-    }
-    return (scaleTop * Math.ceil(normValue))
-            + (scaleBottom * Math.ceil(1 - normValue))
-            + (opacity * normValue);
+    return isContinuous ?
+          ((scaleTop * normValue) & scaleTop)
+          + ((scaleBottom * (1 - normValue)) & scaleBottom)
+          + (opacity * opacityCoefficient)
+          :
+          (scaleTop * Math.ceil(normValue))
+          + (scaleBottom * Math.ceil(1 - normValue))
+          + (opacity * normValue);
   }
 }
 
