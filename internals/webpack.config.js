@@ -79,7 +79,7 @@ const config = {
         },
       },
       {
-        test: /\.css/,
+        test: /\.css$/,
         loaders: [
           'isomorphic-style-loader',
           `css-loader?${JSON.stringify({
@@ -156,8 +156,8 @@ const config = {
     return {
       default: [
         // Transfer @import rule by inlining content, e.g. @import 'normalize.css'
-        // https://github.com/jonathantneal/postcss-partial-import
-        require('postcss-partial-import')({ addDependencyTo: bundler }),
+        // https://github.com/postcss/postcss-import
+        require('postcss-import')(),
         // Allow you to fix url() according to postcss to and/or from options
         // https://github.com/postcss/postcss-url
         require('postcss-url')(),
@@ -176,6 +176,9 @@ const config = {
         // W3C calc() function, e.g. div { height: calc(100px - 2em); }
         // https://github.com/postcss/postcss-calc
         require('postcss-calc')(),
+        // Allows @extend
+        // https://github.com/travcopostcss-extend
+        require('postcss-extend')(),
         // Allows you to nest one style rule inside another
         // https://github.com/jonathantneal/postcss-nesting
         require('postcss-nesting')(),

@@ -12,9 +12,9 @@ class Layout extends React.Component {
 
   render() {
     return (
-      <div className={cx(s['mdl-layout'])}>
+      <div className={cx(s.page, s.container)}>
         <Header />
-        <main className={cx(s['mdl-layout__content'], s.content)}>
+        <main className={cx(s.content, s.container)}>
           {this.props.children}
         </main>
       </div>

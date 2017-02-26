@@ -6,17 +6,9 @@
   --font-family-base: 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
 
   /*
-   * Layout
+   * Colors
    * ======================================================================== */
-
-  --max-content-width: 1000px;
-
-  /*
-   * Media queries breakpoints
-   * ======================================================================== */
-
-  --screen-xs-min: 480px;  /* Extra small screen / phone */
-  --screen-sm-min: 768px;  /* Small screen / tablet */
-  --screen-md-min: 992px;  /* Medium screen / desktop */
-  --screen-lg-min: 1200px; /* Large screen / wide desktop */
+   --header-color: #F2F2F2;
+   --text-color: #212121;
+   --text-light-color: #212121;
 }

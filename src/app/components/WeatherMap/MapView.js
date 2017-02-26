@@ -42,6 +42,7 @@ class MapView extends React.Component {
     zoom: PropTypes.number,
     theme: PropTypes.array,
     markers: PropTypes.array,
+    className: PropTypes.string,
   };
 
   static Theme = {
@@ -126,17 +127,19 @@ class MapView extends React.Component {
     });
 
     return (
-      <GoogleMapReact
-        bootstrapURLKeys={keys}
-        defaultZoom={this.props.zoom}
-        defaultCenter={DEFAULT_CENTER}
-        center={this.state.center}
-        options={this.createMapOptions}
-        yesIWantToUseGoogleMapApiInternals
-        onGoogleApiLoaded={this.onGoogleApiLoaded}
-      >
-        {markers}
-      </GoogleMapReact>
+      <div className={this.props.className}>
+        <GoogleMapReact
+          bootstrapURLKeys={keys}
+          defaultZoom={this.props.zoom}
+          defaultCenter={DEFAULT_CENTER}
+          center={this.state.center}
+          options={this.createMapOptions}
+          yesIWantToUseGoogleMapApiInternals
+          onGoogleApiLoaded={this.onGoogleApiLoaded}
+        >
+          {markers}
+        </GoogleMapReact>
+      </div>
     );
   }
 }

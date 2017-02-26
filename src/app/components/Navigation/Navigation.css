@@ -1,5 +1,5 @@
-.root {
-  margin: 0;
+.navigation {
+  height: 48px;
 }
 
 .link {
@@ -12,25 +12,9 @@
 .link,
 .link:active,
 .link:visited {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(22, 22, 22, 0.6);
 }
 
 .link:hover {
-  color: rgba(255, 255, 255, 1);
-}
-
-.highlight {
-  margin-right: 8px;
-  margin-left: 8px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.15);
-  color: #fff;
-}
-
-.highlight:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.spacer {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(22, 22, 22, 1);
 }

@@ -43,7 +43,7 @@ class WeatherOverview extends React.Component {
     });
 
     return (
-      <div>
+      <div className={s.weatherOverview}>
         <ul>
           {days}
         </ul>

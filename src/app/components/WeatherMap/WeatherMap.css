@@ -1,5 +1,9 @@
-.weatherMap {
-  background-color: #1d2c4d;
-  height: 100%;
-  width: 100%;
+@import '../global.css';
+
+.mapView div {
+  @extend .content;
+}
+
+.mapControls {
+  height: 48px;
 }
