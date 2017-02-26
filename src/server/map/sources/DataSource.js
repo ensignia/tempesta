@@ -160,7 +160,7 @@ class DataSource {
       return grid[yFloor][xFloor];
     }
 
-    /* function bilinearInterpolation(latitude, longitude) {
+    function bilinearInterpolation(latitude, longitude) {
       // translate server standard lat/lon to grib2 header coordinates
       // see map/readme.md for rationale
       // assumes grib2 uses coordinate system rooted at top-left (90,0)
@@ -171,10 +171,25 @@ class DataSource {
       // check lat/lon is within coverage bounds
       if (grib2lat < originLatitude || grib2lat > gridLatitudeBound
         || grib2long < originLongitude || grib2long > gridLongitudeBound) {
-        return 0x000000FF;
+        return 0;
       }
-      return 0;
-    } */
+
+      // precise lat/long in grid scale
+      const y = (grib2lat - 90) * 2;
+      const x = grib2long * 2;
+
+      // enclosing data points in grid scale lat/long (note y1 is north, )
+      const y1 = Math.floor(y);
+      const y0 = Math.ceil(y);
+      const x0 = Math.floor(x);
+      const x1 = Math.ceil(x);
+
+      const y1x = grid[y1][x0] + ((x - x0) * ((grid[y1][x1] - grid[y1][x0]) / (x1 - x0)));
+      const y0x = grid[y0][x0] + ((x - x0) * ((grid[y0][x1] - grid[y0][x0]) / (x1 - x0)));
+      const yx = y0x + ((y - y0) * ((y1x - y0x) / (y1 - y0)));
+
+      return yx;
+    }
 
     return {
       header,
@@ -190,6 +205,7 @@ class DataSource {
       grid,
       simpleDiscreteMapping,
       simpleNeighborAverage,
+      bilinearInterpolation,
     };
   }
 

@@ -31,7 +31,7 @@ class CapeLayer extends Layer {
         const pixelLatitude = topLatitude - (angularPixelHeight * yPixel);
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
-        const pixelValue = data.simpleNeighborAverage(pixelLatitude, pixelLongitude);
+        const pixelValue = data.bilinearInterpolation(pixelLatitude, pixelLongitude);
         const val = this.colorer.render(pixelValue, 2500, 0x0000FF00, 0xFF000000, true, 0xFF);
         ctx.compositePixel(xPixel, yPixel, val);
       }
