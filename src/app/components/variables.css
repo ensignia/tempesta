@@ -3,12 +3,14 @@
    * Typography
    * ======================================================================== */
 
-  --font-family-base: 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
+  --font-family-base: 'Roboto', sans-serif;
 
   /*
    * Colors
    * ======================================================================== */
    --header-color: #F2F2F2;
-   --text-color: #212121;
-   --text-light-color: #212121;
+   --text-color: rgba(0, 0, 0, 0.87);
+   --text-color-secondary: rgba(0, 0, 0, 0.54);
+   --text-light-color: rgba(255, 255, 255, 1);
+   --text-light-secondary-color: rgba(255, 255, 255, 0.7);
 }

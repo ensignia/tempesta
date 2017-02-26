@@ -1,0 +1,64 @@
+@import '../global.css';
+
+.checkbox {
+  @extend .clearfix;
+  display: inline-block;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checkbox span {
+  display: inline-block;
+  font-size: 1.1em;
+  padding-right: 1em;
+  float: left;
+  user-select: none;
+}
+
+.checkbox > svg {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  pointer-events: none;
+  float: right;
+}
+
+.checkbox:active > svg {
+  transform: scale3d(0.9, 0.9, 1);
+}
+
+.checkbox > input + svg .checked {
+  display: none;
+}
+
+.checkbox > input:checked + svg .unchecked {
+  display: none;
+}
+
+.checkbox > input:checked + svg .checked {
+  display: initial;
+}
+
+.checkbox > input:checked + svg path {
+  fill: teal;
+}
+
+.checkbox > input:disabled + svg {
+  cursor: default;
+}
+
+.checkbox > input:disabled + svg:active {
+  transform: none;
+}
+
+.checkbox > input:disabled + svg path {
+  fill: #B0B0B0;
+}
+
+.checkbox > input {
+  display: block;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}

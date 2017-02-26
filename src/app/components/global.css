@@ -1,33 +1,16 @@
-@import 'variables.css';
-/* FIXME: Causes duplication every time it's included due to
-postcss-import/css-loader inlining the files */
-@import 'normalize.css';
-@import 'material-design-lite/material.css';
+:root {
+  /*
+   * Typography
+   * ======================================================================== */
 
-:global {
-  html,
-  body,
-  #app {
-    height: 100%;
-  }
-}
+  --font-family-base: 'Roboto', sans-serif;
 
-/*
- * Base styles
- * ========================================================================== */
-.page {
-  min-height: 100vh;
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-}
-
-.container > * {
-  flex: 0 0 auto;
-}
-
-.content {
-  flex: auto;
+  /*
+   * Colors
+   * ======================================================================== */
+  --header-color: #f2f2f2;
+  --text-color: rgba(0, 0, 0, 0.87);
+  --text-color-secondary: rgba(0, 0, 0, 0.54);
+  --text-light-color: rgba(255, 255, 255, 1);
+  --text-light-secondary-color: rgba(255, 255, 255, 0.7);
 }

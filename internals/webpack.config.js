@@ -80,6 +80,7 @@ const config = {
       },
       {
         test: /\.css$/,
+        exclude: /node_modules/,
         loaders: [
           'isomorphic-style-loader',
           `css-loader?${JSON.stringify({
@@ -89,6 +90,23 @@ const config = {
             // CSS Modules https://github.com/css-modules/css-modules
             modules: true,
             localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
+            // CSS Nano http://cssnano.co/options/
+            minimize: !isDebug,
+            discardComments: { removeAll: true },
+          })}`,
+          'postcss-loader?pack=default',
+        ],
+      },
+      {
+        test: /\.css$/,
+        include: /node_modules/,
+        loaders: [
+          'isomorphic-style-loader',
+          `css-loader?${JSON.stringify({
+            // CSS Loader https://github.com/webpack/css-loader
+            importLoaders: 1,
+            sourceMap: isDebug,
+            localIdentName: '[local]',
             // CSS Nano http://cssnano.co/options/
             minimize: !isDebug,
             discardComments: { removeAll: true },
@@ -152,7 +170,7 @@ const config = {
 
   // The list of plugins for PostCSS
   // https://github.com/postcss/postcss
-  postcss(bundler) {
+  postcss() {
     return {
       default: [
         // Transfer @import rule by inlining content, e.g. @import 'normalize.css'
