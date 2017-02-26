@@ -1,6 +1,8 @@
 class Colorer {
 
-  render(dataValue, normalizationRange, scaleBottom, scaleTop, isContinuous, opacity) {
+  /** Returns an RGBA color value for a pixel based on a data value, the
+  normalization range for the data it belongs to, and color scale settings. */
+  render(dataValue, normalizationRange, scaleBottom, scaleTop, isContinuous, maxOpacity) {
     /* eslint-disable no-bitwise */
 
     const normValue = dataValue > normalizationRange ? 1 : dataValue / normalizationRange;
@@ -9,11 +11,11 @@ class Colorer {
     return isContinuous ?
           ((scaleTop * normValue) & scaleTop)
           + ((scaleBottom * (1 - normValue)) & scaleBottom)
-          + (opacity * opacityCoefficient)
+          + (maxOpacity * opacityCoefficient)
           :
           (scaleTop * Math.ceil(normValue))
           + (scaleBottom * Math.ceil(1 - normValue))
-          + (opacity * normValue);
+          + (maxOpacity * normValue);
   }
 }
 
