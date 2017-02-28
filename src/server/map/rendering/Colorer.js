@@ -10,7 +10,9 @@ class Colorer {
     if (!isContinuous) normValue = Math.ceil(normValue * 10) / 10;
 
     // set opacity coefficient
-    const opacityCoefficient = isContinuous ? 0.55 + (0.15 * normValue) : 0.65;
+    // 0.55 + (0.15 * normValue)
+    let opacityCoefficient = isContinuous ? normValue : 0.65;
+    if (opacityCoefficient > 0.8) opacityCoefficient = 0.8;
 
     return isContinuous ?
           ((scaleTop * normValue) & scaleTop)
@@ -33,7 +35,7 @@ class Colorer {
     */
   }
 
-  renderRaw(dataValue, normalizationRange) { // eslint-disable-line class-methods-use-this
+  static renderRaw(dataValue, normalizationRange) {
     const normValue = dataValue > normalizationRange ? 1 : dataValue / normalizationRange;
     return (0xFF * normValue);
   }

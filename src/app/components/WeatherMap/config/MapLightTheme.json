@@ -4,7 +4,16 @@
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#444444"
+        "color": "#888888"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.country",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "visibility": "off"
       }
     ]
   },
@@ -25,10 +34,41 @@
     ]
   },
   {
-    "featureType": "landscape",
+    "featureType": "administrative.province",
+    "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#f2f2f2"
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.province",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e3e3e3"
+      },
+      {
+        "visibility": "on"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
       }
     ]
   },
@@ -61,10 +101,7 @@
     "featureType": "road",
     "stylers": [
       {
-        "saturation": -100
-      },
-      {
-        "lightness": 45
+        "color": "#cccccc"
       }
     ]
   },
@@ -91,23 +128,6 @@
     "stylers": [
       {
         "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "stylers": [
-      {
-        "visibility": "simplified"
       }
     ]
   },
@@ -137,13 +157,65 @@
     ]
   },
   {
-    "featureType": "water",
+    "featureType": "transit",
+    "elementType": "labels.icon",
     "stylers": [
       {
-        "color": "#a7def5"
-      },
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
       {
-        "visibility": "on"
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station.airport",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station.airport",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#FFFFFF"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
       }
     ]
   },

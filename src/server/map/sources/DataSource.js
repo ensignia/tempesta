@@ -125,8 +125,8 @@ class DataSource {
       }
 
       // convert grib2 lat/lon to grid indices
-      const y = Math.floor((grib2lat - 90) * 2);
-      const x = Math.floor((grib2long) * 2);
+      const y = Math.floor((grib2lat - 90) * (gridHeightNum / 180));
+      const x = Math.floor((grib2long) * (gridWidthNum / 360));
 
       // return simple value
       return grid[y][x];
@@ -176,8 +176,8 @@ class DataSource {
 
       // precise lat/long in grid scale
       // TODO this works for a 360x720 grid
-      const y = (grib2lat - 90) * 2;
-      const x = grib2long * 2;
+      const y = (grib2lat - 90) * (gridHeightNum / 180);
+      const x = grib2long * (gridWidthNum / 360);
 
       // enclosing data points in grid scale lat/long (note y1 is north )
       const y1 = Math.floor(y);
