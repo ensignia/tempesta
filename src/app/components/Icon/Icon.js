@@ -9,9 +9,12 @@ class Icon extends React.Component {
     size: PropTypes.num,
   };
 
+  static sizes = [18, 24, 36, 48];
+
   render() {
     const { name, size } = this.props;
-    const sizeClass = [18, 24, 36, 48].includes(size) ? `md-${size}` : '';
+    const sizeClass = Icon.sizes.includes(size) ? `md-${size}` : '';
+
     return <i className={cx(s['material-icons'], s[sizeClass])}>{name}</i>;
   }
 }
