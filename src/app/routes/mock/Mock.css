@@ -1,7 +1,7 @@
 @import '../../components/global.css';
 
 .mockPage {
-  background: linear-gradient(to left, #00d2ff, #3a7bd5);
+  background: linear-gradient(to left, #00d2ff , #3a7bd5);
   /*background: linear-gradient(to left, #4b6cb7 , #182848);*/
   /*background: linear-gradient(to left, #24C6DC , #514A9D);*/
 }

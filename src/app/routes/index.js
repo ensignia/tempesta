@@ -9,6 +9,7 @@ export default {
   children: [
     require('./home').default,
     require('./about').default,
+    require('./mock').default,
 
     // Wildcard routes last
     require('./notFound').default,

@@ -2,9 +2,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cx from 'classnames';
-/* Layout loads global libraries such as normalize and material design lite,
-libraries imported from node_modules are not part of CSS Modules,
-TODO: Use css-loader imports? therefore move this to Layout.css? */
 import normalize from 'normalize.css';
 import mdl from 'material-design-lite/material.css';
 import s from './Layout.css';

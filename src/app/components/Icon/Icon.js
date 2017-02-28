@@ -6,7 +6,7 @@ import s from './Icon.css';
 class Icon extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    size: PropTypes.num,
+    size: PropTypes.number,
   };
 
   static sizes = [18, 24, 36, 48];
