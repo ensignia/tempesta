@@ -1,7 +1,7 @@
 @import '../variables.css';
 
 .weatherOverview {
-  height: 48px;
+  height: 200px;
   background: #333;
   box-shadow: inset 0px -5px 10px 0px rgba(51,51,51,1);
 }
@@ -28,7 +28,7 @@ li div{
 
 li div span{
   display: block;
-  /*position: absolute;*/
+  position: absolute;
 }
 
 /*Add inner bottom shadow -Words from God*/

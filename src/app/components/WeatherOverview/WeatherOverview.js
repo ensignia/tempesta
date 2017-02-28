@@ -22,11 +22,18 @@ class WeatherOverview extends React.Component {
   }
 
   componentDidMount() {
-    this.getData();
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        this.getData({ lat: latitude, lng: longitude });
+      });
+    } else {
+      this.getData({ lat: 0.5, lng: 0.5 });
+    }
   }
 
-  async getData() {
-    const response = await fetch('/api/weather/0.5,0.5');
+  async getData(coords) {
+    const response = await fetch(`/api/weather/${coords.lat},${coords.lng}`);
     const json = await response.json();
 
     this.setState({ daily: json.daily.data });
