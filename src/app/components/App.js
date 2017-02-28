@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+import Store from './store.js';
+import actions from './actions.js';
 
 const ContextType = {
   // Enables critical path CSS rendering
@@ -35,10 +37,22 @@ class App extends React.PureComponent {
     children: PropTypes.element.isRequired,
   };
 
-  static childContextTypes = ContextType;
+  static childContextTypes = {
+    store: PropTypes.object.isRequired,
+    ...ContextType,
+  };
+
+  constructor() {
+    super();
+
+    this.store = new Store(actions);
+  }
 
   getChildContext() {
-    return this.props.context;
+    return {
+      store: this.store,
+      ...this.props.context,
+    };
   }
 
   render() {

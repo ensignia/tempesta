@@ -1,14 +1,35 @@
-@import '../../components/global.css';
+@import 'variables.css';
 
-.mockPage {
-  background: linear-gradient(to left, #00d2ff, #3a7bd5);
-  /*background: linear-gradient(to left, #4b6cb7 , #182848);*/
-  /*background: linear-gradient(to left, #24C6DC , #514A9D);*/
+:global {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
 }
 
-.frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  overflow: hidden;
+/*
+ * Base styles
+ * ========================================================================== */
+.page {
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.container > * {
+  flex: 0 0 auto;
+}
+
+.content {
+  flex: auto;
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
 }

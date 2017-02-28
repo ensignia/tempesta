@@ -11,6 +11,10 @@ class Navigation extends React.Component {
     onToggleOverview: PropTypes.func,
   };
 
+  static contextTypes = {
+    store: PropTypes.object.isRequired,
+  };
+
   render() {
     return (
       <div className={cx(s.navigation, this.props.className)} role="navigation">
@@ -20,6 +24,7 @@ class Navigation extends React.Component {
           <span>Tempesta</span>
         </Link>
         <Link className={s.link} to="/about">About</Link>
+        <Link className={s.link} to="#" onClick={() => { this.context.store.dispatch('showLayerModal'); }}>Layers</Link>
       </div>
     );
   }

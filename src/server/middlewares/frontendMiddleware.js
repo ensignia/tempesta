@@ -3,7 +3,7 @@ import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
-import App from '../../app/components/App';
+import App from '../../app/components/App.js';
 import Html from '../../app/components/Html';
 import { ErrorPageWithoutStyle } from '../../app/routes/error/ErrorPage';
 import errorPageStyle from '../../app/routes/error/ErrorPage.css';

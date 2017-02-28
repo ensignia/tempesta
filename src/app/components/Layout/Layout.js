@@ -6,27 +6,11 @@ import normalize from 'normalize.css';
 import mdl from 'material-design-lite/material.css';
 import s from './Layout.css';
 import Header from '../Header/Header.js';
-import Modal from '../Modal/Modal.js';
-import Checkbox from '../Checkbox/Checkbox.js';
 
 class Layout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
   };
-
-  constructor() {
-    super();
-
-    this.state = {
-      showModal: true,
-    };
-
-    this.onClose = this.onClose.bind(this);
-  }
-
-  onClose() {
-    this.setState({ showModal: false });
-  }
 
   render() {
     return (
@@ -34,9 +18,6 @@ class Layout extends React.Component {
         <Header />
         <main className={cx(s.content, s.container)}>
           {this.props.children}
-          <Modal title="Hello there" isOpen={this.state.showModal} onClose={this.onClose}>
-            <Checkbox name="test" label="Show CAPE data" />
-          </Modal>
         </main>
       </div>
     );
