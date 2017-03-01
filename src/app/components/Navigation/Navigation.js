@@ -17,15 +17,35 @@ class Navigation extends React.Component {
 
   render() {
     return (
+
       <div className={cx(s.navigation, this.props.className)} role="navigation">
-        <Link className={s.link} to="#" onClick={this.props.onToggleOverview}>Show WeatherOverview</Link>
-        <Link className={s.link} to="/">
-          <Icon name="face" />
-          <span>Tempesta</span>
+
+        <Link className={cx(s.link, s.edgeicons)} to="#" onClick={this.props.onToggleOverview}>
+          <Icon name="keyboard_arrow_down" />
         </Link>
-        <Link className={s.link} to="/about">About</Link>
-        <Link className={s.link} to="#" onClick={() => { this.context.store.dispatch('showLayerModal'); }}>Layers</Link>
+        <div className={s.middleicons}>
+          <Link className={cx(s.link, s.icontext)} to="#" onClick={() => { this.context.store.dispatch('showLayerModal'); }}>
+            <Icon name="layers" />
+            <span>Layers</span>
+          </Link>
+
+          <Link className={cx(s.link, s.icontext)} to="#">
+            <Icon name="timeline" />
+            <span>Model</span>
+          </Link>
+
+          <Link className={cx(s.link, s.icontext)} to="#">
+            <Icon name="settings" />
+            <span>Settings</span>
+          </Link>
+        </div>
+
+        <Link className={cx(s.link, s.edgeicons)} to="#">
+          <Icon name="my_location" />
+        </Link>
+
       </div>
+
     );
   }
 }

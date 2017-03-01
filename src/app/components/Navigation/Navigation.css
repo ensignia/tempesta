@@ -1,5 +1,8 @@
 .navigation {
   height: 48px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .link {
@@ -7,6 +10,7 @@
   padding: 3px 8px;
   text-decoration: none;
   font-size: 1.125em; /* ~18px */
+  text-align: center;
 }
 
 .link,
@@ -18,3 +22,20 @@
 .link:hover {
   color: rgba(22, 22, 22, 1);
 }
+
+.middleicons .link i {
+  display: flex;
+  flex-direction: column;
+}
+
+.middleicons .link span {
+  display: flex;
+  flex-direction: column;
+}
+
+.edgeicons {
+  display: flex;
+  align-items: center;
+}
+
+
