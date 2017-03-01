@@ -42,7 +42,7 @@
 }
 
 .checkbox > input:checked + svg path {
-  fill: teal;
+  fill: var(--primary-color);
 }
 
 .checkbox > input:disabled + svg {

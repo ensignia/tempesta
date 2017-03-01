@@ -12,6 +12,7 @@ function id() {
 class Radio extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     checked: PropTypes.bool,
     onChange: PropTypes.func,
@@ -24,12 +25,12 @@ class Radio extends React.Component {
   }
 
   render() {
-    const { name, label, checked } = this.props;
+    const { name, value, label, checked } = this.props;
 
     return (
       <label className={s.radio} htmlFor={this.radioId}>
+        <input name={name} type="radio" value={value} id={this.radioId} checked={checked} onChange={this.props.onChange} />
         <span>{label}</span>
-        <input name={name} type="radio" id={this.radioId} checked={checked} onChange={this.props.onChange} />
       </label>
     );
   }

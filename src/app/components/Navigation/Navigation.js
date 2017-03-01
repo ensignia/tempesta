@@ -29,7 +29,7 @@ class Navigation extends React.Component {
             <span>Layers</span>
           </Link>
 
-          <Link className={cx(s.link, s.icontext)} to="#">
+          <Link className={cx(s.link, s.icontext)} to="#" onClick={() => { this.context.store.dispatch('showModelModal'); }}>
             <Icon name="timeline" />
             <span>Model</span>
           </Link>

@@ -45,8 +45,8 @@ class WeatherMap extends React.Component {
   }
 
   modelOnChange(e) {
-    if (e.target.value && !this.state.model === e.target.name) {
-      this.setState({ model: e.target.name });
+    if (this.state.model !== e.target.value) {
+      this.setState({ model: e.target.value });
     }
   }
 
@@ -77,8 +77,8 @@ class WeatherMap extends React.Component {
           isOpen={this.context.store.getState().showModelModal}
           onClose={() => { this.context.store.dispatch('hideModelModal'); }}
         >
-          <Radio name="gfs" label="Global Forecast System" checked={this.state.model === 'gfs'} onChange={this.modelOnChange} />
-          <Radio name="hrrr" label="HRRR" checked={this.state.model === 'hrrr'} onChange={this.modelOnChange} />
+          <Radio name="model" value="gfs" label="Global Forecast System" checked={this.state.model === 'gfs'} onChange={this.modelOnChange} />
+          <Radio name="model" value="hrrr" label="HRRR" checked={this.state.model === 'hrrr'} onChange={this.modelOnChange} />
         </Modal>
       </div>
     );
