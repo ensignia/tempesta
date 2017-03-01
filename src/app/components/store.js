@@ -1,3 +1,5 @@
+import React, { PropTypes } from 'react';
+
 class Store {
   constructor(actions) {
     this.actions = actions;
@@ -30,3 +32,39 @@ class Store {
 }
 
 export default Store;
+
+function bindToDispatch(actions, dispatch) {
+  const bound = {};
+  Object.keys(actions).forEach((key) => {
+    bound[key] = (...args) => {
+      dispatch(key, ...args);
+    };
+  });
+  return bound;
+}
+
+export function connect(mapStateToProps) {
+  return (WrappedComponent) => (
+    class extends React.Component {
+      static contextTypes = {
+        store: PropTypes.object.isRequired,
+      };
+
+      componentWillMount() {
+        this.removeListener = this.context.store.subscribe(() => {
+          this.forceUpdate();
+        });
+      }
+
+      componentWillUnmount() {
+        this.removeListener();
+      }
+
+      render() {
+        const actions = bindToDispatch(this.context.store.actions, this.context.store.dispatch);
+        const props = { actions, ...mapStateToProps(this.context.store.getState()), ...this.props };
+        return <WrappedComponent {...props} />;
+      }
+    }
+  );
+}
