@@ -1,6 +1,7 @@
 function initialize() {
   return {
     showLayerModal: false,
+    showModelModal: false,
   };
 }
 
@@ -19,4 +20,18 @@ function hideLayerModal(state) {
   };
 }
 
-export default { initialize, showLayerModal, hideLayerModal };
+function showModelModal(state) {
+  return {
+    ...state,
+    showModelModal: true,
+  };
+}
+
+function hideModelModal(state) {
+  return {
+    ...state,
+    showModelModal: false,
+  };
+}
+
+export default { initialize, showLayerModal, hideLayerModal, showModelModal, hideModelModal };

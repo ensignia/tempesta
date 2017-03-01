@@ -6,6 +6,7 @@ import MapView from './MapView.js';
 import MapControls from './MapControls.js';
 import Modal from '../Modal/Modal.js';
 import Checkbox from '../Checkbox/Checkbox.js';
+import Radio from '../Radio/Radio.js';
 
 class WeatherMap extends React.Component {
 
@@ -18,9 +19,11 @@ class WeatherMap extends React.Component {
 
     this.state = {
       layers: ['cape'],
+      model: 'gfs',
     };
 
     this.layerOnChange = this.layerOnChange.bind(this);
+    this.modelOnChange = this.modelOnChange.bind(this);
   }
 
   componentWillMount() {
@@ -41,6 +44,12 @@ class WeatherMap extends React.Component {
     }
   }
 
+  modelOnChange(e) {
+    if (e.target.value && !this.state.model === e.target.name) {
+      this.setState({ model: e.target.name });
+    }
+  }
+
   render() {
     const markers = [];
     markers.push({ lat: 0.5, lng: 0.5 });
@@ -52,7 +61,7 @@ class WeatherMap extends React.Component {
           layers={this.state.layers}
           markers={markers}
         />
-        <MapControls className={cx(s.mapControls)} />
+        <MapControls className={s.mapControls} />
         <Modal
           title="Layers"
           isOpen={this.context.store.getState().showLayerModal}
@@ -62,6 +71,14 @@ class WeatherMap extends React.Component {
           <Checkbox name="wind" label="Show wind and fronts" checked={this.state.layers.includes('wind')} onChange={this.layerOnChange} />
           <Checkbox name="spc" label="Show storm prediction centre reports" checked={this.state.layers.includes('spc')} onChange={this.layerOnChange} />
           <Checkbox name="lightning" label="Show lightning" checked={this.state.layers.includes('lightning')} onChange={this.layerOnChange} />
+        </Modal>
+        <Modal
+          title="Models"
+          isOpen={this.context.store.getState().showModelModal}
+          onClose={() => { this.context.store.dispatch('hideModelModal'); }}
+        >
+          <Radio name="gfs" label="Global Forecast System" checked={this.state.model === 'gfs'} onChange={this.modelOnChange} />
+          <Radio name="hrrr" label="HRRR" checked={this.state.model === 'hrrr'} onChange={this.modelOnChange} />
         </Modal>
       </div>
     );
