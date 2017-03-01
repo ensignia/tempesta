@@ -1,0 +1,38 @@
+@import '../global.css';
+
+.sliderLabel {
+  padding: 0.5em 0;
+  width: 100%;
+}
+
+.sliderLabel input {
+  display: none;
+}
+
+.slider {
+  display: block;
+  position: relative;
+  background: #bebebe;
+  height: 4px;
+}
+
+.sliderFill {
+  display: block;
+  height: 100%;
+  background: var(--primary-color);
+  top: 0;
+  z-index: 1;
+}
+
+.sliderHandle {
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  top: -5.5px;
+  background: var(--primary-color);
+  z-index: 2;
+}

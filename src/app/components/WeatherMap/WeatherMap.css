@@ -3,7 +3,3 @@
 .mapView div {
   @extend .content;
 }
-
-.mapControls {
-  height: 48px;
-}

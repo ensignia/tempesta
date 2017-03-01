@@ -61,7 +61,7 @@ class WeatherMap extends React.Component {
           layers={this.state.layers}
           markers={markers}
         />
-        <MapControls className={s.mapControls} />
+        <MapControls />
         <Modal
           title="Layers"
           isOpen={this.context.store.getState().showLayerModal}
