@@ -14,6 +14,7 @@ class Checkbox extends React.Component {
     name: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     checked: PropTypes.bool,
+    onChange: PropTypes.func,
   };
 
   constructor() {
@@ -28,7 +29,7 @@ class Checkbox extends React.Component {
     return (
       <label className={s.checkbox} htmlFor={this.checkboxId}>
         <span>{label}</span>
-        <input name={name} type="checkbox" id={this.checkboxId} checked={checked} />
+        <input name={name} type="checkbox" id={this.checkboxId} checked={checked} onChange={this.props.onChange} />
         <svg width="18" height="18">
           <path className={s.checked} d="M16,0H2C0.9,0,0,0.9,0,2v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V2C18,0.9,17.1,0,16,0z M7,14L2,9l1.4-1.4L7,11.2l7.6-7.6L16,5L7,14z" />
           <path className={s.unchecked} d="M16,2v14H2V2H16 M16,0H2C0.9,0,0,0.9,0,2v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V2C18,0.9,17.1,0,16,0z" />

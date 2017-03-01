@@ -43,6 +43,7 @@ class MapView extends React.Component {
     theme: PropTypes.array,
     markers: PropTypes.array,
     className: PropTypes.string,
+    layers: PropTypes.array,
   };
 
   static Theme = {
@@ -55,9 +56,48 @@ class MapView extends React.Component {
     theme: MapView.Theme.LIGHT,
   };
 
+  static createLayerHelper(google, modelName, layerName, index) {
+    const layer = new google.maps.ImageMapType({
+      getTileUrl(coord, zoom) {
+        const normalizedCoord = getNormalizedCoord(coord, zoom);
+        if (!normalizedCoord) {
+          return null;
+        }
+        return `/api/map/${modelName}/${layerName}/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
+      },
+      tileSize: new google.maps.Size(256, 256),
+      maxZoom: 9,
+      minZoom: 0,
+      radius: 1738000,
+      name: modelName,
+    });
+    let visible = false;
+
+    return {
+      layer,
+      index,
+      isVisible() {
+        return visible;
+      },
+      addLayer() {
+        if (visible) return;
+        visible = true;
+        google.map.overlayMapTypes.setAt(index, layer);
+      },
+      removeLayer() {
+        if (!visible) return;
+        visible = false;
+        google.map.overlayMapTypes.setAt(index, null);
+      },
+    };
+  }
+
   constructor(props) {
     super(props);
-    this.state = { center: this.props.center };
+    this.state = {
+      center: this.props.center,
+      layers: {},
+    };
 
     this.requestLocation = this.requestLocation.bind(this);
     this.updateLocation = this.updateLocation.bind(this);
@@ -69,27 +109,33 @@ class MapView extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    Object.keys(this.state.layers).forEach((key) => {
+      if (!this.state.layers[key]) return;
+
+      if (nextProps.layers.includes(key)) {
+        this.state.layers[key].gfs.addLayer();
+      } else {
+        this.state.layers[key].gfs.removeLayer();
+      }
+    });
+  }
+
   componentWillUnmount() {
     // empty
   }
 
   onGoogleApiLoaded(google) {
-    this.testMapType = new google.maps.ImageMapType({
-      getTileUrl(coord, zoom) {
-        const normalizedCoord = getNormalizedCoord(coord, zoom);
-        if (!normalizedCoord) {
-          return null;
-        }
-        return `/api/map/gfs/cape/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
-      },
-      tileSize: new google.maps.Size(256, 256),
-      maxZoom: 9,
-      minZoom: 0,
-      radius: 1738000,
-      name: 'Test',
+    this.state.layers.cape = {
+      gfs: MapView.createLayerHelper(google, 'gfs', 'cape', 1),
+    };
+
+    Object.keys(this.state.layers).forEach(() => {
+      google.map.overlayMapTypes.push(null);
     });
 
-    google.map.overlayMapTypes.insertAt(0, this.testMapType);
+    // Force update of layers, as google api loads after first props
+    this.componentWillReceiveProps(this.props);
   }
 
   requestLocation() {

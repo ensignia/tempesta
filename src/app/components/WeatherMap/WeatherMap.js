@@ -13,6 +13,16 @@ class WeatherMap extends React.Component {
     store: PropTypes.object.isRequired,
   };
 
+  constructor() {
+    super();
+
+    this.state = {
+      layers: ['cape'],
+    };
+
+    this.layerOnChange = this.layerOnChange.bind(this);
+  }
+
   componentWillMount() {
     this.removeListener = this.context.store.subscribe(() => {
       this.forceUpdate();
@@ -23,23 +33,35 @@ class WeatherMap extends React.Component {
     this.removeListener();
   }
 
+  layerOnChange(e) {
+    if (e.target.value && !this.state.layers.includes(e.target.name)) {
+      this.setState({ layers: this.state.layers.concat(e.target.name) });
+    } else {
+      this.setState({ layers: this.state.layers.filter(l => l !== e.target.name) });
+    }
+  }
+
   render() {
     const markers = [];
     markers.push({ lat: 0.5, lng: 0.5 });
 
     return (
       <div className={cx(s.content, s.container)}>
-        <MapView className={cx(s.content, s.container, s.mapView)} markers={markers} />
+        <MapView
+          className={cx(s.content, s.container, s.mapView)}
+          layers={this.state.layers}
+          markers={markers}
+        />
         <MapControls className={cx(s.mapControls)} />
         <Modal
-          title="Hello there"
+          title="Layers"
           isOpen={this.context.store.getState().showLayerModal}
           onClose={() => { this.context.store.dispatch('hideLayerModal'); }}
         >
-          <Checkbox name="test" label="Show convective available potential energy" />
-          <Checkbox name="test" label="Show wind and fronts" />
-          <Checkbox name="test" label="Show storm prediction centre reports" />
-          <Checkbox name="test" label="Show lightning" />
+          <Checkbox name="cape" label="Show convective available potential energy" checked={this.state.layers.includes('cape')} onChange={this.layerOnChange} />
+          <Checkbox name="wind" label="Show wind and fronts" checked={this.state.layers.includes('wind')} onChange={this.layerOnChange} />
+          <Checkbox name="spc" label="Show storm prediction centre reports" checked={this.state.layers.includes('spc')} onChange={this.layerOnChange} />
+          <Checkbox name="lightning" label="Show lightning" checked={this.state.layers.includes('lightning')} onChange={this.layerOnChange} />
         </Modal>
       </div>
     );
