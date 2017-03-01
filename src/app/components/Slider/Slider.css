@@ -17,6 +17,7 @@
 }
 
 .sliderFill {
+  cursor: pointer;
   display: block;
   height: 100%;
   background: var(--primary-color);

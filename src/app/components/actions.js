@@ -2,10 +2,13 @@ function initialize() {
   return {
     showLayerModal: false,
     showModelModal: false,
+    showWeatherOverview: false,
   };
 }
 
-
+/**
+ * Layer Modal
+ */
 function showLayerModal(state) {
   return {
     ...state,
@@ -20,6 +23,9 @@ function hideLayerModal(state) {
   };
 }
 
+/**
+ * Model Modal
+ */
 function showModelModal(state) {
   return {
     ...state,
@@ -34,4 +40,29 @@ function hideModelModal(state) {
   };
 }
 
-export default { initialize, showLayerModal, hideLayerModal, showModelModal, hideModelModal };
+/**
+ * Weather Overview
+ */
+function showWeatherOverview(state) {
+  return {
+    ...state,
+    showWeatherOverview: true,
+  };
+}
+
+function hideWeatherOverview(state) {
+  return {
+    ...state,
+    showWeatherOverview: false,
+  };
+}
+
+export default {
+  initialize,
+  showLayerModal,
+  hideLayerModal,
+  showModelModal,
+  hideModelModal,
+  showWeatherOverview,
+  hideWeatherOverview,
+};
