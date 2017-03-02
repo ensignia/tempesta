@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { connect } from '../store.js';
 import s from './WeatherOverview.css';
 import fetch from '../../core/fetch';
 
@@ -8,6 +9,8 @@ const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 class WeatherOverview extends React.Component {
   static propTypes = {
     className: PropTypes.string,
+    location: PropTypes.object,
+    locationStatus: PropTypes.string,
   };
 
   constructor() {
@@ -15,25 +18,22 @@ class WeatherOverview extends React.Component {
 
     this.state = {
       daily: [],
+      hasData: false,
     };
 
     this.getData = this.getData.bind(this);
-    this.componentDidMount = this.componentDidMount.bind(this);
+    this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
   }
 
-  componentDidMount() {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        this.getData({ lat: latitude, lng: longitude });
-      });
-    } else {
-      this.getData({ lat: 0.5, lng: 0.5 });
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.hasData && nextProps.locationStatus === 'DONE') {
+      this.getData(nextProps.location);
+      this.setState({ hasData: true });
     }
   }
 
   async getData(coords) {
-    const response = await fetch(`/api/weather/${coords.lat},${coords.lng}`);
+    const response = await fetch(`/api/weather/${coords.latitude},${coords.longitude}`);
     const json = await response.json();
 
     this.setState({ daily: json.daily.data });
@@ -46,7 +46,7 @@ class WeatherOverview extends React.Component {
       const dayName = dayNames[new Date(day.time * 1000).getDay()];
       const dayIconName = day.icon;
 
-      days.push(<li><div key={day.time} className={dayIconName}><img src={`/WeatherIcons/${day.icon}.svg`} width="38" height="38" alt="lol" /><span>{dayName}</span></div></li>);
+      days.push(<li key={day.time}><div key={day.time} className={dayIconName}><img src={`/WeatherIcons/${day.icon}.svg`} width="38" height="38" alt="lol" /><span>{dayName}</span></div></li>);
     });
 
     return (
@@ -59,4 +59,7 @@ class WeatherOverview extends React.Component {
   }
 }
 
-export default withStyles(s)(WeatherOverview);
+export default connect((state) => ({
+  location: state.location,
+  locationStatus: state.locationStatus,
+}))(withStyles(s)(WeatherOverview));

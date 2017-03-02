@@ -3,8 +3,8 @@ function initialize() {
     showLayerModal: false,
     showModelModal: false,
     showWeatherOverview: false,
-    location: { latitude: 0, longitude: 0 },
-    locationStatus: 'REQUESTED',
+    location: { latitude: -1, longitude: -1 },
+    locationStatus: 'UNKNOWN',
   };
 }
 

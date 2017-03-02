@@ -14,7 +14,6 @@ class WeatherMap extends React.Component {
     className: PropTypes.string,
     showLayerModal: PropTypes.bool.isRequired,
     showModelModal: PropTypes.bool.isRequired,
-    location: PropTypes.object.isRequired,
     actions: PropTypes.object,
   };
 
@@ -49,21 +48,14 @@ class WeatherMap extends React.Component {
   }
 
   render() {
-    const { actions, showLayerModal, showModelModal, location } = this.props;
-    const zoom = 8;
-    const markers = [];
-    markers.push({ lat: 0.5, lng: 0.5 });
-
-    console.log(location);
+    const { actions, showLayerModal, showModelModal } = this.props;
 
     return (
       <div className={cx(s.content, s.container)}>
         <MapView
           className={cx(s.content, s.container, s.mapView)}
           layers={this.state.layers}
-          markers={markers}
-          center={{ lat: location.latitude, lng: location.longitude }}
-          zoom={zoom}
+          model={this.state.model}
         />
         <MapControls />
         <Modal
@@ -92,5 +84,4 @@ class WeatherMap extends React.Component {
 export default connect((state) => ({
   showLayerModal: state.showLayerModal,
   showModelModal: state.showModelModal,
-  location: state.location,
 }))(withStyles(s)(WeatherMap));

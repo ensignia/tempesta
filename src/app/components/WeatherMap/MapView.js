@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import GoogleMapReact from 'google-map-react';
 import Marker from './Marker.js';
+import { connect } from '../store.js';
 import MapDarkTheme from './config/MapDarkTheme.json';
 import MapLightTheme from './config/MapLightTheme.json';
 import { api } from '../../../config.js';
@@ -10,7 +11,7 @@ const DEFAULT_CENTER = {
   lng: 0.5,
 };
 
-const DEFAULT_ZOOM = 3;
+const DEFAULT_ZOOM = 8;
 
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
@@ -37,15 +38,15 @@ function getNormalizedCoord(coord, zoom) {
 
 class MapView extends React.Component {
   static propTypes = {
-    center: PropTypes.shape({
-      lat: PropTypes.number,
-      lng: PropTypes.number,
+    location: PropTypes.shape({
+      latitude: PropTypes.number,
+      longitude: PropTypes.number,
     }),
-    zoom: PropTypes.number,
-    theme: PropTypes.array,
-    markers: PropTypes.array,
+    locationStatus: PropTypes.string,
     className: PropTypes.string,
+    theme: PropTypes.array,
     layers: PropTypes.array,
+    model: PropTypes.string,
   };
 
   static Theme = {
@@ -54,8 +55,6 @@ class MapView extends React.Component {
   };
 
   static defaultProps = {
-    center: DEFAULT_CENTER,
-    zoom: DEFAULT_ZOOM,
     theme: MapView.Theme.LIGHT,
   };
 
@@ -99,6 +98,8 @@ class MapView extends React.Component {
     super(props);
     this.state = {
       layers: {},
+      mapLoaded: false,
+      shouldUpdateLocation: false,
     };
 
     this.createMapOptions = this.createMapOptions.bind(this);
@@ -115,26 +116,44 @@ class MapView extends React.Component {
         this.state.layers[key].gfs.removeLayer();
       }
     });
+
+    if (nextProps.locationStatus === 'REQUESTING' || nextProps.locationStatus === 'REQUESTED') {
+      this.setState({ shouldUpdateLocation: true });
+    } else if (nextProps.locationStatus === 'DONE' && this.state.shouldUpdateLocation && this.state.mapLoaded) {
+      const { latitude, longitude } = nextProps.location;
+
+      this.panTo({ lat: latitude, lng: longitude });
+      this.setZoom(DEFAULT_ZOOM);
+
+      this.setState({ shouldUpdateLocation: false });
+    }
   }
 
   onGoogleApiLoaded(google) {
-    this.state.layers.cape = {
-      gfs: MapView.createLayerHelper(google, 'gfs', 'cape', 1),
-    };
+    this.setState({
+      layers: {
+        cape: {
+          gfs: MapView.createLayerHelper(google, 'gfs', 'cape', 1),
+        },
+      },
+      mapLoaded: true,
+    });
 
     Object.keys(this.state.layers).forEach(() => {
       google.map.overlayMapTypes.push(null);
     });
 
-    // Force update of layers, as google api loads after first props
-    this.componentWillReceiveProps(this.props);
-
-    // Because GoogleMapReact is stupid
+    // Because GoogleMapReact
     this.panTo = (center) => {
       google.map.panTo(center);
     };
 
-    this.panTo(this.props.center);
+    this.setZoom = (zoom) => {
+      google.map.setZoom(zoom);
+    };
+
+    // Force update of layers, as google api loads after first props
+    this.componentWillReceiveProps(this.props);
   }
 
   createMapOptions(maps) {
@@ -153,14 +172,12 @@ class MapView extends React.Component {
       key: api.google.maps,
     };
 
-    const { zoom, center, markers, className } = this.props;
+    const { className } = this.props;
 
     const markersEl = [];
-    markers.forEach((marker) => {
+    [].forEach((marker) => {
       markersEl.push(<Marker key={`${marker.lat}-${marker.lng}`} lat={marker.lat} lng={marker.lng} />);
     });
-
-    if (this.panTo) this.panTo(center);
 
     return (
       <div className={className}>
@@ -168,8 +185,6 @@ class MapView extends React.Component {
           bootstrapURLKeys={keys}
           defaultZoom={DEFAULT_ZOOM}
           defaultCenter={DEFAULT_CENTER}
-          zoom={zoom}
-          center={center}
           options={this.createMapOptions}
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={this.onGoogleApiLoaded}
@@ -181,4 +196,7 @@ class MapView extends React.Component {
   }
 }
 
-export default MapView;
+export default connect((state) => ({
+  location: state.location,
+  locationStatus: state.locationStatus,
+}))(MapView);
