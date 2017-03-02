@@ -12,8 +12,9 @@ import Radio from '../Radio/Radio.js';
 class WeatherMap extends React.Component {
   static propTypes = {
     className: PropTypes.string,
-    showLayerModal: PropTypes.bool,
-    showModelModal: PropTypes.bool,
+    showLayerModal: PropTypes.bool.isRequired,
+    showModelModal: PropTypes.bool.isRequired,
+    location: PropTypes.object.isRequired,
     actions: PropTypes.object,
   };
 
@@ -27,6 +28,10 @@ class WeatherMap extends React.Component {
 
     this.layerOnChange = this.layerOnChange.bind(this);
     this.modelOnChange = this.modelOnChange.bind(this);
+  }
+
+  componentWillMount() {
+    this.props.actions.requestLocation();
   }
 
   layerOnChange(e) {
@@ -44,9 +49,12 @@ class WeatherMap extends React.Component {
   }
 
   render() {
-    const { actions, showLayerModal, showModelModal } = this.props;
+    const { actions, showLayerModal, showModelModal, location } = this.props;
+    const zoom = 8;
     const markers = [];
     markers.push({ lat: 0.5, lng: 0.5 });
+
+    console.log(location);
 
     return (
       <div className={cx(s.content, s.container)}>
@@ -54,6 +62,8 @@ class WeatherMap extends React.Component {
           className={cx(s.content, s.container, s.mapView)}
           layers={this.state.layers}
           markers={markers}
+          center={{ lat: location.latitude, lng: location.longitude }}
+          zoom={zoom}
         />
         <MapControls />
         <Modal
@@ -82,4 +92,5 @@ class WeatherMap extends React.Component {
 export default connect((state) => ({
   showLayerModal: state.showLayerModal,
   showModelModal: state.showModelModal,
+  location: state.location,
 }))(withStyles(s)(WeatherMap));

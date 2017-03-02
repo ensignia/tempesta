@@ -41,7 +41,7 @@ class Navigation extends React.Component {
             <span>Settings</span>
           </Link>
         </div>
-        <Link className={cx(s.link, s.edgeicons)} to="#">
+        <Link className={cx(s.link, s.edgeicons)} to="#" onClick={() => { actions.requestLocation(); }}>
           <Icon name="my_location" />
         </Link>
       </div>

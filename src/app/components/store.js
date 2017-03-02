@@ -18,8 +18,11 @@ class Store {
   }
 
   dispatch(action, ...args) {
-    this.state = this.actions[action](this.state, ...args);
-    this.listeners.forEach(listener => listener());
+    const nextState = this.actions[action](this.state, ...args);
+    if (!Object.is(nextState, this.state)) {
+      this.state = nextState;
+      this.listeners.forEach(listener => listener());
+    }
   }
 
   subscribe(listener) {
@@ -62,7 +65,8 @@ export function connect(mapStateToProps) {
 
       render() {
         const actions = bindToDispatch(this.context.store.actions, this.context.store.dispatch);
-        const props = { actions, ...mapStateToProps(this.context.store.getState()), ...this.props };
+        const state = mapStateToProps ? mapStateToProps(this.context.store.getState()) : {};
+        const props = { actions, ...state, ...this.props };
         return <WrappedComponent {...props} />;
       }
     }

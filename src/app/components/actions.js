@@ -3,7 +3,37 @@ function initialize() {
     showLayerModal: false,
     showModelModal: false,
     showWeatherOverview: false,
+    location: { latitude: 0, longitude: 0 },
+    locationStatus: 'REQUESTED',
   };
+}
+
+/**
+ * Location
+ */
+function updateLocation(state, coords) {
+  return {
+    ...state,
+    location: coords,
+  };
+}
+
+function setLocationState(state, locState) {
+  switch (locState) {
+    case 'REQUESTED':
+    case 'REQUESTING':
+    case 'DONE':
+      return {
+        ...state,
+        locationStatus: locState,
+      };
+    default:
+      return state;
+  }
+}
+
+function requestLocation(state) {
+  return setLocationState(state, 'REQUESTED');
 }
 
 /**
@@ -65,4 +95,7 @@ export default {
   hideModelModal,
   showWeatherOverview,
   hideWeatherOverview,
+  updateLocation,
+  setLocationState,
+  requestLocation,
 };

@@ -2,39 +2,34 @@ import React, { PropTypes } from 'react';
 import Collapse from 'react-collapse';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
+import { connect } from '../store.js';
 import Navigation from '../Navigation/Navigation.js';
 import WeatherOverview from '../WeatherOverview/WeatherOverview.js';
 
 class Header extends React.Component {
 
-  static contextTypes = {
-    store: PropTypes.object.isRequired,
+  static propTypes = {
+    showWeatherOverview: PropTypes.bool.isRequired,
   };
 
-  componentWillMount() {
-    this.removeListener = this.context.store.subscribe(() => {
-      this.forceUpdate();
-    });
-  }
-
-  componentWillUnmount() {
-    this.removeListener();
-  }
-
   render() {
+    const { showWeatherOverview } = this.props;
+
     return (
       <div className={s.header}>
         <Collapse
-          isOpened={this.context.store.getState().showWeatherOverview}
+          isOpened={showWeatherOverview}
           fixedHeight={50}
           keepCollapsedContent
         >
           <WeatherOverview />
         </Collapse>
-        <Navigation onToggleOverview={this.onToggleOverview} />
+        <Navigation />
       </div>
     );
   }
 }
 
-export default withStyles(s)(Header);
+export default connect((state) => ({
+  showWeatherOverview: state.showWeatherOverview,
+}))(withStyles(s)(Header));

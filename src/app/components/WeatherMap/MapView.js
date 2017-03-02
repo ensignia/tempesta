@@ -10,6 +10,8 @@ const DEFAULT_CENTER = {
   lng: 0.5,
 };
 
+const DEFAULT_ZOOM = 3;
+
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
 function getNormalizedCoord(coord, zoom) {
@@ -52,7 +54,8 @@ class MapView extends React.Component {
   };
 
   static defaultProps = {
-    zoom: 3,
+    center: DEFAULT_CENTER,
+    zoom: DEFAULT_ZOOM,
     theme: MapView.Theme.LIGHT,
   };
 
@@ -95,18 +98,11 @@ class MapView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      center: this.props.center,
       layers: {},
     };
 
-    this.requestLocation = this.requestLocation.bind(this);
-    this.updateLocation = this.updateLocation.bind(this);
     this.createMapOptions = this.createMapOptions.bind(this);
     this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
-
-    if (!this.props.center) { // If a center was given to us, then use that
-      this.requestLocation();
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -121,10 +117,6 @@ class MapView extends React.Component {
     });
   }
 
-  componentWillUnmount() {
-    // empty
-  }
-
   onGoogleApiLoaded(google) {
     this.state.layers.cape = {
       gfs: MapView.createLayerHelper(google, 'gfs', 'cape', 1),
@@ -136,19 +128,13 @@ class MapView extends React.Component {
 
     // Force update of layers, as google api loads after first props
     this.componentWillReceiveProps(this.props);
-  }
 
-  requestLocation() {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        this.updateLocation({ lat: latitude, lng: longitude });
-      });
-    }
-  }
+    // Because GoogleMapReact is stupid
+    this.panTo = (center) => {
+      google.map.panTo(center);
+    };
 
-  updateLocation(location) {
-    this.setState({ center: { lat: location.lat, lng: location.lng } });
+    this.panTo(this.props.center);
   }
 
   createMapOptions(maps) {
@@ -167,23 +153,28 @@ class MapView extends React.Component {
       key: api.google.maps,
     };
 
-    const markers = [];
-    this.props.markers.forEach((marker) => {
-      markers.push(<Marker key={`${marker.lat}-${marker.lng}`} lat={marker.lat} lng={marker.lng} />);
+    const { zoom, center, markers, className } = this.props;
+
+    const markersEl = [];
+    markers.forEach((marker) => {
+      markersEl.push(<Marker key={`${marker.lat}-${marker.lng}`} lat={marker.lat} lng={marker.lng} />);
     });
 
+    if (this.panTo) this.panTo(center);
+
     return (
-      <div className={this.props.className}>
+      <div className={className}>
         <GoogleMapReact
           bootstrapURLKeys={keys}
-          defaultZoom={this.props.zoom}
+          defaultZoom={DEFAULT_ZOOM}
           defaultCenter={DEFAULT_CENTER}
-          center={this.state.center}
+          zoom={zoom}
+          center={center}
           options={this.createMapOptions}
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={this.onGoogleApiLoaded}
         >
-          {markers}
+          {markersEl}
         </GoogleMapReact>
       </div>
     );
