@@ -1,3 +1,5 @@
+@import '../global.css';
+
 .navigation {
   height: 48px;
   display: flex;
@@ -23,17 +25,74 @@
   color: rgba(22, 22, 22, 1);
 }
 
-.middleicons .link i {
+.main .link i {
   display: flex;
   flex-direction: column;
 }
 
-.middleicons .link span {
+.main .link span {
   display: flex;
   flex-direction: column;
 }
 
-.edgeicons {
+.link.icon {
   display: flex;
   align-items: center;
+  transition: color 0.2s;
+  transition: transform 0.2s;
+}
+
+.link.rotateArrow {
+  transform: rotate(-180deg);
+}
+
+.link.pulse {
+  /* animation: glow 1s infinite alternate; */
+  color: var(--primary-color);
+  position: relative;
+}
+
+.link.pulse i {
+  z-index: 20;
+}
+
+.link.pulse::after {
+  content: '';
+  border: 5px solid var(--primary-color);
+  height: 30px;
+  width: 30px;
+  border-radius: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -15px;
+  margin-top: -15px;
+  animation: pulse 1s ease-out infinite;
+  opacity: 0;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+@keyframes glow {
+  0% {
+    color: rgba(22, 22, 22, 0.6);
+  }
+
+  100% {
+    color: var(--primary-color);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.1, 0.1);
+    opacity: 0;
+  }
+
+  50% { opacity: 0.5; }
+
+  100% {
+    transform: scale(1, 1);
+    opacity: 0;
+  }
 }

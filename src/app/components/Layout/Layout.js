@@ -34,11 +34,15 @@ class Layout extends React.Component {
     const { actions } = this.props;
 
     if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        actions.updateLocation({ latitude, longitude });
-        actions.setLocationState('DONE');
-      });
+      const getLocation = () => {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const { latitude, longitude } = position.coords;
+          actions.updateLocation({ latitude, longitude });
+          actions.setLocationState('DONE');
+        });
+      };
+
+      setTimeout(getLocation, 1000); // Delay location for cool factor
     }
   }
 

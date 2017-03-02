@@ -11,23 +11,26 @@ class Navigation extends React.Component {
     className: PropTypes.string,
     showWeatherOverview: PropTypes.bool,
     actions: PropTypes.object,
+    locationStatus: PropTypes.string,
   };
 
   render() {
-    const { actions, showWeatherOverview } = this.props;
+    const { actions, showWeatherOverview, locationStatus } = this.props;
+
     return (
       <div className={cx(s.navigation, this.props.className)} role="navigation">
         <Link
-          className={cx(s.link, s.edgeicons)}
+          className={cx(s.link, s.icon, { [s.rotateArrow]: showWeatherOverview })}
           to="#"
           onClick={() => {
             if (showWeatherOverview) actions.hideWeatherOverview();
             else actions.showWeatherOverview();
           }}
         >
-          <Icon name={`${showWeatherOverview ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}`} />
+          <Icon name={'keyboard_arrow_up'} />
         </Link>
-        <div className={s.middleicons}>
+
+        <div className={s.main}>
           <Link className={s.link} to="#" onClick={() => { actions.showLayerModal(); }}>
             <Icon name="layers" />
             <span>Layers</span>
@@ -41,7 +44,8 @@ class Navigation extends React.Component {
             <span>Settings</span>
           </Link>
         </div>
-        <Link className={cx(s.link, s.edgeicons)} to="#" onClick={() => { actions.requestLocation(); }}>
+
+        <Link className={cx(s.link, s.icon, { [s.pulse]: locationStatus !== 'DONE' })} to="#" onClick={() => { actions.requestLocation(); }}>
           <Icon name="my_location" />
         </Link>
       </div>
@@ -51,4 +55,5 @@ class Navigation extends React.Component {
 
 export default connect((state) => ({
   showWeatherOverview: state.showWeatherOverview,
+  locationStatus: state.locationStatus,
 }))(withStyles(s)(Navigation));

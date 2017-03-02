@@ -1,18 +1,17 @@
 :root {
   /*
-   * Typography
-   * ======================================================================== */
+  * Typography
+  * ======================================================================== */
 
   --font-family-base: 'Roboto', sans-serif;
 
   /*
-   * Colors
-   * ======================================================================== */
-   --header-color: #F2F2F2;
-   --text-color: rgba(0, 0, 0, 0.87);
-   --text-color-secondary: rgba(0, 0, 0, 0.54);
-   --text-light-color: rgba(255, 255, 255, 1);
-   --text-light-secondary-color: rgba(255, 255, 255, 0.7);
-
-   --primary-color: #2196F3;
+  * Colors
+  * ======================================================================== */
+  --header-color: #f2f2f2;
+  --text-color: rgba(0, 0, 0, 0.87);
+  --text-color-secondary: rgba(0, 0, 0, 0.54);
+  --text-light-color: rgba(255, 255, 255, 1);
+  --text-light-secondary-color: rgba(255, 255, 255, 0.7);
+  --primary-color: #2196f3;
 }
