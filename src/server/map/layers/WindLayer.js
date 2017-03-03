@@ -3,14 +3,14 @@ import pureimage from 'pureimage';
 import fs from 'fs';
 import Layer from './Layer.js';
 
-class CapeLayer extends Layer {
+class WindLayer extends Layer {
 
   async isSupportedSource(dataSourceName) {
     return dataSourceName === 'gfs';
   }
 
   async getTile(outputPath, dataSource, tileX, tileY, tileZ) {
-    console.log(`Generating Wind Shear tile for ${tileX}/${tileY}/${tileZ}`);
+    console.log(`Generating Wind tile for ${tileX}/${tileY}/${tileZ}`);
 
     const dataU = dataSource.getData('windU', 0);
     const dataV = dataSource.getData('windV', 0);
@@ -43,4 +43,4 @@ class CapeLayer extends Layer {
 
 }
 
-export default CapeLayer;
+export default WindLayer;

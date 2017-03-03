@@ -68,7 +68,7 @@ class MapView extends React.Component {
         return `/api/map/${modelName}/${layerName}/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
       },
       tileSize: new google.maps.Size(256, 256),
-      maxZoom: 9,
+      maxZoom: 11,
       minZoom: 0,
       radius: 1738000,
       name: modelName,
@@ -107,16 +107,21 @@ class MapView extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    Object.keys(this.state.layers).forEach((key) => {
-      if (!this.state.layers[key]) return;
+    // Activate correct layers in google maps overview
+    Object.keys(this.state.layers).forEach((layerName) => {
+      const layer = this.state.layers[layerName];
+      const isActive = nextProps.layers.includes(layerName);
 
-      if (nextProps.layers.includes(key)) {
-        this.state.layers[key].gfs.addLayer();
-      } else {
-        this.state.layers[key].gfs.removeLayer();
-      }
+      if (!layer) return; // Layer doesn't exist
+
+      Object.keys(layer).forEach((modelName) => {
+        if (!isActive || modelName !== nextProps.model) layer[modelName].removeLayer();
+      });
+
+      if (isActive && layer[nextProps.model]) layer[nextProps.model].addLayer();
     });
 
+    // Pan to location when requested
     if (nextProps.locationStatus === 'REQUESTING' || nextProps.locationStatus === 'REQUESTED') {
       this.setState({ shouldUpdateLocation: true });
     } else if (nextProps.locationStatus === 'DONE' && this.state.shouldUpdateLocation && this.state.mapLoaded) {
@@ -134,6 +139,10 @@ class MapView extends React.Component {
       layers: {
         cape: {
           gfs: MapView.createLayerHelper(google, 'gfs', 'cape', 1),
+          hrrr: MapView.createLayerHelper(google, 'hrrr', 'cape', 1),
+        },
+        wind: {
+          gfs: MapView.createLayerHelper(google, 'gfs', 'wind', 2),
         },
       },
       mapLoaded: true,
@@ -164,6 +173,8 @@ class MapView extends React.Component {
         position: maps.ControlPosition.RIGHT_TOP,
       },
       disableDefaultUI: true,
+      minZoom: 2,
+      minZoomOverride: true,
     };
   }
 
