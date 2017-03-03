@@ -39,6 +39,9 @@ class MapControls extends React.Component {
         <div className={s.slider}>
           <Slider name="test" min={0} max={100} value={sliderValue} onChange={this.handleChange} />
         </div>
+        <div className={s.speed}>
+          <span>1x</span>
+        </div>
       </div>
     );
   }

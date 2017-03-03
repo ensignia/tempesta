@@ -27,7 +27,7 @@ class Navigation extends React.Component {
             else actions.showWeatherOverview();
           }}
         >
-          <Icon name={'keyboard_arrow_up'} />
+          <Icon name={'keyboard_arrow_down'} />
         </Link>
 
         <div className={s.main}>

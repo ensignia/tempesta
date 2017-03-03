@@ -18,7 +18,9 @@
 .link,
 .link:active,
 .link:visited {
-  color: rgba(22, 22, 22, 0.6);
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
 }
 
 .link:hover {

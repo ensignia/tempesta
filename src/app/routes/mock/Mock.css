@@ -6,6 +6,10 @@
   background: linear-gradient(to left, #24C6DC , #514A9D);
 }
 
+.inner {
+  padding: 50px;
+}
+
 .frame {
   width: 100%;
   height: 100%;
