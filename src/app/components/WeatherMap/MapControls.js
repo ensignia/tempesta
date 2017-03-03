@@ -37,6 +37,10 @@ class MapControls extends React.Component {
           <Icon name="play_arrow" size={48} />
         </Link>
         <div className={s.slider}>
+          <div className={s.currentDate}>
+              current date
+          </div>
+
           <Slider name="test" min={0} max={100} value={sliderValue} onChange={this.handleChange} />
         </div>
         <div className={s.speed}>
