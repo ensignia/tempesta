@@ -34,8 +34,8 @@
   flex: auto;
 }
 
-.clearfix:after {
-  content: "";
+.clearfix::after {
+  content: '';
   display: table;
   clear: both;
 }

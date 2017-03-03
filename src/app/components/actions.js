@@ -40,6 +40,7 @@ function requestLocation(state) {
  * Layer Modal
  */
 function showLayerModal(state) {
+  if (state.showModelModal) return state;
   return {
     ...state,
     showLayerModal: true,
@@ -57,6 +58,7 @@ function hideLayerModal(state) {
  * Model Modal
  */
 function showModelModal(state) {
+  if (state.showLayerModal) return state;
   return {
     ...state,
     showModelModal: true,
