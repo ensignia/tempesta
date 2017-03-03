@@ -46,11 +46,18 @@ class WeatherOverview extends React.Component {
       const dayName = dayNames[new Date(day.time * 1000).getDay()];
       const dayIconName = day.icon;
 
-      days.push(<li key={day.time}><div key={day.time} className={dayIconName}><img src={`/WeatherIcons/${day.icon}.svg`} width="38" height="38" alt="lol" /><span>{dayName}</span></div></li>);
+      days.push(<li><div key={day.time} className={dayIconName}><img src={`/WeatherIcons/${day.icon}.svg`} width="38" height="38" alt="lol" /><span>{dayName}</span></div></li>);
     });
 
     return (
       <div className={s.weatherOverview}>
+        <div className={s.Current}>
+          <span>Today</span>
+          <span>hjhh</span>
+        </div>
+        <div>
+          ojij/*CURRENT WEATHER */
+        </div>
         <ul>
           {days}
         </ul>

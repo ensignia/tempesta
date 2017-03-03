@@ -1,9 +1,12 @@
 @import '../variables.css';
 
 .weatherOverview {
-  height: 200px;
+  height: 48px;
   background: #333;
   box-shadow: inset 0px -5px 10px 0px rgba(51,51,51,1);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 ul {
@@ -11,6 +14,10 @@ ul {
     margin: 0;
     padding: 0;
     overflow: hidden;
+}
+
+.Current{
+  
 }
 
 li {
@@ -28,7 +35,7 @@ li div{
 
 li div span{
   display: block;
-  position: absolute;
+  /*position: absolute;*/
 }
 
-/*Add inner bottom shadow -Words from God*/
+/*RECOLOUR ICONS*/
