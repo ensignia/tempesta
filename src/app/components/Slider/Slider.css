@@ -20,6 +20,7 @@
   cursor: pointer;
   display: block;
   height: 100%;
+  width: 0;
   background: var(--primary-color);
   top: 0;
   z-index: 1;

@@ -108,15 +108,14 @@ class Slider extends React.Component {
 
   render() {
     const { name, value, min, max } = this.props;
-    const { grab } = this.state;
 
     const position = this.getPositionFromValue(value);
-    const fillStyle = { width: `${position + grab}px` };
+    const fillStyle = { width: `${position}px` };
     const handleStyle = { left: `${position}px` };
 
     return (
       <label className={s.sliderLabel} htmlFor={this.sliderId}>
-        <input name={name} min={min} max={max} type="range" value={value} id={this.sliderId} onChange={this.props.onChange} />
+        <input name={name} min={min} max={max} type="range" value={value} id={this.sliderId} />
         <div
           ref={(l) => { this.sliderEl = l; }}
           onMouseDown={this.handleDrag}

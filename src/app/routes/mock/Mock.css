@@ -6,13 +6,27 @@
   background: linear-gradient(to left, #24C6DC , #514A9D);
 }
 
-.inner {
-  padding: 50px;
-}
-
 .frame {
   width: 100%;
   height: 100%;
   border: none;
   overflow: hidden;
+}
+
+.mockPage > div {
+  transition: transform 1s ease-in;
+}
+
+@media (max-height: 700px) {
+  .mockPage > div {
+    margin-top: -30px;
+    transform: scale(0.8, 0.8);
+  }
+}
+
+@media (max-height: 600px) {
+  .mockPage > div {
+    margin-top: -80px;
+    transform: scale(0.6, 0.6);
+  }
 }

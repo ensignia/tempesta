@@ -11,7 +11,7 @@ const DEFAULT_CENTER = {
   lng: 0.5,
 };
 
-const DEFAULT_ZOOM = 8;
+const DEFAULT_ZOOM = 11;
 
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
@@ -172,7 +172,7 @@ class MapView extends React.Component {
       key: api.google.maps,
     };
 
-    const { className } = this.props;
+    const { className, location } = this.props;
 
     const markersEl = [];
     [].forEach((marker) => {
@@ -189,6 +189,7 @@ class MapView extends React.Component {
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={this.onGoogleApiLoaded}
         >
+          <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} />
           {markersEl}
         </GoogleMapReact>
       </div>

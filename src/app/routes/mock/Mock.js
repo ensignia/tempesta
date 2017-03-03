@@ -13,11 +13,9 @@ class Home extends React.Component {
   render() {
     return (
       <div className={cx(s.container, s.center, s.page, s.mockPage)}>
-        <div className={s.inner}>
-          <Nexus>
-            <iframe className={s.frame} scrolling="no" src="/" />
-          </Nexus>
-        </div>
+        <Nexus>
+          <iframe className={s.frame} scrolling="no" src="/" />
+        </Nexus>
       </div>
     );
   }
