@@ -11,6 +11,10 @@ const router = Router();
 
 const data = new Data();
 
+router.get('/map', (req, res) => {
+  res.status(200).json(data.getMeta());
+});
+
 router.get('/map/:dataSource/:layer/:forecastHour/:z/:x/:y/tile.png', async (req, res) => {
   try {
     // path to tile image
@@ -51,15 +55,33 @@ router.get('/weather/:latitude,:longitude', async (req, res) => {
   }
 });
 
-router.get('lightning/:timestamp', async (req, res) => {
+/**
+ * GET lightning
+ * Query parameters:
+ * -  since: The unix time to get lightning data since
+ * Response:
+ * - Json object, example:
+ * {
+ *  meta: { since: 1000000, to: 2000000 },
+ *  data: [
+ *    {latitude: 0.5, longitude: 0.5, time: 1500000},
+ *    ...
+ *  ],
+ * }
+ * It is expected that the client will make the following request using the to attribute
+ * as the since attribute, therefore it should be assumed one is inclusive (to) and the other
+ * exclusive (since)
+ */
+router.get('/lightning', (req, res) => {
   try {
-    const lightningData = data.getArrayData('lightning', parseInt(req.params.timestamp, 10));
+    const lightningDataSource = data.getDataSource('lightning');
+    const to = new Date();
+    const since = new Date(parseInt(req.query.since, 10)) || to;
 
-    if (lightningData != null) {
-      lightningData.pipe(res);
-    } else {
-      res.status(500).end();
-    }
+    res.status(200).json({
+      meta: { since, to },
+      data: lightningDataSource.getLightningBetween(since, to),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).end();

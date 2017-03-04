@@ -43,13 +43,20 @@ class LightningDataSource extends DataSource {
     console.log('Generated lighting Data');
     this.loaded = true;
   }
+
   /**
    * From this.data, return the object matching the forecastHour and
-   * dataName, e.g. getData('strikes', 0) returns the current lightningArray
-   * strike radar data
+   * dataName, e.g. getData('probability', 0)
    */
+  // getData() is exclusively for tile generating, tbh the whole data source/layer system is a bit brittle
   getData(dataName, forecastHour) {
     return this.data[forecastHour][dataName];
+  }
+
+  // Used for live lightning
+  getLightningBetween(sinceDate, toDate) {
+    // TODO: Implement
+    return [];
   }
 }
 

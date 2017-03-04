@@ -40,12 +40,12 @@ class Colorer {
     */
   }
 
-  static renderRaw(dataValue, normalizationRange) {
+  renderRaw(dataValue, normalizationRange) {
     const normValue = dataValue > normalizationRange ? 1 : dataValue / normalizationRange;
     return (0xFF * normValue);
   }
 
-  static renderCM(dataValue, normalizationRange, colorMap, shades) {
+  renderCM(dataValue, normalizationRange, colorMap, shades) {
     // generate color scale
     const colorScale = colormap({
       colormap: colorMap,

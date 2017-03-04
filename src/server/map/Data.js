@@ -70,8 +70,19 @@ class Data {
     this.sources[dataSourceName] = dataSource;
   }
 
-  async getMeta() {
-    return {};
+  getDataSource(dataSourceName) {
+    return this.sources[dataSourceName];
+  }
+
+  getMeta() {
+    const models = {};
+    Object.keys(this.sources).forEach((sourceName) => {
+      models[sourceName] = {};
+    });
+
+    return {
+      models,
+    };
   }
 
   /** Passes the tile data request on to the correct Layer, returns
@@ -107,15 +118,6 @@ class Data {
     }
 
     return tilePath;
-  }
-
-  /** Gets data that is to be returned to the client in array format rather
-  than as tiles */
-  async getArrayData(dataSourceName, dataName, timestamp) {
-    /* eslint-disable brace-style */
-    const dataSource = this.sources[dataSourceName];
-
-    return dataSource.getData(dataName, timestamp);
   }
 
   /** Calls load() on every registered data source */
