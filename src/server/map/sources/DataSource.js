@@ -11,7 +11,7 @@ const isWin = /^win/.test(os.platform());
 async function gribParser(filePath, options) {
   return await new Promise((resolve, reject) => {
     grib2json(filePath, {
-      scriptPath: path.join(__dirname, `../lib/grib2json/bin/grib2json${isWin ? '.cmd' : ''}`),
+      scriptPath: path.join(__dirname, `lib/grib2json/bin/grib2json${isWin ? '.cmd' : ''}`),
       ...options,
     }, (err, json) => {
       if (err) return reject(err);

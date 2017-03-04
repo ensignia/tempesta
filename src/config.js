@@ -10,7 +10,7 @@ export const analytics = {
 
 export const server = {
 
-  dataDirectory: '../data',
+  dataDirectory: process.env.DATA_DIRECTORY || '../data',
 
 };
 
