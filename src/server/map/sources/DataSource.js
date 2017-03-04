@@ -36,10 +36,10 @@ class DataSource {
   }
 
   /** HELPER: Download data from url into output if not exists */
-  static async downloadURL(url, output) {
+  static async downloadURL(url, output, forceDownload = false) {
     try {
       const exists = await fsExists(output);
-      if (exists) return output;
+      if (exists && !forceDownload) return output;
 
       const response = await fetch(url);
       const dest = fs.createWriteStream(output);

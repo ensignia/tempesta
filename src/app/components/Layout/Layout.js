@@ -26,7 +26,7 @@ class Layout extends React.Component {
 
     if (nextProps.locationStatus === 'REQUESTED') {
       this.requestLocation();
-      actions.setLocationState('REQUESTING');
+      actions.setLocationStatus('REQUESTING');
     }
   }
 
@@ -38,7 +38,7 @@ class Layout extends React.Component {
         navigator.geolocation.getCurrentPosition((position) => {
           const { latitude, longitude } = position.coords;
           actions.updateLocation({ latitude, longitude });
-          actions.setLocationState('DONE');
+          actions.setLocationStatus('DONE');
         });
       };
 

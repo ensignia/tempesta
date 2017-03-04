@@ -11,10 +11,10 @@ class CapeLayer extends Layer {
 
   /** Fulfills tile data request with dataSource argument, tiles dumped
   into the outputPath directory */
-  async getTile(outputPath, dataSource, tileX, tileY, tileZ) {
+  async getTile(outputPath, dataSource, forecastHour, tileX, tileY, tileZ) {
     console.log(`Generating CAPE tile for ${tileX}/${tileY}/${tileZ}`);
 
-    const data = dataSource.getData('cape', 0);
+    const data = dataSource.getData('cape', forecastHour);
 
     const { // Use object destructuring, only get what you need :)
       leftLongitude,

@@ -11,6 +11,7 @@
 
 .playButton {
   color: black;
+  cursor: pointer;
 }
 
 .slider {

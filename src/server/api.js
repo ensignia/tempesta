@@ -11,12 +11,13 @@ const router = Router();
 
 const data = new Data();
 
-router.get('/map/:dataSource/:layer/:z/:x/:y/tile.png', async (req, res) => {
+router.get('/map/:dataSource/:layer/:forecastHour/:z/:x/:y/tile.png', async (req, res) => {
   try {
     // path to tile image
     const path = await data.getTile(
       req.params.dataSource.toLowerCase(),
       req.params.layer.toLowerCase(),
+      req.params.forecastHour,
       parseInt(req.params.x, 10),
       parseInt(req.params.y, 10),
       parseInt(req.params.z, 10));

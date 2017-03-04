@@ -27,11 +27,11 @@ class GfsDataSource extends DataSource {
     return `${GFS_BASE_URL}gfs.${padLeft(year, 4)}${padLeft(month, 2)}${padLeft(day, 2)}${padLeft(modelCycle, 2)}/gfs.t${padLeft(modelCycle, 2)}z.pgrb2.0p50.f${padLeft(forecastHour, 3)}`;
   }
 
-  static async download(year, month, day, modelCycle, forecastHour) {
+  static async download(year, month, day, modelCycle, forecastHour, forceDownload = false) {
     const url = GfsDataSource.getURL(year, month, day, modelCycle, forecastHour);
     const output = path.join(__dirname, server.dataDirectory, `grib/gfs-${year}-${month}-${day}-${modelCycle}-${forecastHour}.grib2`);
 
-    return await DataSource.downloadURL(url, output);
+    return await DataSource.downloadURL(url, output, forceDownload);
   }
 
   static async getAvailable() {
@@ -61,51 +61,78 @@ class GfsDataSource extends DataSource {
     return [];
   }
 
+  getForecastHours() {
+    return process.env.NODE_ENV === 'production' ? 24 : 6;
+  }
+
+  getForecastHourStep() {
+    return 3;
+  }
+
+  async parseData(forecastHour, filePath) {
+    const capeData = await DataSource.parseGribFile(filePath, {
+      category: 7, // Grib2 category number, equals to --fc 1
+      parameter: 6, // Grib2 parameter number, equals to --fp 7
+      surfaceType: 1, // Grib2 surface type, equals to --fs 103
+      //surfaceValue: 10, // Grib2 surface value, equals to --fv 10
+    });
+
+    const windUData = await DataSource.parseGribFile(filePath, {
+      category: 2, // Grib2 category number, equals to --fc 1
+      parameter: 2, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
+      surfaceType: 100, // Isobar surface
+      surfaceValue: 100000,
+    });
+
+    const windVData = await DataSource.parseGribFile(filePath, {
+      category: 2, // Grib2 category number, equals to --fc 1
+      parameter: 3, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
+      surfaceType: 100, // Isobar surface
+      surfaceValue: 100000,
+    });
+
+    this.data[forecastHour] = {
+      cape: capeData[0],
+      windU: windUData[0],
+      windV: windVData[0],
+    };
+  }
+
   async load() {
     console.log('Loading GFS Data');
 
     const available = await GfsDataSource.getAvailable();
-
     // Use latest data
     // FIXME: Temp fix
     const latest = available[available.length - 2];
 
     // for every available hour, download data and place in this.data[hour]
-    for (let hour = 0; hour < 3; hour += 3) {
-      console.log(`Loading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${hour}`);
-      const filePath = await GfsDataSource.download(
-        latest.year,
-        latest.month,
-        latest.day,
-        latest.modelCycle,
-        hour);
+    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
+      console.log(`Loading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
+      let filePath = await GfsDataSource.download(
+            latest.year,
+            latest.month,
+            latest.day,
+            latest.modelCycle,
+            forecastHour);
 
-      const capeData = await DataSource.parseGribFile(filePath, {
-        category: 7, // Grib2 category number, equals to --fc 1
-        parameter: 6, // Grib2 parameter number, equals to --fp 7
-        surfaceType: 1, // Grib2 surface type, equals to --fs 103
-        //surfaceValue: 10, // Grib2 surface value, equals to --fv 10
-      });
+      try {
+        await this.parseData(forecastHour, filePath);
+      } catch (e) {
+        if (e.message.includes('NullPointerException')) { // Failed likely due to corrupt data
+          console.log(`Failed GFS data for ${latest.day}/${latest.month} - cycle ${latest.modelCycle} - hour +${forecastHour}: Retrying with forced download`);
+          // Try again but force a download
+          filePath = await GfsDataSource.download(
+            latest.year,
+            latest.month,
+            latest.day,
+            latest.modelCycle,
+            forecastHour,
+            true);
 
-      const windUData = await DataSource.parseGribFile(filePath, {
-        category: 2, // Grib2 category number, equals to --fc 1
-        parameter: 2, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
-        surfaceType: 100, // Isobar surface
-        surfaceValue: 100000,
-      });
-
-      const windVData = await DataSource.parseGribFile(filePath, {
-        category: 2, // Grib2 category number, equals to --fc 1
-        parameter: 3, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
-        surfaceType: 100, // Isobar surface
-        surfaceValue: 100000,
-      });
-
-      this.data[hour] = {
-        cape: capeData[0],
-        windU: windUData[0],
-        windV: windVData[0],
-      };
+          await this.parseData(forecastHour, filePath);
+        }
+      }
     }
 
     console.log('Loaded GFS Data');

@@ -58,7 +58,6 @@ class Data {
     this.registerDataSource('gfs', new GfsDataSource());
     this.registerDataSource('hrrr', new HrrrDataSource());
     this.registerDataSource('lightning', new LightningDataSource());
-    // this.registerDataSource('nam', new NamDataSource());
 
     this.load();
   }
@@ -71,17 +70,29 @@ class Data {
     this.sources[dataSourceName] = dataSource;
   }
 
+  async getMeta() {
+    return {};
+  }
+
   /** Passes the tile data request on to the correct Layer, returns
   path to the output png file for the tile */
-  async getTile(dataSourceName, layerName, tileX, tileY, tileZ) {
-    const tilePath = path.join(__dirname, server.dataDirectory, `tiles/${dataSourceName}-${layerName}-${tileX}-${tileY}-${tileZ}.png`);
+  async getTile(dataSourceName, layerName, forecastHour, tileX, tileY, tileZ) {
+    const tilePath = path.join(__dirname, server.dataDirectory, `tiles/${dataSourceName}-${layerName}-${forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
     const exists = await fsExists(tilePath);
 
+    // Don't use cache in development
     if (!exists || process.env.NODE_ENV === 'development') {
       // Get data source i.e. Gfs, and get data for a layer from it i.e. cape
       const dataSource = this.sources[dataSourceName];
       if (dataSource == null || !dataSource.isLoaded()) {
         console.log(`Invalid data source ${dataSourceName}, or not yet loaded`);
+        return null;
+      }
+
+      if (forecastHour < 0
+        || forecastHour > dataSource.getForecastHours()
+        || forecastHour % dataSource.getForecastHourStep() !== 0) {
+        console.log(`Forecast hour ${forecastHour} for data source ${dataSourceName} is invalid`);
         return null;
       }
 
@@ -92,7 +103,7 @@ class Data {
       }
 
       // call data layer, providing output path and correct data source
-      await layer.getTile(tilePath, dataSource, tileX, tileY, tileZ);
+      await layer.getTile(tilePath, dataSource, forecastHour, tileX, tileY, tileZ);
     }
 
     return tilePath;

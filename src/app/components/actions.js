@@ -5,7 +5,31 @@ function initialize() {
     showWeatherOverview: false,
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
+    mapAnimationStatus: 'PLAYING',
   };
+}
+
+/**
+ * Map animation
+ */
+function setMapAnimationStatus(state, mapAnimationStatus) {
+  switch (mapAnimationStatus) {
+    case 'PLAYING':
+    case 'PAUSED':
+      return {
+        ...state,
+        mapAnimationStatus,
+      };
+    default:
+      return state;
+  }
+}
+
+function toggleAnimationStatus(state) {
+  if (state.mapAnimationStatus === 'PLAYING') {
+    return setMapAnimationStatus(state, 'PAUSED');
+  }
+  return setMapAnimationStatus(state, 'PLAYING');
 }
 
 /**
@@ -18,14 +42,14 @@ function updateLocation(state, coords) {
   };
 }
 
-function setLocationState(state, locState) {
-  switch (locState) {
+function setLocationStatus(state, locationStatus) {
+  switch (locationStatus) {
     case 'REQUESTED':
     case 'REQUESTING':
     case 'DONE':
       return {
         ...state,
-        locationStatus: locState,
+        locationStatus,
       };
     default:
       return state;
@@ -33,7 +57,7 @@ function setLocationState(state, locState) {
 }
 
 function requestLocation(state) {
-  return setLocationState(state, 'REQUESTED');
+  return setLocationStatus(state, 'REQUESTED');
 }
 
 /**
@@ -98,6 +122,8 @@ export default {
   showWeatherOverview,
   hideWeatherOverview,
   updateLocation,
-  setLocationState,
+  setLocationStatus,
   requestLocation,
+  setMapAnimationStatus,
+  toggleAnimationStatus,
 };

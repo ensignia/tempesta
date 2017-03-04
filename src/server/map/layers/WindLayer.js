@@ -9,7 +9,7 @@ class WindLayer extends Layer {
     return dataSourceName === 'gfs';
   }
 
-  async getTile(outputPath, dataSource, tileX, tileY, tileZ) {
+  async getTile(outputPath, dataSource, forecastHour, tileX, tileY, tileZ) {
     console.log(`Generating Wind tile for ${tileX}/${tileY}/${tileZ}`);
 
     const dataU = dataSource.getData('windU', 0);

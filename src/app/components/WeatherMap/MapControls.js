@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import cx from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { connect } from '../store.js';
 import s from './MapControls.css';
 import Link from '../Link/Link.js';
 import Icon from '../Icon/Icon.js';
@@ -9,7 +10,8 @@ import Slider from '../Slider/Slider.js';
 class MapControls extends React.Component {
 
   static propTypes = {
-    className: PropTypes.string,
+    mapAnimationStatus: PropTypes.string,
+    actions: PropTypes.object,
   };
 
   constructor() {
@@ -30,18 +32,22 @@ class MapControls extends React.Component {
 
   render() {
     const { sliderValue } = this.state;
+    const { actions, mapAnimationStatus } = this.props;
 
     return (
       <div className={cx(s.mapControls)}>
-        <Link className={cx(s.playButton)} to="/">
-          <Icon name="play_arrow" size={48} />
-        </Link>
+        <Icon
+          className={s.playButton}
+          name={mapAnimationStatus === 'PLAYING' ? 'pause' : 'play_arrow'}
+          onClick={actions.toggleAnimationStatus}
+          size={48}
+        />
         <div className={s.slider}>
           <div className={s.currentDate}>
               current date
           </div>
 
-          <Slider name="test" min={0} max={100} value={sliderValue} onChange={this.handleChange} />
+          <Slider name="mapAnimationBar" min={0} max={100} value={sliderValue} onChange={this.handleChange} />
         </div>
         <div className={s.speed}>
           <span>1x</span>
@@ -51,4 +57,6 @@ class MapControls extends React.Component {
   }
 }
 
-export default withStyles(s)(MapControls);
+export default connect((state) => ({
+  mapAnimationStatus: state.mapAnimationStatus,
+}))(withStyles(s)(MapControls));
