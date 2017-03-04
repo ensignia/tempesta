@@ -69,6 +69,8 @@ class GfsDataSource extends DataSource {
     // Use latest data
     // FIXME: Temp fix
     const latest = available[available.length - 2];
+
+    // for every available hour, download data and place in this.data[hour]
     for (let hour = 0; hour < 3; hour += 3) {
       console.log(`Loading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${hour}`);
       const filePath = await GfsDataSource.download(

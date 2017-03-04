@@ -13,6 +13,7 @@ const data = new Data();
 
 router.get('/map/:dataSource/:layer/:z/:x/:y/tile.png', async (req, res) => {
   try {
+    // path to tile image
     const path = await data.getTile(
       req.params.dataSource.toLowerCase(),
       req.params.layer.toLowerCase(),
@@ -20,6 +21,7 @@ router.get('/map/:dataSource/:layer/:z/:x/:y/tile.png', async (req, res) => {
       parseInt(req.params.y, 10),
       parseInt(req.params.z, 10));
 
+    // transmit tile
     if (path != null) {
       res.writeHead(200, {
         'Content-Type': 'image/png',
@@ -45,6 +47,21 @@ router.get('/weather/:latitude,:longitude', async (req, res) => {
     console.log(error);
     // something went wrong
     res.status(500).json({ error: 'Failed to get data' });
+  }
+});
+
+router.get('lightning/:timestamp', async (req, res) => {
+  try {
+    const lightningData = data.getArrayData('lightning', parseInt(req.params.timestamp, 10));
+
+    if (lightningData != null) {
+      lightningData.pipe(res);
+    } else {
+      res.status(500).end();
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).end();
   }
 });
 

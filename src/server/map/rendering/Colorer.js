@@ -1,4 +1,9 @@
+import colormap from 'colormap';
+
 class Colorer {
+  constructor() {
+    this.colorMaps = ['jet', 'hsv', 'hot', 'cool', 'spring', 'YIGnBu'];
+  }
 
   /** Returns an RGBA color value for a pixel based on a data value, the
   normalization range for the data it belongs to, and color scale settings. */
@@ -38,6 +43,22 @@ class Colorer {
   static renderRaw(dataValue, normalizationRange) {
     const normValue = dataValue > normalizationRange ? 1 : dataValue / normalizationRange;
     return (0xFF * normValue);
+  }
+
+  static renderCM(dataValue, normalizationRange, colorMap, shades) {
+    // generate color scale
+    const colorScale = colormap({
+      colormap: colorMap,
+      nshades: shades,
+      format: 'rgbaString',
+      alpha: 1,
+    });
+
+    // normalize data
+    const normValue = dataValue > normalizationRange ?
+                    shades : (dataValue / normalizationRange) * shades;
+
+    return colorScale[Math.ceil(normValue)];
   }
 }
 

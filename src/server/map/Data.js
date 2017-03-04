@@ -4,8 +4,10 @@ import path from 'path';
 import fs from 'fs';
 import CapeLayer from './layers/CapeLayer.js';
 import WindLayer from './layers/WindLayer.js';
+import LightningProbabilityLayer from './layers/LightningProbabilityLayer.js';
 import GfsDataSource from './sources/GfsDataSource.js';
 import HrrrDataSource from './sources/HrrrDataSource.js';
+import LightningDataSource from './sources/LightningDataSource.js';
 // import NamDataSource from './sources/NamDataSource.js';
 import { server } from '../../config.js';
 
@@ -52,8 +54,10 @@ class Data {
 
     this.registerLayer('cape', new CapeLayer());
     this.registerLayer('wind', new WindLayer());
+    this.registerLayer('lightningProbability', new LightningProbabilityLayer());
     this.registerDataSource('gfs', new GfsDataSource());
     this.registerDataSource('hrrr', new HrrrDataSource());
+    this.registerDataSource('lightning', new LightningDataSource());
     // this.registerDataSource('nam', new NamDataSource());
 
     this.load();
@@ -67,7 +71,8 @@ class Data {
     this.sources[dataSourceName] = dataSource;
   }
 
-  /** Passes the tile data request on to the correct Layer */
+  /** Passes the tile data request on to the correct Layer, returns
+  path to the output png file for the tile */
   async getTile(dataSourceName, layerName, tileX, tileY, tileZ) {
     const tilePath = path.join(__dirname, server.dataDirectory, `tiles/${dataSourceName}-${layerName}-${tileX}-${tileY}-${tileZ}.png`);
     const exists = await fsExists(tilePath);
@@ -93,6 +98,16 @@ class Data {
     return tilePath;
   }
 
+  /** Gets data that is to be returned to the client in array format rather
+  than as tiles */
+  async getArrayData(dataSourceName, dataName, timestamp) {
+    /* eslint-disable brace-style */
+    const dataSource = this.sources[dataSourceName];
+
+    return dataSource.getData(dataName, timestamp);
+  }
+
+  /** Calls load() on every registered data source */
   async load() {
     Object.values(this.sources).forEach(source => source.load());
   }
