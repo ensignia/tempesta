@@ -99,7 +99,6 @@
     "postcss-selector-matches": "^2.0.5",
     "postcss-selector-not": "^2.0.0",
     "postcss-url": "^5.1.2",
-    "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
     "react-addons-test-utils": "15.4.1",
     "react-deep-force-update": "^2.0.1",
@@ -164,6 +163,7 @@
       "react/no-unused-prop-types": "off",
       "react/prefer-stateless-function": "off",
       "no-console": "off",
+      "class-methods-use-this": "off",
       "no-restricted-syntax": [
         "error",
         "ForInStatement",
@@ -194,7 +194,6 @@
       ]
     }
   },
-  "pre-commit": "lint:staged",
   "lint-staged": {
     "*.{md,sh,txt,xml,html,json}": [
       "editorconfig-tools fix",
