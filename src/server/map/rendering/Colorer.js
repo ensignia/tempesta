@@ -1,8 +1,12 @@
 import colormap from 'colormap';
 
+const NUM_SHADES = 40;
+
 class Colorer {
   constructor() {
-    this.colorMaps = ['jet', 'hsv', 'hot', 'cool', 'spring', 'YIGnBu'];
+    this.colorScales = {
+      rainbow: colormap({ colormap: 'rainbow', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
+    };
   }
 
   /** Returns an RGBA color value for a pixel based on a data value, the
@@ -40,25 +44,12 @@ class Colorer {
     */
   }
 
-  renderRaw(dataValue, normalizationRange) {
-    const normValue = dataValue > normalizationRange ? 1 : dataValue / normalizationRange;
-    return (0xFF * normValue);
-  }
-
-  renderCM(dataValue, normalizationRange, colorMap, shades) {
-    // generate color scale
-    const colorScale = colormap({
-      colormap: colorMap,
-      nshades: shades,
-      format: 'rgbaString',
-      alpha: 1,
-    });
-
+  renderCM = function renderCM(dataValue, normalizationRange, colorMap) {
     // normalize data
     const normValue = dataValue > normalizationRange ?
-                    shades : (dataValue / normalizationRange) * shades;
+                    NUM_SHADES - 1 : (dataValue / normalizationRange) * NUM_SHADES;
 
-    return colorScale[Math.ceil(normValue)];
+    return (parseInt(this.colorScales[colorMap][Math.floor(normValue)].replace('#', ''), 16) << 8) + 0xFF;
   }
 }
 
