@@ -1,6 +1,5 @@
 import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './Home.css';
+import WeatherMap from '../../components/WeatherMap/WeatherMap.js';
 
 class Home extends React.Component {
   static propTypes = {
@@ -8,13 +7,9 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div className={s.root}>
-        <div className={s.container}>
-          <h1>React.js News</h1>
-        </div>
-      </div>
+      <WeatherMap />
     );
   }
 }
 
-export default withStyles(s)(Home);
+export default Home;

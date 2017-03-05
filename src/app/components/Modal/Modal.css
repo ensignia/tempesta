@@ -1,0 +1,63 @@
+@import '../variables.css';
+
+.modalDisableBody {
+  pointer-events: none;
+}
+
+.modalOverlay,
+.modalWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.modalWrapper {
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.modal {
+  border: none;
+  background-color: #ffffff;
+  box-shadow: 0 9px 46px 8px rgba(0, 0, 0, 0.14), 0 11px 15px -7px rgba(0, 0, 0, 0.12), 0 24px 38px 3px rgba(0, 0, 0, 0.2);
+  width: 280px;
+
+  pointer-events: auto;
+}
+
+.title {
+  padding: 24px 24px 0;
+  margin: 0;
+  font-size: 40px;
+  font-size: 2.5rem;
+  color: --text-color;
+}
+
+.content {
+  padding: 20px 24px 24px 24px;
+  color: --text-color-secondary;
+}
+
+.actions {
+  padding: 8px 8px 8px 24px;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+}
+
+.actions > * {
+  margin-right: 8px;
+  height: 36px;
+}
+
+.actions > *:first-child {
+  margin-right: 0px;
+}

@@ -1,0 +1,41 @@
+@import 'variables.css';
+
+:global {
+  html,
+  body,
+  #app {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+/*
+ * Base styles
+ * ========================================================================== */
+.page {
+  min-height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.container > * {
+  flex: 0 0 auto;
+}
+
+.center {
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  flex: auto;
+}
+
+.clearfix::after {
+  content: '';
+  display: table;
+  clear: both;
+}

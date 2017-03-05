@@ -9,6 +9,7 @@ export default {
   children: [
     require('./home').default,
     require('./about').default,
+    require('./mock').default,
 
     // Wildcard routes last
     require('./notFound').default,
@@ -19,7 +20,7 @@ export default {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || 'Untitled Page'}`;
+    route.title = `${route.title || ''} Tempesta`;
     route.description = route.description || '';
 
     return route;

@@ -7,7 +7,7 @@ import queryString from 'query-string';
 import { createPath } from 'history/PathUtils';
 import OfflinePlugin from 'offline-plugin/runtime';
 import history from './core/history';
-import App from './components/App';
+import App from './components/App.js';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 
 // Global (context) variables that can be easily accessed from any React component

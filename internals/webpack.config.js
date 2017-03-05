@@ -12,6 +12,7 @@ import webpack from 'webpack';
 import extend from 'extend';
 import AssetsPlugin from 'assets-webpack-plugin';
 import OfflinePlugin from 'offline-plugin';
+import ParseEnv from './lib/parse-env.js';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
@@ -78,7 +79,8 @@ const config = {
         },
       },
       {
-        test: /\.css/,
+        test: /\.css$/,
+        exclude: /node_modules/,
         loaders: [
           'isomorphic-style-loader',
           `css-loader?${JSON.stringify({
@@ -88,6 +90,23 @@ const config = {
             // CSS Modules https://github.com/css-modules/css-modules
             modules: true,
             localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
+            // CSS Nano http://cssnano.co/options/
+            minimize: !isDebug,
+            discardComments: { removeAll: true },
+          })}`,
+          'postcss-loader?pack=default',
+        ],
+      },
+      {
+        test: /\.css$/,
+        include: /node_modules/,
+        loaders: [
+          'isomorphic-style-loader',
+          `css-loader?${JSON.stringify({
+            // CSS Loader https://github.com/webpack/css-loader
+            importLoaders: 1,
+            sourceMap: isDebug,
+            localIdentName: '[local]',
             // CSS Nano http://cssnano.co/options/
             minimize: !isDebug,
             discardComments: { removeAll: true },
@@ -151,12 +170,12 @@ const config = {
 
   // The list of plugins for PostCSS
   // https://github.com/postcss/postcss
-  postcss(bundler) {
+  postcss() {
     return {
       default: [
         // Transfer @import rule by inlining content, e.g. @import 'normalize.css'
-        // https://github.com/jonathantneal/postcss-partial-import
-        require('postcss-partial-import')({ addDependencyTo: bundler }),
+        // https://github.com/postcss/postcss-import
+        require('postcss-import')(),
         // Allow you to fix url() according to postcss to and/or from options
         // https://github.com/postcss/postcss-url
         require('postcss-url')(),
@@ -175,6 +194,9 @@ const config = {
         // W3C calc() function, e.g. div { height: calc(100px - 2em); }
         // https://github.com/postcss/postcss-calc
         require('postcss-calc')(),
+        // Allows @extend
+        // https://github.com/travcopostcss-extend
+        require('postcss-extend')(),
         // Allows you to nest one style rule inside another
         // https://github.com/jonathantneal/postcss-nesting
         require('postcss-nesting')(),
@@ -239,6 +261,11 @@ const clientConfig = extend(true, {}, config, {
       'process.env.BROWSER': true,
       __DEV__: isDebug,
     }),
+
+    // Replace env variables with env file
+    new webpack.DefinePlugin(
+      ParseEnv(path.resolve(__dirname, '../secrets.env')),
+    ),
 
     // Emit a file with assets paths
     // https://github.com/sporto/assets-webpack-plugin#options
@@ -336,6 +363,11 @@ const serverConfig = extend(true, {}, config, {
       'process.env.BROWSER': false,
       __DEV__: isDebug,
     }),
+
+    // Replace env variables with env file
+    new webpack.DefinePlugin(
+      ParseEnv(path.resolve(__dirname, '../secrets.env')),
+    ),
 
     // Do not create separate chunks of the server bundle
     // https://webpack.github.io/docs/list-of-plugins.html#limitchunkcountplugin

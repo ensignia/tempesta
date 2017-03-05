@@ -1,34 +1,63 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
+/* eslint-disable css-modules/no-unused-or-extra-class */
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cx from 'classnames';
+import normalize from 'normalize.css';
+import mdl from 'material-design-lite/material.css';
+import { connect } from '../store.js';
 import s from './Layout.css';
-import Header from '../Header';
-import Feedback from '../Feedback';
-import Footer from '../Footer';
+import Header from '../Header/Header.js';
 
 class Layout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
+    locationStatus: PropTypes.string.isRequired,
+    actions: PropTypes.object.isRequired,
   };
+
+  constructor() {
+    super();
+
+    this.requestLocation = this.requestLocation.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { actions } = this.props;
+
+    if (nextProps.locationStatus === 'REQUESTED') {
+      this.requestLocation();
+      actions.setLocationStatus('REQUESTING');
+    }
+  }
+
+  requestLocation() {
+    const { actions } = this.props;
+
+    if ('geolocation' in navigator) {
+      const getLocation = () => {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const { latitude, longitude } = position.coords;
+          actions.updateLocation({ latitude, longitude });
+          actions.setLocationStatus('DONE');
+        });
+      };
+
+      setTimeout(getLocation, 1000); // Delay location for cool factor
+    }
+  }
 
   render() {
     return (
-      <div>
+      <div className={cx(s.page, s.container)}>
         <Header />
-        {this.props.children}
-        <Feedback />
-        <Footer />
+        <main className={cx(s.content, s.container)}>
+          {this.props.children}
+        </main>
       </div>
     );
   }
 }
 
-export default withStyles(s)(Layout);
+export default connect((state) => ({
+  locationStatus: state.locationStatus,
+}))(withStyles(normalize, mdl, s)(Layout));

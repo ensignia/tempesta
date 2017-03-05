@@ -30,12 +30,14 @@ async function copy() {
     }, null, 2)),
     copyDir('src/content', 'build/content'),
     copyDir('public', 'build/public'),
+    copyDir('lib', 'build/lib'),
   ]);
 
   if (process.argv.includes('--watch')) {
     const watcher = chokidar.watch([
       'src/content/**/*',
       'public/**/*',
+      'lib/**/*',
     ], { ignoreInitial: true });
 
     watcher.on('all', async (event, filePath) => {

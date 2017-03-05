@@ -6,9 +6,11 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
-import jwt from 'jsonwebtoken';
+import compression from 'compression';
+import pretty from 'express-prettify';
 import minimist from 'minimist';
 import frontendMiddleware from './middlewares/frontendMiddleware';
+import api from './api.js';
 import { auth } from '../config';
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -26,11 +28,12 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 //
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
-// app.use(compression());
+if (!isDev) app.use(compression());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+if (isDev) app.use(pretty({ query: 'pretty' }));
 
 //
 // Authentication
@@ -46,7 +49,7 @@ if (isDev) app.enable('trust proxy');
 //
 // Register API middleware
 // -----------------------------------------------------------------------------
-
+app.use('/api', api);
 
 //
 // Register server-side rendering middleware
@@ -65,5 +68,5 @@ app.listen(port, host, (err) => {
   }
 
   const prettyHost = host || 'localhost';
-  console.log(`The server is running at http://${prettyHost}:${port}`);
+  console.log(`The server is running at http://${prettyHost}:${port}/`);
 });
