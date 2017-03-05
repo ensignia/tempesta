@@ -75,10 +75,10 @@
   3. *mesoscale discussions*: http://www.spc.noaa.gov/products/md/
 2. **Global Forecast System** low-resolution, global data.
   1. Data source name: 'gfs'
-  2. Layer names: 'cape', 'windeshear'
+  2. Layer names: 'cape', 'wind'
 3. **HRRR** high-resolution, high-refresh
   1. Data source name: 'hrrr'
-  2. Layer names: 'cape', 'windshear'
+  2. Layer names: 'cape', 'wind'
 4. **Lightning simulation** simple frequency-based probabilistic lightning simulation
   1. Data source name: 'lighting'
   2. Layer names: 'strikes' (non-tiled), 'probability'
