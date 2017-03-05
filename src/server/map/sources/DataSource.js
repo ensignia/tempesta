@@ -27,8 +27,8 @@ function fsExists(file) {
   });
 }
 
-class DataSource {
 
+class DataSource {
   constructor() {
     this.loaded = false;
 

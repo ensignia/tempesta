@@ -9,7 +9,11 @@ class Layer {
     this.colorer = new Colorer();
   }
 
+  // number of pixels in tile width
   static TILE_SIZE = 256;
+  // number of vector shapes in tile width
+  static TILE_VECTOR_BLOCKS = 8;
+  static PIXELS_PER_VBLOCK = 256 / 8;
 
   /** Converts a google maps tile number to the longitude value
   of its upper left corner */
@@ -34,6 +38,8 @@ class Layer {
     const angularTileHeight = Math.abs(topLatitude - bottomLatitude);
     const angularPixelWidth = angularTileWidth / Layer.TILE_SIZE;
     const angularPixelHeight = angularTileHeight / Layer.TILE_SIZE;
+    const angularVectorWidth = angularTileWidth / Layer.TILE_VECTOR_BLOCKS;
+    const angularVectorHeight = angularTileHeight / Layer.TILE_VECTOR_BLOCKS;
 
     return {
       leftLongitude,
@@ -44,6 +50,8 @@ class Layer {
       angularTileHeight,
       angularPixelWidth,
       angularPixelHeight,
+      angularVectorWidth,
+      angularVectorHeight,
     };
   }
 

@@ -82,3 +82,7 @@
 4. **Lightning simulation** simple frequency-based probabilistic lightning simulation
   1. Data source name: 'lighting'
   2. Layer names: 'strikes' (non-tiled), 'probability'
+
+
+### RANDOM SHIT
+1. Options for drawing the wind layer include:

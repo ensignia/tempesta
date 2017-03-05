@@ -6,15 +6,12 @@ class Colorer {
   constructor() {
     /* eslint-disable no-restricted-syntax */
     /* eslint-disable no-bitwise */
-
     this.colorScales = {
       jet: colormap({ colormap: 'jet', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
       rainbow: colormap({ colormap: 'rainbow', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
       plasma: colormap({ colormap: 'plasma', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
       hsv: colormap({ colormap: 'hsv', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
     };
-
-    // set up color scale arrays
     for (const scale in this.colorScales) {
       if (Object.prototype.hasOwnProperty.call(this.colorScales, scale)) {
         for (let i = 0; i < this.colorScales[scale].length; i += 1) {
@@ -33,6 +30,16 @@ class Colorer {
     const opacityCoefficient = normValue > 0.8 ? 0.8 : normValue;
 
     return this.colorScales[colorMap][scaleIndex] + (0xFF * opacityCoefficient);
+  }
+
+  drawVector(ctx, vectorData) {
+    ctx.beginPath();
+    ctx.moveTo(vectorData.originX, vectorData.originY);
+    ctx.lineTo(vectorData.headX, vectorData.headY);
+    ctx.lineTo(vectorData.arrowLeftCornerX, vectorData.arrowLeftCornerY);
+    ctx.lineTo(vectorData.arrowRightCornerX, vectorData.arrowRightCornerY);
+    ctx.lineTo(vectorData.headX, vectorData.headY);
+    ctx.stroke();
   }
 }
 

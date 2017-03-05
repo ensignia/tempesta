@@ -67,7 +67,6 @@ class CapeLayer extends Layer {
       pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
     });
   }
-
 }
 
 export default CapeLayer;

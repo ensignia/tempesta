@@ -9,8 +9,8 @@ function padLeft(number, zeroes, str) {
   return Array((zeroes - String(number).length) + 1).join(str || '0') + number;
 }
 
-class HrrrDataSource extends DataSource {
 
+class HrrrDataSource extends DataSource {
   constructor() {
     super();
     this.data = {};
