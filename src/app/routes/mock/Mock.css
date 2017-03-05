@@ -1,9 +1,7 @@
 @import '../../components/global.css';
 
 .mockPage {
-  /*background: linear-gradient(to left, #00d2ff , #3a7bd5);*/
-  /*background: linear-gradient(to left, #4b6cb7 , #182848);*/
-  background: linear-gradient(to left, #24C6DC , #514A9D);
+  background: linear-gradient(to left, #24c6dc, #514a9d);
 }
 
 .frame {
@@ -13,20 +11,32 @@
   overflow: hidden;
 }
 
+/** Super dirty ugly fix for scale() not rendering properly due to differences
+ *  in text rendering on the CPU vs GPU, this appears to force GPU rendering.
+ *  There are issues with text becoming blurry however as I believe GPU does not
+ *  have sup pixel antialiasing
+ */
+* {
+  backface-visibility: hidden;
+}
+
 .mockPage > div {
   transition: transform 1s ease-in;
+  filter: blur(0);
+  -webkit-font-smoothing: subpixel-antialiased;
+  transform: translateZ(0) scale(1, 1);
 }
 
 @media (max-height: 700px) {
   .mockPage > div {
     margin-top: -30px;
-    transform: scale(0.8, 0.8);
+    transform: translateZ(0) scale(0.8, 0.8);
   }
 }
 
 @media (max-height: 600px) {
   .mockPage > div {
     margin-top: -80px;
-    transform: scale(0.6, 0.6);
+    transform: translateZ(0) scale(0.6, 0.6);
   }
 }

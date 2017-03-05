@@ -50,6 +50,7 @@ class LightningDataSource extends DataSource {
    */
   // getData() is exclusively for tile generating, tbh the whole data source/layer system is a bit brittle
   getData(dataName, forecastHour) {
+    if (!this.loaded) throw new Error('Data not loaded yet!');
     return this.data[forecastHour][dataName];
   }
 

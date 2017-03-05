@@ -15,16 +15,15 @@ router.get('/map', (req, res) => {
   res.status(200).json(data.getMeta());
 });
 
-router.get('/map/:dataSource/:layer/:forecastHour/:z/:x/:y/tile.png', async (req, res) => {
+router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
   try {
     // path to tile image
     const path = await data.getTile(
-      req.params.dataSource.toLowerCase(),
       req.params.layer.toLowerCase(),
-      req.params.forecastHour,
       parseInt(req.params.x, 10),
       parseInt(req.params.y, 10),
-      parseInt(req.params.z, 10));
+      parseInt(req.params.z, 10),
+      req.query);
 
     // transmit tile
     if (path != null) {
@@ -36,7 +35,7 @@ router.get('/map/:dataSource/:layer/:forecastHour/:z/:x/:y/tile.png', async (req
       res.status(500).end();
     }
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     // something went wrong
     res.status(500).end();
   }

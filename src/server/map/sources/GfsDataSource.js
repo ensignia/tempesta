@@ -140,6 +140,7 @@ class GfsDataSource extends DataSource {
   }
 
   getData(dataName, forecastHour) {
+    if (!this.loaded) throw new Error('Data not loaded yet!');
     return this.data[forecastHour][dataName];
   }
 }

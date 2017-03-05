@@ -91,12 +91,12 @@ class MapView extends React.Component {
         if (!normalizedCoord) {
           return null;
         }
-        return `/api/map/${modelName}/${layerName}/${forecastHour}/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png`;
+        return `/api/map/${layerName}/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png?forecastHour=${forecastHour}&source=${modelName}`;
       },
       tileSize: new google.maps.Size(256, 256),
       maxZoom: 11,
       minZoom: 0,
-      name: modelName,
+      name: layerName,
     });
 
     return {

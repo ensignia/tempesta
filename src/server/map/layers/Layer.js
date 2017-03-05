@@ -1,8 +1,11 @@
+import path from 'path';
 import Colorer from '../rendering/Colorer.js';
+import { server } from '../../../config.js';
 
 class Layer {
 
-  constructor() {
+  constructor(data) {
+    this.data = data;
     this.colorer = new Colorer();
   }
 
@@ -44,6 +47,13 @@ class Layer {
     };
   }
 
+  static getFullPath(imageName) {
+    return path.join(__dirname, server.dataDirectory, 'tiles/', imageName);
+  }
+
+  getData() {
+    return this.data;
+  }
 }
 
 export default Layer;

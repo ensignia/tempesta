@@ -52,9 +52,9 @@ class Data {
       if (!exists) fs.mkdir(GRIB_DIR);
     });
 
-    this.registerLayer('cape', new CapeLayer());
-    this.registerLayer('wind', new WindLayer());
-    this.registerLayer('lightningProbability', new LightningProbabilityLayer());
+    this.registerLayer('cape', new CapeLayer(this));
+    this.registerLayer('wind', new WindLayer(this));
+    this.registerLayer('lightningProbability', new LightningProbabilityLayer(this));
     this.registerDataSource('gfs', new GfsDataSource());
     this.registerDataSource('hrrr', new HrrrDataSource());
     this.registerDataSource('lightning', new LightningDataSource());
@@ -87,35 +87,16 @@ class Data {
 
   /** Passes the tile data request on to the correct Layer, returns
   path to the output png file for the tile */
-  async getTile(dataSourceName, layerName, forecastHour, tileX, tileY, tileZ) {
-    const tilePath = path.join(__dirname, server.dataDirectory, `tiles/${dataSourceName}-${layerName}-${forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+  async getTile(layerName, tileX, tileY, tileZ, options) {
+    const layer = this.layers[layerName];
+
+    const validatedOptions = layer.getOptions(options);
+    const tilePath = layer.getPath(tileX, tileY, tileZ, validatedOptions);
+
     const exists = await fsExists(tilePath);
+    const isCached = exists && process.env.NODE_ENV === 'production';
 
-    // Don't use cache in development
-    if (!exists || process.env.NODE_ENV === 'development') {
-      // Get data source i.e. Gfs, and get data for a layer from it i.e. cape
-      const dataSource = this.sources[dataSourceName];
-      if (dataSource == null || !dataSource.isLoaded()) {
-        console.log(`Invalid data source ${dataSourceName}, or not yet loaded`);
-        return null;
-      }
-
-      if (forecastHour < 0
-        || forecastHour > dataSource.getForecastHours()
-        || forecastHour % dataSource.getForecastHourStep() !== 0) {
-        console.log(`Forecast hour ${forecastHour} for data source ${dataSourceName} is invalid`);
-        return null;
-      }
-
-      const layer = this.layers[layerName];
-      if (!layer.isSupportedSource(dataSourceName)) {
-        console.log(`Layer ${layerName} does not support data source ${dataSourceName}`);
-        return null;
-      }
-
-      // call data layer, providing output path and correct data source
-      await layer.getTile(tilePath, dataSource, forecastHour, tileX, tileY, tileZ);
-    }
+    if (!isCached) await layer.generateTile(tilePath, tileX, tileY, tileZ, validatedOptions);
 
     return tilePath;
   }

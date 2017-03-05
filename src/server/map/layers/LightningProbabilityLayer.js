@@ -5,18 +5,39 @@ import Layer from './Layer.js';
 
 class LightningProbabilityLayer extends Layer {
   /** Allows checking if given data source is supported for this layer */
-  async isSupportedSource(dataSourceName) {
-    return dataSourceName === 'lightning';
+  static defaultOptions = {
+    forecastHour: 0,
+  }
+
+  getOptions(options_) {
+    const options = {
+      ...LightningProbabilityLayer.defaultOptions,
+      ...options_,
+    };
+
+    const source = this.getData().getDataSource('lightning');
+
+    if (options.forecastHour < 0
+      || options.forecastHour > source.getForecastHours()
+      || options.forecastHour % source.getForecastHourStep() !== 0) {
+      throw new Error(`Forecast hour ${options.forecastHour} for data source is invalid`);
+    }
+
+    return options;
+  }
+
+  getPath(tileX, tileY, tileZ, options) {
+    return Layer.getFullPath(`lightning-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
   /** Fulfills tile data request with dataSource argument, tiles dumped
   into the outputPath directory */
-  async getTile(outputPath, dataSource, tileX, tileY, tileZ) {
+  async getTile(tilePath, tileX, tileY, tileZ, options) {
     console.log(`Generating LIGHTNING PROBABILITY tile for ${tileX}/${tileY}/${tileZ}`);
 
-    const data = dataSource.getData('probability', 0);
+    const data = this.getData().getDataSource('lightning').getData('probability', options.forecastHour);
 
-    const { // Use object destructuring, only get what you need :)
+    const {
       leftLongitude,
       topLatitude,
       angularPixelWidth,
@@ -37,8 +58,8 @@ class LightningProbabilityLayer extends Layer {
       }
     }
 
-    return await new Promise(resolve => {
-      pureimage.encodePNG(image, fs.createWriteStream(outputPath), err => resolve(!err));
+    await new Promise(resolve => {
+      pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
     });
   }
 

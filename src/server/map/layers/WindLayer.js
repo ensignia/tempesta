@@ -5,15 +5,43 @@ import Layer from './Layer.js';
 
 class WindLayer extends Layer {
 
-  async isSupportedSource(dataSourceName) {
-    return dataSourceName === 'gfs';
+  static defaultOptions = {
+    source: 'gfs',
+    forecastHour: 0,
   }
 
-  async getTile(outputPath, dataSource, forecastHour, tileX, tileY, tileZ) {
+  getOptions(options_) {
+    const options = {
+      ...WindLayer.defaultOptions,
+      ...options_,
+    };
+
+    options.source = options.source.toLowerCase();
+
+    if (!['gfs'].includes(options.source)) {
+      throw new Error(`Source ${options.source} for WindLayer is invalid`);
+    }
+
+    const source = this.getData().getDataSource(options.source);
+
+    if (options.forecastHour < 0
+      || options.forecastHour > source.getForecastHours()
+      || options.forecastHour % source.getForecastHourStep() !== 0) {
+      throw new Error(`Forecast hour ${options.forecastHour} for data source is invalid`);
+    }
+
+    return options;
+  }
+
+  getPath(tileX, tileY, tileZ, options) {
+    return Layer.getFullPath(`wind-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+  }
+
+  async generateTile(tilePath, tileX, tileY, tileZ, options) {
     console.log(`Generating Wind tile for ${tileX}/${tileY}/${tileZ}`);
 
-    const dataU = dataSource.getData('windU', 0);
-    const dataV = dataSource.getData('windV', 0);
+    const dataU = this.getData().getDataSource(options.source).getData('windU', options.forecastHour);
+    const dataV = this.getData().getDataSource(options.source).getData('windV', options.forecastHour);
 
     const { // Use object destructuring, only get what you need :)
       leftLongitude,
@@ -36,8 +64,8 @@ class WindLayer extends Layer {
       }
     }
 
-    return await new Promise(resolve => {
-      pureimage.encodePNG(image, fs.createWriteStream(outputPath), err => resolve(!err));
+    await new Promise(resolve => {
+      pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
     });
   }
 

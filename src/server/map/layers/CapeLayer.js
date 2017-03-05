@@ -5,16 +5,42 @@ import Layer from './Layer.js';
 
 class CapeLayer extends Layer {
 
-  async isSupportedSource(dataSourceName) {
-    return dataSourceName === 'gfs' || dataSourceName === 'hrrr';
+  static defaultOptions = {
+    source: 'gfs',
+    forecastHour: 0,
   }
 
-  /** Fulfills tile data request with dataSource argument, tiles dumped
-  into the outputPath directory */
-  async getTile(outputPath, dataSource, forecastHour, tileX, tileY, tileZ) {
+  getOptions(options_) {
+    const options = {
+      ...CapeLayer.defaultOptions,
+      ...options_,
+    };
+
+    options.source = options.source.toLowerCase();
+
+    if (!['gfs', 'hrrr'].includes(options.source)) {
+      throw new Error(`Source ${options.source} for CapeLayer is invalid`);
+    }
+
+    const source = this.getData().getDataSource(options.source);
+
+    if (options.forecastHour < 0
+      || options.forecastHour > source.getForecastHours()
+      || options.forecastHour % source.getForecastHourStep() !== 0) {
+      throw new Error(`Forecast hour ${options.forecastHour} for data source is invalid`);
+    }
+
+    return options;
+  }
+
+  getPath(tileX, tileY, tileZ, options) {
+    return Layer.getFullPath(`cape-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+  }
+
+  async generateTile(tilePath, tileX, tileY, tileZ, options) {
     console.log(`Generating CAPE tile for ${tileX}/${tileY}/${tileZ}`);
 
-    const data = dataSource.getData('cape', forecastHour);
+    const data = this.getData().getDataSource(options.source).getData('cape', options.forecastHour);
 
     const { // Use object destructuring, only get what you need :)
       leftLongitude,
@@ -37,8 +63,8 @@ class CapeLayer extends Layer {
       }
     }
 
-    return await new Promise(resolve => {
-      pureimage.encodePNG(image, fs.createWriteStream(outputPath), err => resolve(!err));
+    await new Promise(resolve => {
+      pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
     });
   }
 
