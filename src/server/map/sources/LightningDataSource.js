@@ -42,6 +42,8 @@ class LightningDataSource extends DataSource {
 
     console.log('Generated lighting Data');
     this.loaded = true;
+
+    return true;
   }
 
   /**

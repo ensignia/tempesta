@@ -227,6 +227,10 @@ class DataSource {
   isLoaded() {
     return this.loaded;
   }
+
+  getMeta() {
+    return {};
+  }
 }
 
 export default DataSource;

@@ -33,6 +33,7 @@ class Data {
 
     this.layers = {};
     this.sources = {};
+    this.cache = [];
 
     const fnt = pureimage.registerFont('public/server/SourceSansPro-Regular.ttf', 'Source Sans Pro');
     fnt.loadSync();
@@ -60,6 +61,9 @@ class Data {
     this.registerDataSource('lightning', new LightningDataSource());
 
     this.load();
+    setInterval(() => {
+      this.load();
+    }, 60 * 60 * 1000); // Check for new data every hour
   }
 
   registerLayer(layerName, layer) {
@@ -75,35 +79,60 @@ class Data {
   }
 
   getMeta() {
-    const models = {};
+    const sources = {};
     Object.keys(this.sources).forEach((sourceName) => {
-      models[sourceName] = {};
+      sources[sourceName] = this.sources[sourceName].getMeta();
     });
 
+    const layers = Object.keys(this.layers);
+
     return {
-      models,
+      sources,
+      layers,
     };
+  }
+
+  isCached(tilePath) {
+    // Keep cached list in memory, faster than disk lookup
+    // const exists = await fsExists(tilePath);
+    // const isCached = exists && process.env.NODE_ENV === 'production';
+    return process.env.NODE_ENV === 'production' ? this.cache.includes(tilePath) : false;
+  }
+
+  setCached(tilePath) {
+    this.cache.push(tilePath);
+  }
+
+  /**
+   * Clears cache where the cache item contains the item phrase
+   * TODO: Better cache matching?
+   */
+  clearCache(item) {
+    this.cache = this.cache.filter(p => !p.includes(item));
   }
 
   /** Passes the tile data request on to the correct Layer, returns
   path to the output png file for the tile */
   async getTile(layerName, tileX, tileY, tileZ, options) {
+    console.log(`Serving ${layerName} tile for ${tileX}/${tileY}/${tileZ} options ${options}`);
     const layer = this.layers[layerName];
 
     const validatedOptions = layer.getOptions(options);
     const tilePath = layer.getPath(tileX, tileY, tileZ, validatedOptions);
 
-    const exists = await fsExists(tilePath);
-    const isCached = exists && process.env.NODE_ENV === 'production';
-
-    if (!isCached) await layer.generateTile(tilePath, tileX, tileY, tileZ, validatedOptions);
+    if (!this.isCached(tilePath)) {
+      await layer.generateTile(tilePath, tileX, tileY, tileZ, validatedOptions);
+      this.setCached(tilePath);
+    }
 
     return tilePath;
   }
 
   /** Calls load() on every registered data source */
   async load() {
-    Object.values(this.sources).forEach(source => source.load());
+    Object.values(this.sources).forEach((source) => {
+      if (source.load()) this.clearCache(source); // Clear cache on new data
+    });
   }
 }
 

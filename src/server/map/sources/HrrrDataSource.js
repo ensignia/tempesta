@@ -14,6 +14,7 @@ class HrrrDataSource extends DataSource {
   constructor() {
     super();
     this.data = {};
+    this.meta = null;
   }
 
   /**
@@ -91,6 +92,14 @@ class HrrrDataSource extends DataSource {
     return 1;
   }
 
+  getMeta() {
+    return {
+      forecastHours: this.getForecastHours(),
+      forecastHourStep: this.getForecastHourStep(),
+      latest: this.meta,
+    };
+  }
+
   async parseData(forecastHour, filePath) {
     const capeData = await DataSource.parseGribFile(filePath, {
       category: 7, // Grib2 category number, equals to --fc 1
@@ -128,6 +137,15 @@ class HrrrDataSource extends DataSource {
     // Use latest data
     const latest = available[available.length - 1];
 
+    if (this.meta &&
+      this.meta.year === latest.year &&
+      this.meta.month === latest.month &&
+      this.meta.day === latest.day &&
+      this.meta.modelCycle === latest.modelCycle) {
+      // We've already loaded the latest data
+      return false;
+    }
+
     for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
       console.log(`Loading HRRR data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
       let filePath = await HrrrDataSource.download(
@@ -157,7 +175,10 @@ class HrrrDataSource extends DataSource {
     }
 
     console.log('Loaded HRRR Data');
+    this.meta = latest;
     this.loaded = true;
+
+    return true;
   }
 
   getData(dataName, forecastHour) {

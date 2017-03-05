@@ -14,6 +14,7 @@ class GfsDataSource extends DataSource {
   constructor() {
     super();
     this.data = {};
+    this.meta = null;
   }
 
   /**
@@ -69,6 +70,14 @@ class GfsDataSource extends DataSource {
     return 3;
   }
 
+  getMeta() {
+    return {
+      forecastHours: this.getForecastHours(),
+      forecastHourStep: this.getForecastHourStep(),
+      latest: this.meta,
+    };
+  }
+
   async parseData(forecastHour, filePath) {
     const capeData = await DataSource.parseGribFile(filePath, {
       category: 7, // Grib2 category number, equals to --fc 1
@@ -98,13 +107,24 @@ class GfsDataSource extends DataSource {
     };
   }
 
+  /**
+   * Returns true if loaded new data, false otherwise
+   */
   async load() {
     console.log('Loading GFS Data');
 
     const available = await GfsDataSource.getAvailable();
     // Use latest data
-    // FIXME: Temp fix
-    const latest = available[available.length - 2];
+    const latest = available[available.length - 1];
+
+    if (this.meta &&
+      this.meta.year === latest.year &&
+      this.meta.month === latest.month &&
+      this.meta.day === latest.day &&
+      this.meta.modelCycle === latest.modelCycle) {
+      // We've already loaded the latest data
+      return false;
+    }
 
     // for every available hour, download data and place in this.data[hour]
     for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
@@ -136,7 +156,10 @@ class GfsDataSource extends DataSource {
     }
 
     console.log('Loaded GFS Data');
+    this.meta = latest;
     this.loaded = true;
+
+    return true;
   }
 
   getData(dataName, forecastHour) {
