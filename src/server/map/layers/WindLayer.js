@@ -31,7 +31,7 @@ class WindLayer extends Layer {
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
         const pixelValue = dataU.simpleDiscreteMapping(pixelLatitude, pixelLongitude);
-        const val = this.colorer.render(pixelValue, 5, 0x0000FF00, 0xFF000000, true, 0x88);
+        const val = this.colorer.render(pixelValue, 100, 'plasma');
         ctx.compositePixel(xPixel, yPixel, val);
       }
     }
