@@ -82,7 +82,8 @@ class Data {
     // Keep cached list in memory, faster than disk lookup
     // const exists = await fsExists(tilePath);
     // const isCached = exists && process.env.NODE_ENV === 'production';
-    return process.env.NODE_ENV === 'production' ? this.cache.includes(tilePath) : false;
+    // return process.env.NODE_ENV === 'production' ? this.cache.includes(tilePath) : false;
+    return this.cache.includes(tilePath);
   }
 
   setCached(tilePath) {
@@ -99,19 +100,31 @@ class Data {
 
   /** Passes the tile data request on to the correct Layer, returns
   path to the output png file for the tile */
-  async getTile(layerName, tileX, tileY, tileZ, options) {
-    console.log(`Serving ${layerName} tile for ${tileX}/${tileY}/${tileZ}`);
+  async getTile(layerName, tileX, tileY, tileZ, options, req, res) {
     const layer = this.layers[layerName];
 
     const validatedOptions = layer.getOptions(options);
     const tilePath = layer.getPath(tileX, tileY, tileZ, validatedOptions);
 
-    if (!this.isCached(tilePath)) {
-      await layer.generateTile(tilePath, tileX, tileY, tileZ, validatedOptions);
+    if (req.fresh) {
+      res.status(304);
+      // use client cache
+    } else if (this.isCached(tilePath)) {
+      // is cached, send that
+      res.status(200).set({
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=3600',
+      });
+      fs.createReadStream(tilePath).pipe(res);
+    } else {
+      // generate the tile
+      res.status(200).set({
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=3600',
+      });
+      await layer.generateTile(tilePath, tileX, tileY, tileZ, validatedOptions, res);
       this.setCached(tilePath);
     }
-
-    return tilePath;
   }
 
   /** Calls load() on every registered data source */

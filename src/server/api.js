@@ -18,22 +18,14 @@ router.get('/map', (req, res) => {
 router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
   try {
     // path to tile image
-    const path = await data.getTile(
+    await data.getTile(
       req.params.layer.toLowerCase(),
       parseInt(req.params.x, 10),
       parseInt(req.params.y, 10),
       parseInt(req.params.z, 10),
-      req.query);
-
-    // transmit tile
-    if (path != null) {
-      res.writeHead(200, {
-        'Content-Type': 'image/png',
-      });
-      fs.createReadStream(path).pipe(res);
-    } else {
-      res.status(500).end();
-    }
+      req.query,
+      req,
+      res);
   } catch (error) {
     console.log(error.message);
     // something went wrong

@@ -1,6 +1,7 @@
 /* eslint-disable no-console, class-methods-use-this */
 import pureimage from 'pureimage';
 import fs from 'fs';
+import stream from 'stream';
 import Layer from './Layer.js';
 
 class WindLayer extends Layer {
@@ -37,9 +38,7 @@ class WindLayer extends Layer {
     return Layer.getFullPath(`wind-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
-  async generateTile(tilePath, tileX, tileY, tileZ, options) {
-    console.log(`Generating Wind tile for ${tileX}/${tileY}/${tileZ}`);
-
+  async generateTile(tilePath, tileX, tileY, tileZ, options, res) {
     const dataU = this.getData().getDataSource(options.source).getData('windU', options.forecastHour);
     const dataV = this.getData().getDataSource(options.source).getData('windV', options.forecastHour);
 
@@ -108,7 +107,10 @@ class WindLayer extends Layer {
     }
 
     await new Promise(resolve => {
-      pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
+      const output = new stream.PassThrough();
+      output.pipe(fs.createWriteStream(tilePath));
+      output.pipe(res);
+      pureimage.encodePNG(image, output, err => resolve(!err));
     });
   }
 
