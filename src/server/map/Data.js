@@ -100,7 +100,7 @@ class Data {
   /** Passes the tile data request on to the correct Layer, returns
   path to the output png file for the tile */
   async getTile(layerName, tileX, tileY, tileZ, options) {
-    console.log(`Serving ${layerName} tile for ${tileX}/${tileY}/${tileZ} options ${options}`);
+    console.log(`Serving ${layerName} tile for ${tileX}/${tileY}/${tileZ}`);
     const layer = this.layers[layerName];
 
     const validatedOptions = layer.getOptions(options);
