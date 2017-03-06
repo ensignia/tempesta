@@ -51,10 +51,11 @@ export const makeDir = (name) => new Promise((resolve, reject) => {
 });
 
 export const copyDir = async (source, target) => {
-  const dirs = await readDir('**/*.*', {
+  const dirs = await readDir('**/*', {
     cwd: source,
     nosort: true,
     dot: true,
+    nodir: true,
   });
   await Promise.all(dirs.map(async dir => {
     const from = path.resolve(source, dir);
