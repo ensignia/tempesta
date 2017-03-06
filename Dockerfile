@@ -6,7 +6,8 @@ COPY ./build /usr/src/app
 WORKDIR /usr/src/app
 
 RUN mkdir /usr/src/app/data
-RUN chown -R node:node /usr/src/app/data
+RUN chown -R node:node /usr/src/app
+RUN chmod -R +x /usr/src/app
 
 # Install Node.js dependencies
 RUN npm install --production
