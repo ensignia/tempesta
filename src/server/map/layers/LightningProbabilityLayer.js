@@ -1,6 +1,7 @@
 /* eslint-disable no-console, class-methods-use-this */
 import pureimage from 'pureimage';
 import fs from 'fs';
+import stream from 'stream';
 import Layer from './Layer.js';
 
 class LightningProbabilityLayer extends Layer {
@@ -32,9 +33,7 @@ class LightningProbabilityLayer extends Layer {
 
   /** Fulfills tile data request with dataSource argument, tiles dumped
   into the outputPath directory */
-  async getTile(tilePath, tileX, tileY, tileZ, options) {
-    console.log(`Generating LIGHTNING PROBABILITY tile for ${tileX}/${tileY}/${tileZ}`);
-
+  async getTile(tilePath, tileX, tileY, tileZ, options, res) {
     const data = this.getData().getDataSource('lightning').getData('probability', options.forecastHour);
 
     const {
@@ -59,7 +58,10 @@ class LightningProbabilityLayer extends Layer {
     }
 
     await new Promise(resolve => {
-      pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
+      const output = new stream.PassThrough();
+      output.pipe(fs.createWriteStream(tilePath));
+      output.pipe(res);
+      pureimage.encodePNG(image, output, err => resolve(!err));
     });
   }
 

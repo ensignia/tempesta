@@ -1,6 +1,7 @@
 /* eslint-disable no-console, class-methods-use-this */
 import pureimage from 'pureimage';
 import fs from 'fs';
+import stream from 'stream';
 import Layer from './Layer.js';
 
 class CapeLayer extends Layer {
@@ -37,9 +38,7 @@ class CapeLayer extends Layer {
     return Layer.getFullPath(`cape-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
-  async generateTile(tilePath, tileX, tileY, tileZ, options) {
-    console.log(`Generating CAPE tile for ${tileX}/${tileY}/${tileZ}`);
-
+  async generateTile(tilePath, tileX, tileY, tileZ, options, res) {
     const data = this.getData().getDataSource(options.source).getData('cape', options.forecastHour);
 
     const { // Use object destructuring, only get what you need :)
@@ -64,7 +63,10 @@ class CapeLayer extends Layer {
     }
 
     await new Promise(resolve => {
-      pureimage.encodePNG(image, fs.createWriteStream(tilePath), err => resolve(!err));
+      const output = new stream.PassThrough();
+      output.pipe(fs.createWriteStream(tilePath));
+      output.pipe(res);
+      pureimage.encodePNG(image, output, err => resolve(!err));
     });
   }
 }

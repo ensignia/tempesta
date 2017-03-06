@@ -5,7 +5,7 @@ function initialize() {
     showWeatherOverview: false,
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
-    mapAnimationStatus: 'PLAYING',
+    mapAnimationStatus: 'PAUSED',
   };
 }
 

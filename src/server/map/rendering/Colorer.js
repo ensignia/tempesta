@@ -26,7 +26,7 @@ class Colorer {
     // normalize data
     const normValue = dataValue >= normalizationRange ?
                     1 : (dataValue / normalizationRange);
-    const scaleIndex = Math.floor(normValue * NUM_SHADES) - 1;
+    const scaleIndex = ~~(normValue * NUM_SHADES) - 1;
     const opacityCoefficient = normValue > 0.8 ? 0.8 : normValue;
 
     return this.colorScales[colorMap][scaleIndex] + (0xFF * opacityCoefficient);
