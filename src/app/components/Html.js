@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { analytics } from '../../config';
+import { analytics, api } from '../../config';
 
 class Html extends React.Component {
   static propTypes = {
@@ -30,6 +30,7 @@ class Html extends React.Component {
         </head>
         <body>
           <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
+          <script dangerouslySetInnerHTML={{ __html: `window.env=${JSON.stringify(api)};` }} />
           {scripts && scripts.map(script => <script key={script} src={script} />)}
           {analytics.google.trackingId &&
             <script

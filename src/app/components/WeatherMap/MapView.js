@@ -4,7 +4,6 @@ import Marker from './Marker.js';
 import { connect } from '../store.js';
 import MapDarkTheme from './config/MapDarkTheme.json';
 import MapLightTheme from './config/MapLightTheme.json';
-import { api } from '../../../config.js';
 
 const DEFAULT_CENTER = {
   lat: 0.5,
@@ -279,7 +278,7 @@ class MapView extends React.Component {
     return (
       <div className={className}>
         <GoogleMapReact
-          bootstrapURLKeys={{ key: api.google.maps }}
+          bootstrapURLKeys={{ key: process.env.BROWSER ? window.env.google.maps : null }}
           defaultZoom={DEFAULT_ZOOM}
           defaultCenter={DEFAULT_CENTER}
           options={this.createMapOptions}
