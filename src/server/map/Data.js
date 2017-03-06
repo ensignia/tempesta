@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import pureimage from 'pureimage';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
 import CapeLayer from './layers/CapeLayer.js';
 import WindLayer from './layers/WindLayer.js';
 import LightningProbabilityLayer from './layers/LightningProbabilityLayer.js';
@@ -10,13 +10,6 @@ import HrrrDataSource from './sources/HrrrDataSource.js';
 import LightningDataSource from './sources/LightningDataSource.js';
 // import NamDataSource from './sources/NamDataSource.js';
 import { server } from '../../config.js';
-
-/** Checks if file exists. Returns promise */
-function fsExists(file) {
-  return new Promise(resolve => {
-    fs.access(file, fs.F_OK, error => resolve(!error));
-  });
-}
 
 const DATA_DIR = path.join(__dirname, server.dataDirectory);
 const TILES_DIR = path.join(DATA_DIR, 'tiles');
@@ -38,19 +31,12 @@ class Data {
     const fnt = pureimage.registerFont('public/server/SourceSansPro-Regular.ttf', 'Source Sans Pro');
     fnt.loadSync();
 
-    // Make data directory
-    fsExists(DATA_DIR).then((exists) => {
-      if (!exists) fs.mkdir(DATA_DIR);
+    fs.ensureDir(TILES_DIR, err => {
+      if (err) console.log(err);
     });
 
-    // Make tiles directory
-    fsExists(TILES_DIR).then((exists) => {
-      if (!exists) fs.mkdir(TILES_DIR);
-    });
-
-    // Make grib directory
-    fsExists(GRIB_DIR).then((exists) => {
-      if (!exists) fs.mkdir(GRIB_DIR);
+    fs.ensureDir(GRIB_DIR, err => {
+      if (err) console.log(err);
     });
 
     this.registerLayer('cape', new CapeLayer(this));
