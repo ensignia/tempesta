@@ -28,11 +28,8 @@ class GfsDataSource extends DataSource {
     return `${GFS_BASE_URL}gfs.${padLeft(year, 4)}${padLeft(month, 2)}${padLeft(day, 2)}${padLeft(modelCycle, 2)}/gfs.t${padLeft(modelCycle, 2)}z.pgrb2.0p50.f${padLeft(forecastHour, 3)}`;
   }
 
-  static async download(year, month, day, modelCycle, forecastHour, forceDownload = false) {
-    const url = GfsDataSource.getURL(year, month, day, modelCycle, forecastHour);
-    const output = path.join(__dirname, server.dataDirectory, `grib/gfs-${year}-${month}-${day}-${modelCycle}-${forecastHour}.grib2`);
-
-    return await DataSource.downloadURL(url, output, forceDownload);
+  static getPath(year, month, day, modelCycle, forecastHour) {
+    return path.join(__dirname, server.dataDirectory, `grib/gfs-${year}-${month}-${day}-${modelCycle}-${forecastHour}.grib2`);
   }
 
   static async getAvailable() {
@@ -79,6 +76,8 @@ class GfsDataSource extends DataSource {
   }
 
   async parseData(forecastHour, filePath) {
+    this.data[forecastHour] = {};
+
     const capeData = await DataSource.parseGribFile(filePath, {
       category: 7, // Grib2 category number, equals to --fc 1
       parameter: 6, // Grib2 parameter number, equals to --fp 7
@@ -107,12 +106,8 @@ class GfsDataSource extends DataSource {
     };
   }
 
-  /**
-   * Returns true if loaded new data, false otherwise
-   */
-  async load() {
-    console.log('Loading GFS Data');
-
+  async download() {
+    console.log('Downloading GFS data');
     const available = await GfsDataSource.getAvailable();
     // Use latest data
     const latest = available[available.length - 1];
@@ -128,35 +123,38 @@ class GfsDataSource extends DataSource {
 
     // for every available hour, download data and place in this.data[hour]
     for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
-      console.log(`Loading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
-      let filePath = await GfsDataSource.download(
-            latest.year,
-            latest.month,
-            latest.day,
-            latest.modelCycle,
-            forecastHour);
+      console.log(`Downloading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
+      const url = GfsDataSource.getURL(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
+      const output = GfsDataSource.getPath(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
+      await DataSource.downloadURL(url, output);
+      console.log('Downloaded');
+    }
 
+    this.meta = latest;
+
+    return true;
+  }
+
+  /**
+   * Returns true if loaded new data, false otherwise
+   */
+  async load(args) {
+    console.log('Parsing GFS Data');
+
+    // for every available hour, download data and place in this.data[hour]
+    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
+      console.log(`Parsing GFS data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle} and forecast hour +${forecastHour}`);
+      const filePath = GfsDataSource.getPath(args.latest.year, args.latest.month, args.latest.day, args.latest.modelCycle, forecastHour);
       try {
         await this.parseData(forecastHour, filePath);
       } catch (e) {
-        if (e.message.includes('NullPointerException')) { // Failed likely due to corrupt data
-          console.log(`Failed GFS data for ${latest.day}/${latest.month} - cycle ${latest.modelCycle} - hour +${forecastHour}: Retrying with forced download`);
-          // Try again but force a download
-          filePath = await GfsDataSource.download(
-            latest.year,
-            latest.month,
-            latest.day,
-            latest.modelCycle,
-            forecastHour,
-            true);
-
-          await this.parseData(forecastHour, filePath);
-        }
+        console.log(`Error parsing GFS data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle}`);
+        return false;
       }
     }
 
     console.log('Loaded GFS Data');
-    this.meta = latest;
+    this.meta = args.latest;
     this.loaded = true;
 
     return true;

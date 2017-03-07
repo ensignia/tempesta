@@ -6,76 +6,78 @@ import { api } from '../config.js';
 
 const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
 
-const router = Router();
+export default class ApiMiddleware {
 
-const data = new Data();
+  constructor() {
+    this.router = Router();
+    this.data = new Data();
 
-router.get('/map', (req, res) => {
-  res.status(200).json(data.getMeta());
-});
-
-router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
-  try {
-    // path to tile image
-    await data.getTile(
-      req.params.layer.toLowerCase(),
-      parseInt(req.params.x, 10),
-      parseInt(req.params.y, 10),
-      parseInt(req.params.z, 10),
-      req.query,
-      req,
-      res);
-  } catch (error) {
-    console.log(error);
-    // something went wrong
-    res.status(500).end();
-  }
-});
-
-router.get('/weather/:latitude,:longitude', async (req, res) => {
-  try {
-    const response = await fetch(`${DARK_SKY_BASE_URL}${api.darksky}/${req.params.latitude},${req.params.longitude}?exclude=[minutely,hourly]`);
-
-    res.status(200);
-    response.body.pipe(res);
-  } catch (error) {
-    console.log(error);
-    // something went wrong
-    res.status(500).json({ error: 'Failed to get data' });
-  }
-});
-
-/**
- * GET lightning
- * Query parameters:
- * -  since: The unix time to get lightning data since
- * Response:
- * - Json object, example:
- * {
- *  meta: { since: 1000000, to: 2000000 },
- *  data: [
- *    {latitude: 0.5, longitude: 0.5, time: 1500000},
- *    ...
- *  ],
- * }
- * It is expected that the client will make the following request using the to attribute
- * as the since attribute, therefore it should be assumed one is inclusive (to) and the other
- * exclusive (since)
- */
-router.get('/lightning', (req, res) => {
-  try {
-    const lightningDataSource = data.getDataSource('lightning');
-    const to = new Date();
-    const since = new Date(parseInt(req.query.since, 10)) || to;
-
-    res.status(200).json({
-      meta: { since, to },
-      data: lightningDataSource.getLightningBetween(since, to),
+    this.router.get('/map', (req, res) => {
+      res.status(200).json(this.data.getMeta());
     });
-  } catch (error) {
-    console.log(error);
-    res.status(500).end();
-  }
-});
 
-export default router;
+    this.router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
+      try {
+        // path to tile image
+        await this.data.getTile(
+          req.params.layer.toLowerCase(),
+          parseInt(req.params.x, 10),
+          parseInt(req.params.y, 10),
+          parseInt(req.params.z, 10),
+          req.query,
+          req,
+          res);
+      } catch (error) {
+        console.log(error);
+        // something went wrong
+        res.status(500).end();
+      }
+    });
+
+    this.router.get('/weather/:latitude,:longitude', async (req, res) => {
+      try {
+        const response = await fetch(`${DARK_SKY_BASE_URL}${api.darksky}/${req.params.latitude},${req.params.longitude}?exclude=[minutely,hourly]`);
+
+        res.status(200);
+        response.body.pipe(res);
+      } catch (error) {
+        console.log(error);
+        // something went wrong
+        res.status(500).json({ error: 'Failed to get data' });
+      }
+    });
+
+    /**
+     * GET lightning
+     * Query parameters:
+     * -  since: The unix time to get lightning data since
+     * Response:
+     * - Json object, example:
+     * {
+     *  meta: { since: 1000000, to: 2000000 },
+     *  data: [
+     *    {latitude: 0.5, longitude: 0.5, time: 1500000},
+     *    ...
+     *  ],
+     * }
+     * It is expected that the client will make the following request using the to attribute
+     * as the since attribute, therefore it should be assumed one is inclusive (to) and the other
+     * exclusive (since)
+     */
+    this.router.get('/lightning', (req, res) => {
+      try {
+        const lightningDataSource = this.data.getDataSource('lightning');
+        const to = new Date();
+        const since = new Date(parseInt(req.query.since, 10)) || to;
+
+        res.status(200).json({
+          meta: { since, to },
+          data: lightningDataSource.getLightningBetween(since, to),
+        });
+      } catch (error) {
+        console.log(error);
+        res.status(500).end();
+      }
+    });
+  }
+}
