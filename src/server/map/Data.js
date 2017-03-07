@@ -8,12 +8,18 @@ import LightningProbabilityLayer from './layers/LightningProbabilityLayer.js';
 import GfsDataSource from './sources/GfsDataSource.js';
 import HrrrDataSource from './sources/HrrrDataSource.js';
 import LightningDataSource from './sources/LightningDataSource.js';
-// import NamDataSource from './sources/NamDataSource.js';
 import { server } from '../../config.js';
 
 const DATA_DIR = path.join(__dirname, server.dataDirectory);
 const TILES_DIR = path.join(DATA_DIR, 'tiles');
 const GRIB_DIR = path.join(DATA_DIR, 'grib');
+
+/** Checks if file exists. Returns promise */
+function fsExists(file) {
+  return new Promise(resolve => {
+    fs.access(file, fs.F_OK, error => resolve(!error));
+  });
+}
 
 /** Data objects track available data sources and data layers. Tile data
 requests are passed on to the appropriate Layer object. */
@@ -43,8 +49,8 @@ class Data {
     this.registerLayer('wind', new WindLayer(this));
     this.registerLayer('lightningProbability', new LightningProbabilityLayer(this));
     this.registerDataSource('gfs', new GfsDataSource());
-    this.registerDataSource('hrrr', new HrrrDataSource());
-    this.registerDataSource('lightning', new LightningDataSource());
+    // this.registerDataSource('hrrr', new HrrrDataSource());
+    // this.registerDataSource('lightning', new LightningDataSource());
 
     this.load();
     setInterval(() => {
@@ -78,24 +84,8 @@ class Data {
     };
   }
 
-  isCached(tilePath) {
-    // Keep cached list in memory, faster than disk lookup
-    // const exists = await fsExists(tilePath);
-    // const isCached = exists && process.env.NODE_ENV === 'production';
-    // return process.env.NODE_ENV === 'production' ? this.cache.includes(tilePath) : false;
-    return this.cache.includes(tilePath);
-  }
-
-  setCached(tilePath) {
-    this.cache.push(tilePath);
-  }
-
-  /**
-   * Clears cache where the cache item contains the item phrase
-   * TODO: Better cache matching?
-   */
-  clearCache(item) {
-    this.cache = this.cache.filter(p => !p.includes(item));
+  async isCached(tilePath) {
+    return await fsExists(tilePath);
   }
 
   /** Passes the tile data request on to the correct Layer, returns
@@ -109,7 +99,7 @@ class Data {
     if (req.fresh) {
       res.status(304);
       // use client cache
-    } else if (this.isCached(tilePath)) {
+    } else if (await this.isCached(tilePath)) {
       // is cached, send that
       res.status(200).set({
         'Content-Type': 'image/png',
@@ -123,15 +113,20 @@ class Data {
         'Cache-Control': 'public, max-age=3600',
       });
       await layer.generateTile(tilePath, tileX, tileY, tileZ, validatedOptions, res);
-      this.setCached(tilePath);
     }
   }
 
   /** Calls load() on every registered data source */
-  async load() {
-    Object.values(this.sources).forEach((source) => {
-      if (source.load()) this.clearCache(source); // Clear cache on new data
+  async download(callback) {
+    Object.keys(this.sources).forEach(async (sourceName) => {
+      if (await this.sources[sourceName].download()) callback(sourceName, this.sources[sourceName].getMeta());
     });
+  }
+
+  load(sourceName, args) {
+    if (this.getDataSource(sourceName) != null) {
+      this.getDataSource(sourceName).load(args);
+    }
   }
 }
 

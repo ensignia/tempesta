@@ -27,6 +27,15 @@ function fsExists(file) {
   });
 }
 
+function fsStat(file) {
+  return new Promise((resolve, reject) => {
+    fs.stat(file, (error, stat) => {
+      if (!error) resolve(stat);
+      reject(error);
+    });
+  });
+}
+
 
 class DataSource {
   constructor() {
@@ -36,12 +45,19 @@ class DataSource {
   }
 
   /** HELPER: Download data from url into output if not exists */
-  static async downloadURL(url, output, forceDownload = false) {
+  static async downloadURL(url, output) {
     try {
       const exists = await fsExists(output);
-      if (exists && !forceDownload) return output;
 
       const response = await fetch(url);
+
+      if (exists) { // if file size matches, don't download
+        const stat = await fsStat(output);
+        console.log(`Exists and lengths are ${stat.size} and ${response.headers.get('Content-Length')}`);
+        console.log(parseInt(stat.size, 10) === parseInt(response.headers.get('Content-Length'), 10));
+        if (parseInt(stat.size, 10) === parseInt(response.headers.get('Content-Length'), 10)) return output;
+      }
+
       const dest = fs.createWriteStream(output);
       response.body.pipe(dest);
 

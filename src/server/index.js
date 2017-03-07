@@ -8,14 +8,15 @@ import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
 import pretty from 'express-prettify';
 import minimist from 'minimist';
+import cluster from 'cluster';
+import os from 'os';
 import frontendMiddleware from './middlewares/frontendMiddleware';
-import api from './api.js';
+import ApiMiddleware from './api.js';
+import Data from './map/Data.js';
 import { auth } from '../config';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const argv = minimist(process.argv.slice(2));
-
-const app = express();
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -24,47 +25,94 @@ const app = express();
 global.navigator = global.navigator || {};
 global.navigator.userAgent = global.navigator.userAgent || 'all';
 
-//
-// Register Node.js middleware
-// -----------------------------------------------------------------------------
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-if (isDev) app.use(pretty({ query: 'pretty' }));
+if (cluster.isMaster) {
+  // Is master
+  const numWorkers = os.cpus().length;
+  let workers = [];
+  const loadedData = [];
 
-//
-// Authentication
-// -----------------------------------------------------------------------------
-app.use(expressJwt({
-  secret: auth.jwt.secret,
-  credentialsRequired: false,
-  getToken: req => req.cookies.id_token,
-}));
-
-if (isDev) app.enable('trust proxy');
-
-//
-// Register API middleware
-// -----------------------------------------------------------------------------
-app.use('/api', api);
-
-//
-// Register server-side rendering middleware
-// -----------------------------------------------------------------------------
-frontendMiddleware(app);
-
-//
-// Launch the server
-// -----------------------------------------------------------------------------
-const host = argv.host || process.env.HOST || null;
-const port = argv.port || process.env.PORT || 3000;
-
-app.listen(port, host, (err) => {
-  if (err) {
-    return console.error(err.message);
+  for (let i = 0; i < numWorkers; i += 1) {
+    cluster.fork();
   }
 
-  const prettyHost = host || 'localhost';
-  console.log(`The server is running at http://${prettyHost}:${port}/`);
-});
+  cluster.on('online', (worker) => {
+    workers.push(worker);
+    loadedData.forEach((loaded) => {
+      // Notify worker to parse data loaded so far
+      worker.send({ type: 'loaded', ...loaded });
+    });
+  });
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
+    workers = workers.filter(w => w !== worker);
+    cluster.fork();
+  });
+
+  const data = new Data();
+  data.download((sourceName, meta) => {
+    const loaded = { source: sourceName, args: meta };
+    // Add new loaded data
+    loadedData.push(loaded);
+    // Notify all workers to parse data
+    workers.forEach((worker) => {
+      worker.send({ type: 'loaded', ...loaded });
+    });
+  });
+
+  // TODO: Every hour replace loaded data with new data
+} else {
+  // Is worker
+  const app = express();
+
+  //
+  // Register Node.js middleware
+  // -----------------------------------------------------------------------------
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(cookieParser());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+  if (isDev) app.use(pretty({ query: 'pretty' }));
+
+  //
+  // Authentication
+  // -----------------------------------------------------------------------------
+  app.use(expressJwt({
+    secret: auth.jwt.secret,
+    credentialsRequired: false,
+    getToken: req => req.cookies.id_token,
+  }));
+
+  if (isDev) app.enable('trust proxy');
+
+  //
+  // Register API middleware
+  // -----------------------------------------------------------------------------
+  const api = new ApiMiddleware();
+  process.on('message', (message) => {
+    if (message.type === 'loaded') {
+      api.data.load(message.source, message.args);
+    }
+  });
+  app.use('/api', api.router);
+
+  //
+  // Register server-side rendering middleware
+  // -----------------------------------------------------------------------------
+  frontendMiddleware(app);
+
+  //
+  // Launch the server
+  // -----------------------------------------------------------------------------
+  const host = argv.host || process.env.HOST || null;
+  const port = argv.port || process.env.PORT || 3000;
+
+  app.listen(port, host, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+
+    const prettyHost = host || 'localhost';
+    console.log(`The server is running at http://${prettyHost}:${port}/`);
+  });
+}
