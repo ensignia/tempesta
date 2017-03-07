@@ -2,6 +2,7 @@ function initialize() {
   return {
     showLayerModal: false,
     showModelModal: false,
+    showSettingsModal: false,
     showWeatherOverview: false,
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
@@ -61,10 +62,28 @@ function requestLocation(state) {
 }
 
 /**
+ * Settings Modal
+ */
+function showSettingsModal(state) {
+  if (state.showModelModal || state.showLayerModal) return state;
+  return {
+    ...state,
+    showSettingsModal: true,
+  };
+}
+
+function hideSettingsModal(state) {
+  return {
+    ...state,
+    showSettingsModal: false,
+  };
+}
+
+/**
  * Layer Modal
  */
 function showLayerModal(state) {
-  if (state.showModelModal) return state;
+  if (state.showModelModal || state.showSettingsModal) return state;
   return {
     ...state,
     showLayerModal: true,
@@ -82,7 +101,7 @@ function hideLayerModal(state) {
  * Model Modal
  */
 function showModelModal(state) {
-  if (state.showLayerModal) return state;
+  if (state.showLayerModal || state.showSettingsModal) return state;
   return {
     ...state,
     showModelModal: true,
@@ -119,6 +138,8 @@ export default {
   hideLayerModal,
   showModelModal,
   hideModelModal,
+  showSettingsModal,
+  hideSettingsModal,
   showWeatherOverview,
   hideWeatherOverview,
   updateLocation,
