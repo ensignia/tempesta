@@ -18,7 +18,7 @@ class HrrrDataSource extends DataSource {
     return `${HRRR_BASE_URL}hrrr.${padLeft(year, 4)}${padLeft(month, 2)}${padLeft(day, 2)}/hrrr.t${padLeft(modelCycle, 2)}z.wrfsfcf${padLeft(forecastHour, 2)}.grib2`;
   }
 
-  static async getPath(year, month, day, modelCycle, forecastHour) {
+  static getPath(year, month, day, modelCycle, forecastHour) {
     return path.join(__dirname, server.dataDirectory, `grib/hrrr-${year}-${month}-${day}-${modelCycle}-${forecastHour}.grib2`);
   }
 

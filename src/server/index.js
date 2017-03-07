@@ -11,7 +11,7 @@ import minimist from 'minimist';
 import cluster from 'cluster';
 import os from 'os';
 import frontendMiddleware from './middlewares/frontendMiddleware';
-import ApiMiddleware from './apiMiddleware.js';
+import ApiMiddleware from './middlewares/apiMiddleware.js';
 import Data from './map/Data.js';
 import { auth } from '../config';
 

@@ -36,8 +36,8 @@ class CapeLayer extends Layer {
 
   getPath(tileX, tileY, tileZ, options) {
     const source = this.getData().getDataSource(options.source);
-    const meta = source.getMeta();
-    return Layer.getFullPath(`cape-${options.source}-${meta.latest.year}-${meta.latest.month}-${meta.latest.day}-${meta.latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+    const latest = source.getMeta().latest || {};
+    return Layer.getFullPath(`cape-${options.source}-${latest.year}-${latest.month}-${latest.day}-${latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
   async generateTile(tilePath, tileX, tileY, tileZ, options, res) {

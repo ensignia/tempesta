@@ -7,6 +7,12 @@ class LightningDataSource extends DataSource {
     this.data = {};
   }
 
+  getMeta() {
+    return {
+      latest: {},
+    };
+  }
+
   async download() {
     return true; // Triggers a load(args) call on all workers
   }
