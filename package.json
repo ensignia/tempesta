@@ -42,6 +42,7 @@
     "react-mobile-devices": "0.0.3",
     "react-motion": "^0.4.7",
     "source-map-support": "^0.4.6",
+    "toobusy-js": "^0.5.1",
     "universal-router": "^2.0.0",
     "whatwg-fetch": "^2.0.1"
   },

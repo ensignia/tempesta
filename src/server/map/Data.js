@@ -9,17 +9,11 @@ import GfsDataSource from './sources/GfsDataSource.js';
 import HrrrDataSource from './sources/HrrrDataSource.js';
 import LightningDataSource from './sources/LightningDataSource.js';
 import { server } from '../../config.js';
+import { fsExists } from './Util.js';
 
 const DATA_DIR = path.join(__dirname, server.dataDirectory);
 const TILES_DIR = path.join(DATA_DIR, 'tiles');
 const GRIB_DIR = path.join(DATA_DIR, 'grib');
-
-/** Checks if file exists. Returns promise */
-function fsExists(file) {
-  return new Promise(resolve => {
-    fs.access(file, fs.F_OK, error => resolve(!error));
-  });
-}
 
 /** Data objects track available data sources and data layers. Tile data
 requests are passed on to the appropriate Layer object. */
@@ -49,8 +43,8 @@ class Data {
     this.registerLayer('wind', new WindLayer(this));
     this.registerLayer('lightningProbability', new LightningProbabilityLayer(this));
     this.registerDataSource('gfs', new GfsDataSource());
-    // this.registerDataSource('hrrr', new HrrrDataSource());
-    // this.registerDataSource('lightning', new LightningDataSource());
+    this.registerDataSource('hrrr', new HrrrDataSource());
+    this.registerDataSource('lightning', new LightningDataSource());
 
     this.load();
     setInterval(() => {
@@ -119,7 +113,9 @@ class Data {
   /** Calls load() on every registered data source */
   async download(callback) {
     Object.keys(this.sources).forEach(async (sourceName) => {
-      if (await this.sources[sourceName].download()) callback(sourceName, this.sources[sourceName].getMeta());
+      if (await this.sources[sourceName].download()) {
+        callback(sourceName, this.sources[sourceName].getMeta());
+      }
     });
   }
 

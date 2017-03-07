@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import fetch from '../../../app/core/fetch';
+import { fsExists, fsStat } from '../Util.js';
 
 const isWin = /^win/.test(os.platform());
 
@@ -20,28 +21,12 @@ async function gribParser(filePath, options) {
   });
 }
 
-/** Checks if file exists. Returns promise */
-function fsExists(file) {
-  return new Promise(resolve => {
-    fs.access(file, fs.F_OK, error => resolve(!error));
-  });
-}
-
-function fsStat(file) {
-  return new Promise((resolve, reject) => {
-    fs.stat(file, (error, stat) => {
-      if (!error) resolve(stat);
-      reject(error);
-    });
-  });
-}
-
 
 class DataSource {
   constructor() {
     this.loaded = false;
-
-    this.isLoaded = this.isLoaded.bind(this);
+    this.data = {};
+    this.meta = null;
   }
 
   /** HELPER: Download data from url into output if not exists */
@@ -238,14 +223,6 @@ class DataSource {
       simpleNeighborAverage,
       bilinearInterpolation,
     };
-  }
-
-  isLoaded() {
-    return this.loaded;
-  }
-
-  getMeta() {
-    return {};
   }
 }
 

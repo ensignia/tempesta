@@ -11,12 +11,14 @@ import minimist from 'minimist';
 import cluster from 'cluster';
 import os from 'os';
 import frontendMiddleware from './middlewares/frontendMiddleware';
-import ApiMiddleware from './api.js';
+import ApiMiddleware from './apiMiddleware.js';
 import Data from './map/Data.js';
 import { auth } from '../config';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const argv = minimist(process.argv.slice(2));
+
+const DATA_REFRESH_RATE = 60 * 60 * 1000;
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -50,15 +52,21 @@ if (cluster.isMaster) {
   });
 
   const data = new Data();
-  data.download((sourceName, meta) => {
-    const loaded = { source: sourceName, args: meta };
-    // Add new loaded data
-    loadedData.push(loaded);
-    // Notify all workers to parse data
-    workers.forEach((worker) => {
-      worker.send({ type: 'loaded', ...loaded });
+
+  const downloadDataFn = () => {
+    data.download((sourceName, meta) => {
+      const loaded = { source: sourceName, args: meta };
+      // Add new loaded data
+      loadedData.push(loaded);
+      // Notify all workers to parse data
+      workers.forEach((worker) => {
+        worker.send({ type: 'loaded', ...loaded });
+      });
     });
-  });
+  };
+
+  setInterval(downloadDataFn, DATA_REFRESH_RATE);
+  downloadDataFn();
 
   // TODO: Every hour replace loaded data with new data
 } else {

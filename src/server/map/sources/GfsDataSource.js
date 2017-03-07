@@ -2,21 +2,11 @@ import path from 'path';
 import DataSource from './DataSource.js';
 import fetch from '../../../app/core/fetch';
 import { server } from '../../../config.js';
+import { padLeft } from '../Util.js';
 
 const GFS_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/';
 
-function padLeft(number, zeroes, str) {
-  return Array((zeroes - String(number).length) + 1).join(str || '0') + number;
-}
-
-
 class GfsDataSource extends DataSource {
-  constructor() {
-    super();
-    this.data = {};
-    this.meta = null;
-  }
-
   /**
    * Gets the GFS url formatted
    * year, month, day and modelCycle (modelCycle may be 00, 06, 12, 18)
@@ -109,6 +99,7 @@ class GfsDataSource extends DataSource {
   async download() {
     console.log('Downloading GFS data');
     const available = await GfsDataSource.getAvailable();
+
     // Use latest data
     const latest = available[available.length - 1];
 
@@ -122,7 +113,9 @@ class GfsDataSource extends DataSource {
     }
 
     // for every available hour, download data and place in this.data[hour]
-    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
+    for (let forecastHour = 0;
+      forecastHour <= this.getForecastHours();
+      forecastHour += this.getForecastHourStep()) {
       console.log(`Downloading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
       const url = GfsDataSource.getURL(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
       const output = GfsDataSource.getPath(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
@@ -142,9 +135,18 @@ class GfsDataSource extends DataSource {
     console.log('Parsing GFS Data');
 
     // for every available hour, download data and place in this.data[hour]
-    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
+    for (let forecastHour = 0;
+      forecastHour <= this.getForecastHours();
+      forecastHour += this.getForecastHourStep()) {
       console.log(`Parsing GFS data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle} and forecast hour +${forecastHour}`);
-      const filePath = GfsDataSource.getPath(args.latest.year, args.latest.month, args.latest.day, args.latest.modelCycle, forecastHour);
+
+      const filePath = GfsDataSource.getPath(
+        args.latest.year,
+        args.latest.month,
+        args.latest.day,
+        args.latest.modelCycle,
+        forecastHour);
+
       try {
         await this.parseData(forecastHour, filePath);
       } catch (e) {

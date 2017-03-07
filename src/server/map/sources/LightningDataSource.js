@@ -7,7 +7,11 @@ class LightningDataSource extends DataSource {
     this.data = {};
   }
 
-  async load() {
+  async download() {
+    return true; // Triggers a load(args) call on all workers
+  }
+
+  async load(args) {
     console.log('Generating lighting Data');
 
     // Generates a 1-dimensional array of lightning strike recors

@@ -35,7 +35,9 @@ class WindLayer extends Layer {
   }
 
   getPath(tileX, tileY, tileZ, options) {
-    return Layer.getFullPath(`wind-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+    const source = this.getData().getDataSource(options.source);
+    const meta = source.getMeta();
+    return Layer.getFullPath(`wind-${options.source}-${meta.latest.year}-${meta.latest.month}-${meta.latest.day}-${meta.latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
   async generateTile(tilePath, tileX, tileY, tileZ, options, res) {
