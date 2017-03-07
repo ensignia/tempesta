@@ -6,7 +6,6 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
-import compression from 'compression';
 import pretty from 'express-prettify';
 import minimist from 'minimist';
 import frontendMiddleware from './middlewares/frontendMiddleware';
@@ -28,7 +27,6 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 //
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
-if (!isDev) app.use(compression());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
