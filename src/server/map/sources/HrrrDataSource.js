@@ -85,7 +85,7 @@ class HrrrDataSource extends DataSource {
   }
 
   getForecastHours() {
-    return process.env.NODE_ENV === 'production' ? 18 : 2;
+    return process.env.NODE_ENV === 'production' ? 10 : 2;
   }
 
   getForecastHourStep() {

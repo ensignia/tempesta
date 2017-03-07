@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import { Router } from 'express';
-import fs from 'fs';
 import Data from './map/Data.js';
 import fetch from '../app/core/fetch';
 import { api } from '../config.js';
@@ -27,7 +26,7 @@ router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
       req,
       res);
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     // something went wrong
     res.status(500).end();
   }
