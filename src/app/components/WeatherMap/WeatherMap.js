@@ -63,10 +63,10 @@ class WeatherMap extends React.Component {
           isOpen={showLayerModal}
           onClose={() => { actions.hideLayerModal(); }}
         >
-          <Checkbox name="cape" label="Show convective available potential energy" checked={this.state.layers.includes('cape')} onChange={this.layerOnChange} />
-          <Checkbox name="wind" label="Show wind and fronts" checked={this.state.layers.includes('wind')} onChange={this.layerOnChange} />
-          <Checkbox name="spc" label="Show storm prediction centre reports" checked={this.state.layers.includes('spc')} onChange={this.layerOnChange} />
-          <Checkbox name="lightning" label="Show lightning" checked={this.state.layers.includes('lightning')} onChange={this.layerOnChange} />
+          <Checkbox name="cape" label="Convective available potential energy" checked={this.state.layers.includes('cape')} onChange={this.layerOnChange} />
+          <Checkbox name="wind" label="Wind vectors and wind fronts" checked={this.state.layers.includes('wind')} onChange={this.layerOnChange} />
+          <Checkbox name="spc" label="Storm Prediction Centre reports" checked={this.state.layers.includes('spc')} onChange={this.layerOnChange} />
+          <Checkbox name="lightning" label="Lightning radar" checked={this.state.layers.includes('lightning')} onChange={this.layerOnChange} />
         </Modal>
         <Modal
           title="Models"
