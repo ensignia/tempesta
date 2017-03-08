@@ -174,7 +174,8 @@
         "ForInStatement",
         "LabeledStatement",
         "WithStatement"
-      ]
+      ],
+      "no-bitwise": "off"
     }
   },
   "stylelint": {

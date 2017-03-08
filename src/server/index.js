@@ -29,7 +29,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 
 if (cluster.isMaster) {
   // Is master
-  const numWorkers = os.cpus().length;
+  const numWorkers = isDev ? 1 : os.cpus().length;
   let workers = [];
   const loadedData = [];
 

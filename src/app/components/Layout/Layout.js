@@ -73,12 +73,12 @@ class Layout extends React.Component {
         </div>
 
         <div className={cx(s.scales)}>
-          <span>KM  </span>
+          <span>Metric  </span>
           <label className={cx(s.switch)}>
             <input type="checkbox" />
             <div className={cx(s.sliderRound, s.slider)} />
           </label>
-          <span>  Miles</span>
+          <span>  Imperial</span>
         </div>
 
         <div className={cx(s.colourScheme)}>
