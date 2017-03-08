@@ -86,11 +86,6 @@ class DataSource {
     const gridLatitudeBound = originLatitude + Math.floor(gridHeightNum * angularGridResY);
     const gridLongitudeBound = originLongitude + Math.floor(gridWidthNum * angularGridResX);
 
-    // console.log('Grid origin: ' + originLatitude + ', ' + originLongitude);
-    // console.log('Angular grid resolution ' + angularGridResY + ', ' + angularGridResX);
-    // console.log('Grid size ' + gridHeightNum + ', ' + gridWidthNum);
-    // console.log('Grid bound: ' + gridLatitudeBound + ', ' + gridLongitudeBound);
-
     const date = new Date(header.refTime);
     date.setHours(date.getHours() + header.forecastTime);
 
@@ -108,6 +103,11 @@ class DataSource {
       }
       grid[y] = row;
     }
+
+    console.log(`Origin: ${originLatitude}, ${originLongitude}`);
+    console.log(`Angular grid resolution: ${angularGridResY}, ${angularGridResX}`);
+    console.log(`Number of data points: ${gridHeightNum}, ${gridWidthNum}`);
+    console.log(`Coverage bound: ${gridLatitudeBound}, ${gridLongitudeBound}`);
 
     function bilinearInterpolation(latitude, longitude) {
       /* eslint-disable brace-style */
