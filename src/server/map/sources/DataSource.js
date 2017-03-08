@@ -73,45 +73,40 @@ class DataSource {
   /** HELPER: Parses a block of grib2 data into a 2D array of data points */
   static parseGribData(data) {
     const header = data.header;
-    // the grid's origin (e.g., 0.0E, 90.0N)
-    const originLatitude = header.la1;
-    const originLongitude = header.lo1;
-    // angular resolution of grid, i.e. angular deltaY and deltaX between grid points
-    const angularGridResY = header.dy;
-    const angularGridResX = header.dx;
-    // number of grid points N-S and W-E (e.g., 144 x 73)
-    const gridHeightNum = header.ny;
-    const gridWidthNum = header.nx;
-    // bottom and right bounds of data
-    const gridLatitudeBound = originLatitude + Math.floor(gridHeightNum * angularGridResY);
-    const gridLongitudeBound = originLongitude + Math.floor(gridWidthNum * angularGridResX);
+    const oLatitude = header.la1;             // grid origin (e.g. 0.0E, 90.0N)
+    const oLongitude = header.lo1;
+    const angularDy = header.dy;              // angular displacement of grid points in degrees
+    const angularDx = header.dx;
+    const yNum = header.ny;                   // number of grid points N-S and W-E (e.g., 144 x 73)
+    const xNum = header.nx;
+    const boundLatitude = oLatitude + ~~(yNum * angularDy);
+    const boundLongitude = oLongitude + ~~(xNum * angularDx);
 
     const date = new Date(header.refTime);
     date.setHours(date.getHours() + header.forecastTime);
 
     // TODO if the bounds are wrong, the scan mode might not be 000
-    // Scan mode 000 assumed. Longitude increases from originLongitude and latitude
-    // decreases from originLatitude. This implies origin at top left corner of
+    // Scan mode 000 assumed. Longitude increases from oLongitude and latitude
+    // decreases from oLatitude. This implies origin at top left corner of
     // coverage area. Values stored in row order.
     // http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table3-4.shtml
     const grid = [];
     let index = 0;
-    for (let y = 0; y < gridHeightNum; y += 1) {
+    for (let y = 0; y < yNum; y += 1) {
       const row = [];
-      for (let x = 0; x < gridWidthNum; x += 1, index += 1) {
+      for (let x = 0; x < xNum; x += 1, index += 1) {
         row[x] = data.data[index];
       }
       grid[y] = row;
     }
 
-    console.log(`Origin: ${originLatitude}, ${originLongitude}`);
-    console.log(`Angular grid resolution: ${angularGridResY}, ${angularGridResX}`);
-    console.log(`Number of data points: ${gridHeightNum}, ${gridWidthNum}`);
-    console.log(`Coverage bound: ${gridLatitudeBound}, ${gridLongitudeBound}`);
+    console.log(`Origin: ${oLatitude}, ${oLongitude}`);
+    console.log(`Angular grid resolution: ${angularDy}, ${angularDx}`);
+    console.log(`Number of data points: ${yNum}, ${xNum}`);
+    console.log(`Coverage bound: ${boundLatitude}, ${boundLongitude}`);
 
     function bilinearInterpolation(latitude, longitude) {
       /* eslint-disable brace-style */
-      /* eslint-disable no-bitwise */
 
       // translate server standard lat/lon to grib2 header coordinates
       // see map/readme.md for rationale
@@ -121,14 +116,14 @@ class DataSource {
       const grib2long = longitude + 180;
 
       // check lat/lon is within coverage bounds
-      if (grib2lat < originLatitude || grib2lat > gridLatitudeBound
-        || grib2long < originLongitude || grib2long > gridLongitudeBound) {
+      if (grib2lat < oLatitude || grib2lat > boundLatitude
+        || grib2long < oLongitude || grib2long > boundLongitude) {
         return 0;
       }
 
       // precise lat/long in grid scale
-      const y = (grib2lat - 90) * (gridHeightNum / 180);
-      const x = grib2long * (gridWidthNum / 360);
+      const y = (grib2lat - 90) * (yNum / 180);
+      const x = grib2long * (xNum / 360);
 
       // enclosing data points in grid scale lat/long (y1 is north )
       const y1 = y | 0;
@@ -158,14 +153,14 @@ class DataSource {
 
     return {
       header,
-      originLatitude,
-      originLongitude,
-      angularGridResY,
-      angularGridResX,
-      gridHeightNum,
-      gridWidthNum,
-      gridLatitudeBound,
-      gridLongitudeBound,
+      oLatitude,
+      oLongitude,
+      angularDy,
+      angularDx,
+      yNum,
+      xNum,
+      boundLatitude,
+      boundLongitude,
       date,
       grid,
       bilinearInterpolation,
