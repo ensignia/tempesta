@@ -66,7 +66,10 @@ class Data {
       sources[sourceName] = this.sources[sourceName].getMeta();
     });
 
-    const layers = Object.keys(this.layers);
+    const layers = {};
+    Object.keys(this.layers).forEach((layerName) => {
+      layers[layerName] = this.layers[layerName].getMeta();
+    });
 
     return {
       sources,

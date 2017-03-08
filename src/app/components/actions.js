@@ -4,33 +4,46 @@ function initialize() {
     showModelModal: false,
     showSettingsModal: false,
     showWeatherOverview: false,
+
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
-    mapAnimationStatus: 'PAUSED',
+
+    mapMeta: null,
+    mapPlaybackIndex: 0,
+    mapActiveLayers: ['cape'],
+    mapActiveModel: 'gfs',
   };
 }
 
 /**
- * Map animation
+ * Map meta
  */
-function setMapAnimationStatus(state, mapAnimationStatus) {
-  switch (mapAnimationStatus) {
-    case 'PLAYING':
-    case 'PAUSED':
-      return {
-        ...state,
-        mapAnimationStatus,
-      };
-    default:
-      return state;
-  }
+function setMapMeta(state, mapMeta) {
+  return {
+    ...state,
+    mapMeta,
+  };
 }
 
-function toggleAnimationStatus(state) {
-  if (state.mapAnimationStatus === 'PLAYING') {
-    return setMapAnimationStatus(state, 'PAUSED');
-  }
-  return setMapAnimationStatus(state, 'PLAYING');
+function setActiveModel(state, mapActiveModel) {
+  return {
+    ...state,
+    mapActiveModel,
+  };
+}
+
+function setActiveLayers(state, mapActiveLayers) {
+  return {
+    ...state,
+    mapActiveLayers,
+  };
+}
+
+function setMapPlaybackIndex(state, mapPlaybackIndex) {
+  return {
+    ...state,
+    mapPlaybackIndex,
+  };
 }
 
 /**
@@ -145,6 +158,8 @@ export default {
   updateLocation,
   setLocationStatus,
   requestLocation,
-  setMapAnimationStatus,
-  toggleAnimationStatus,
+  setMapMeta,
+  setActiveModel,
+  setActiveLayers,
+  setMapPlaybackIndex,
 };

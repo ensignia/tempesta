@@ -10,6 +10,10 @@ class LightningProbabilityLayer extends Layer {
     forecastHour: 0,
   }
 
+  getMeta() {
+    return {};
+  }
+
   getOptions(options_) {
     const options = {
       ...LightningProbabilityLayer.defaultOptions,

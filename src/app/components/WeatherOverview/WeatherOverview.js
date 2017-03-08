@@ -33,7 +33,7 @@ class WeatherOverview extends React.Component {
   }
 
   async getData(coords) {
-    const response = await fetch(`/api/weather/${coords.latitude},${coords.longitude}`);
+    const response = await fetch(`api/weather/${coords.latitude},${coords.longitude}`);
     const json = await response.json();
 
     this.setState({ daily: json.daily.data });

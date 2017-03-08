@@ -14,6 +14,7 @@ import frontendMiddleware from './middlewares/frontendMiddleware';
 import ApiMiddleware from './middlewares/apiMiddleware.js';
 import Data from './map/Data.js';
 import { auth } from '../config';
+import { setHost } from '../app/core/fetch';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const argv = minimist(process.argv.slice(2));
@@ -116,13 +117,14 @@ if (cluster.isMaster) {
   // -----------------------------------------------------------------------------
   const host = argv.host || process.env.HOST || null;
   const port = argv.port || process.env.PORT || 3000;
+  const prettyHost = host || 'localhost';
+  setHost(`${prettyHost}:${port}`);
 
   app.listen(port, host, (err) => {
     if (err) {
       return console.error(err.message);
     }
 
-    const prettyHost = host || 'localhost';
     console.log(`The server is running at http://${prettyHost}:${port}/`);
   });
 }

@@ -11,6 +11,12 @@ class CapeLayer extends Layer {
     forecastHour: 0,
   }
 
+  getMeta() {
+    return {
+      supportedSources: ['gfs', 'hrrr'],
+    };
+  }
+
   getOptions(options_) {
     const options = {
       ...CapeLayer.defaultOptions,
@@ -19,7 +25,7 @@ class CapeLayer extends Layer {
 
     options.source = options.source.toLowerCase();
 
-    if (!['gfs', 'hrrr'].includes(options.source)) {
+    if (!this.getMeta().supportedSources.includes(options.source)) {
       throw new Error(`Source ${options.source} for CapeLayer is invalid`);
     }
 

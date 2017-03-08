@@ -4,38 +4,19 @@ import Marker from './Marker.js';
 import { connect } from '../store.js';
 import MapDarkTheme from './config/MapDarkTheme.json';
 import MapLightTheme from './config/MapLightTheme.json';
+import fetch from '../../core/fetch';
+
+function toQueryString(obj) {
+  return Object.keys(obj).map((k) => {
+    return `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`;
+  }).join('&');
+}
 
 const DEFAULT_CENTER = {
   lat: 0.5,
   lng: 0.5,
 };
 const DEFAULT_ZOOM = 11;
-
-// TODO: Should be provided by server depending on data available
-const META_CONFIG = {
-  models: {
-    gfs: {
-      // Hours from model of data available
-      forecastHours: 6,
-      // Interval of data in hours
-      forecastHourStep: 3,
-    },
-    hrrr: {
-      forecastHours: 2,
-      forecastHourStep: 1,
-    },
-  },
-  layers: {
-    cape: {
-      models: ['gfs', 'hrrr'],
-      zIndex: 1,
-    },
-    wind: {
-      models: ['gfs'],
-      zIndex: 2,
-    },
-  },
-};
 
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
@@ -67,11 +48,13 @@ class MapView extends React.Component {
       longitude: PropTypes.number,
     }),
     locationStatus: PropTypes.string,
+    mapPlaybackIndex: PropTypes.number,
     mapAnimationStatus: PropTypes.string,
+    mapActiveLayers: PropTypes.array,
+    mapActiveModel: PropTypes.string,
     className: PropTypes.string,
     theme: PropTypes.array,
-    layers: PropTypes.array,
-    model: PropTypes.string,
+    actions: PropTypes.object,
   };
 
   static Theme = {
@@ -83,111 +66,33 @@ class MapView extends React.Component {
     theme: MapView.Theme.LIGHT,
   };
 
-  static createLayerHelper(google, modelName, layerName, forecastHour, index) {
-    const layer = new google.maps.ImageMapType({
-      getTileUrl(coord, zoom) {
-        const normalizedCoord = getNormalizedCoord(coord, zoom);
-        if (!normalizedCoord) {
-          return null;
-        }
-        return `/api/map/${layerName}/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png?forecastHour=${forecastHour}&source=${modelName}`;
-      },
-      tileSize: new google.maps.Size(256, 256),
-      maxZoom: 11,
-      minZoom: 0,
-      name: layerName,
-    });
-
-    return {
-      layer,
-      index,
-      addLayer() {
-        google.map.overlayMapTypes.setAt(index, layer);
-      },
-      removeLayer() {
-        google.map.overlayMapTypes.setAt(index, null);
-      },
-    };
-  }
-
-  static createLayers(google) {
-    const result = {};
-    const metaLayers = Object.keys(META_CONFIG.layers);
-    const metaModels = Object.keys(META_CONFIG.models);
-
-    metaLayers.forEach((layerName) => {
-      const layerMeta = META_CONFIG.layers[layerName];
-      result[layerName] = {};
-
-      metaModels.forEach((modelName) => {
-        const modelMeta = META_CONFIG.models[modelName];
-
-        const overlays = [];
-        for (let hour = 0; hour <= modelMeta.forecastHours; hour += modelMeta.forecastHourStep) {
-          overlays.push(
-            MapView.createLayerHelper(google, modelName, layerName, hour, layerMeta.zIndex),
-          );
-        }
-
-        result[layerName][modelName] = {
-          currentOverlay: 0,
-          overlays,
-        };
-      });
-    });
-
-    return result;
-  }
-
   constructor(props) {
     super(props);
     this.state = {
-      layers: {},
       mapLoaded: false,
-      playing: true,
       shouldUpdateLocation: false,
     };
 
-    this.createMapOptions = this.createMapOptions.bind(this);
-    this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
-    this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
-    this.componentWillUnmount = this.componentWillUnmount.bind(this);
-    this.playAnimation = this.playAnimation.bind(this);
-    this.pauseAnimation = this.pauseAnimation.bind(this);
+    this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
+    this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
+    this.loadMeta = this.loadMeta.bind(this);
+    this.createLayerHelper = this.createLayerHelper.bind(this);
+    this.createOverlays = this.createOverlays.bind(this);
+    this.updateOverlays = this.updateOverlays.bind(this);
+    this.createMapOptions = this.createMapOptions.bind(this);
   }
 
+  /**
+   * On mounted, load meta data
+   */
   componentWillMount() {
-    this.playAnimation();
+    this.loadMeta();
   }
 
   componentWillReceiveProps(nextProps) {
-    // Activate correct layers in google maps overview
-    Object.keys(this.state.layers).forEach((layerName) => {
-      const layer = this.state.layers[layerName];
-      const isActive = nextProps.layers.includes(layerName);
-
-      if (!layer) return; // Layer doesn't exist
-
-      Object.keys(layer).forEach((modelName) => {
-        const overlay = layer[modelName];
-        if (!isActive || modelName !== nextProps.model) {
-          overlay.overlays[overlay.currentOverlay].removeLayer();
-        }
-      });
-
-      const overlay = layer[nextProps.model];
-      if (isActive && layer[nextProps.model]) overlay.overlays[overlay.currentOverlay].addLayer();
-    });
-
-    // Play/pause animation
-    if ((nextProps.mapAnimationStatus === 'PLAYING') !== this.state.playing) {
-      if (nextProps.mapAnimationStatus === 'PLAYING') {
-        this.playAnimation();
-      } else {
-        this.pauseAnimation();
-      }
-    }
+    // Update overlays
+    this.updateOverlays(nextProps);
 
     // Pan to location when requested
     if (nextProps.locationStatus === 'REQUESTING' || nextProps.locationStatus === 'REQUESTED') {
@@ -202,20 +107,10 @@ class MapView extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    this.pauseAnimation();
-  }
-
   onGoogleApiLoaded(google) {
-    this.setState({
-      layers: MapView.createLayers(google),
-      mapLoaded: true,
-    });
+    this.setState({ mapLoaded: true });
 
-    // Create placeholder layers in google maps array
-    Object.keys(this.state.layers).forEach(() => {
-      google.map.overlayMapTypes.push(null);
-    });
+    this.googleApi = google;
 
     // Because GoogleMapReact
     this.panTo = (center) => {
@@ -226,34 +121,134 @@ class MapView extends React.Component {
       google.map.setZoom(zoom);
     };
 
-    // Force update of layers, as google api loads after first props
-    this.componentWillReceiveProps(this.props);
+    this.updateOverlays(this.props);
   }
 
-  playAnimation() {
-    this.animation = setInterval(() => {
-      const { layers, model } = this.props;
+  async loadMeta() {
+    const response = await fetch('/api/map');
+    const json = await response.json();
 
-      layers.forEach((layerName) => {
-        const layer = this.state.layers[layerName];
-        if (!layer) return; // Layer doesn't exist
+    this.props.actions.setMapMeta(json);
 
-        const overlay = layer[model];
-        if (!layer[model]) return; // Layer does not support current model
-
-        overlay.currentOverlay = (overlay.currentOverlay + 1) % overlay.overlays.length;
-        overlay.overlays[overlay.currentOverlay].addLayer();
-      });
-    }, 2000);
-
-    this.setState({ playing: true });
+    this.updateOverlays(this.props);
   }
 
-  pauseAnimation() {
-    clearInterval(this.animation);
-    this.setState({ playing: false });
+  /**
+   * Helper for creating google map Api layers
+   */
+  createLayerHelper(layerName, index, options) {
+    const google = this.googleApi;
+    const layer = new google.maps.ImageMapType({
+      getTileUrl(coord, zoom) {
+        const normalizedCoord = getNormalizedCoord(coord, zoom);
+        if (!normalizedCoord) {
+          return null;
+        }
+        const queryString = options !== null ? `?${toQueryString(options)}` : '';
+        return `/api/map/${layerName}/${zoom}/${normalizedCoord.x}/${normalizedCoord.y}/tile.png${queryString}`;
+      },
+      tileSize: new google.maps.Size(256, 256),
+      maxZoom: 11,
+      minZoom: 0,
+      name: layerName,
+    });
+
+    return {
+      layer,
+      index,
+      addLayer() {
+        google.map.overlayMapTypes.setAt(index, layer);
+      },
+      removeLayer() {
+        if (google.map.overlayMapTypes.getAt(index) === layer) {
+          google.map.overlayMapTypes.setAt(index, null);
+        }
+      },
+    };
   }
 
+  /**
+   * Creates the google map overlay layers
+   */
+  createOverlays(meta) {
+    const overlays = [];
+    let zIndex = 0;
+
+    Object.keys(meta.layers).forEach((layerName) => {
+      const layerMeta = meta.layers[layerName]; // Get layer meta data
+      zIndex += 1; // Increase zIndex for layer, each layer on new index
+
+      // If supportedSources exist create overlays for each one
+      if (layerMeta.supportedSources) {
+        layerMeta.supportedSources.forEach((sourceName) => {
+          const sourceMeta = meta.sources[sourceName];
+
+          // Each forecast hour map layer for this layer/source
+          const mapLayers = [];
+          for (let hour = 0; hour <= sourceMeta.forecastHours; hour += sourceMeta.forecastHourStep) {
+            mapLayers.push(
+              this.createLayerHelper(layerName, zIndex, {
+                source: sourceName,
+                forecastHour: hour,
+              }),
+            );
+          }
+
+          overlays.push({
+            sourceName,
+            layerName,
+            currentMapLayer: 0,
+            mapLayers,
+          });
+        });
+      } else {
+        // Else the layer is not dependent on a source, omit sourceName and create a single layer
+        // overlays.push({
+        //   layerName,
+        //   currentMapLayer: 0,
+        //   mapLayers: [MapView.createLayerHelper(this.googleApi, sourceName, layerName, hour, layerMeta.zIndex)],
+        // });
+      }
+    });
+
+    // Save overlays into state
+    this.setState({ overlays });
+
+    // Create placeholder layers in google maps array
+    for (let i = 0; i < zIndex; i += 1) {
+      this.googleApi.map.overlayMapTypes.push(null);
+    }
+  }
+
+  /**
+   * Creates the overlays when meta and google map is loaded
+   */
+  updateOverlays(nextProps) {
+    const { mapActiveLayers, mapActiveModel, mapMeta, mapPlaybackIndex } = nextProps;
+
+    if (!mapMeta || !this.state.mapLoaded) return;
+
+    if (!this.state.overlays) this.createOverlays(mapMeta);
+
+    // Activate correct layers in google maps overview
+    this.state.overlays.forEach((overlay) => {
+      const isActive = mapActiveLayers.includes(overlay.layerName)
+        && (!overlay.sourceName || overlay.sourceName === mapActiveModel);
+
+      const overlayIndex = mapPlaybackIndex % overlay.mapLayers.length;
+
+      if (isActive) {
+        overlay.mapLayers[overlayIndex].addLayer();
+      } else {
+        // TODO: Improve overlay, make it keep track of currently visible layer ( this may cause bugs? )
+        overlay.mapLayers[overlayIndex].removeLayer();
+      }
+    });
+  }
+
+  /**
+   * Creates a google maps options object with map defaults
+   */
   createMapOptions(maps) {
     return {
       styles: this.props.theme,
@@ -270,6 +265,7 @@ class MapView extends React.Component {
   render() {
     const { className, location } = this.props;
 
+    // Render markers on map
     const markersEl = [];
     [].forEach((marker) => {
       markersEl.push(<Marker key={`${marker.lat}-${marker.lng}`} lat={marker.lat} lng={marker.lng} />);
@@ -294,7 +290,11 @@ class MapView extends React.Component {
 }
 
 export default connect((state) => ({
+  mapMeta: state.mapMeta,
+  mapActiveLayers: state.mapActiveLayers,
+  mapActiveModel: state.mapActiveModel,
+  mapAnimationStatus: state.mapAnimationStatus,
+  mapPlaybackIndex: state.mapPlaybackIndex,
   location: state.location,
   locationStatus: state.locationStatus,
-  mapAnimationStatus: state.mapAnimationStatus,
 }))(MapView);

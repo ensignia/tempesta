@@ -11,6 +11,12 @@ class WindLayer extends Layer {
     forecastHour: 0,
   }
 
+  getMeta() {
+    return {
+      supportedSources: ['gfs'],
+    };
+  }
+
   getOptions(options_) {
     const options = {
       ...WindLayer.defaultOptions,
