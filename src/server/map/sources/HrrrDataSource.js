@@ -167,6 +167,7 @@ class HrrrDataSource extends DataSource {
         await this.parseData(forecastHour, filePath);
       } catch (e) {
         console.log(`Error parsing HRRR data for ${args.latest.day}/${args.latest.month} - cycle ${args.latest.modelCycle}`);
+        console.log(e);
         return false;
       }
     }

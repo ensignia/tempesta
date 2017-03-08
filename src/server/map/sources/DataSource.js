@@ -39,8 +39,7 @@ class DataSource {
 
       if (exists) { // if file size matches, don't download
         const stat = await fsStat(output);
-        console.log(`Exists and lengths are ${stat.size} and ${response.headers.get('Content-Length')}`);
-        console.log(parseInt(stat.size, 10) === parseInt(response.headers.get('Content-Length'), 10));
+        // console.log(`Exists and lengths are ${stat.size} and ${response.headers.get('Content-Length')}`);
         if (parseInt(stat.size, 10) === parseInt(response.headers.get('Content-Length'), 10)) return output;
       }
 
@@ -54,6 +53,7 @@ class DataSource {
 
       return await onEnd;
     } catch (e) {
+      console.log('Error downloadURL()');
       console.log(e);
     }
 
