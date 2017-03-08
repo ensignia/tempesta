@@ -1,46 +1,44 @@
 @import '../variables.css';
 
 .weatherOverview {
-  height: 48px;
-  background: #1B1B1B;
-  box-shadow: inset 0px -5px 10px 0px rgba(51,51,51,1);
+  height: 56px;
+  background: #1b1b1b;
+  box-shadow: inset 0 -5px 10px 0 rgba(0, 0, 0, 0.9);
+  padding: 0 15px;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
 }
 
-.Current{
-  color: #ffffff;
+.current {
+  color: #fff;
 }
 
-.Name {
-  color: #ffffff;
-}
-
-ul {
-    display: flex;
-    align-items: stretch; /* Default */
-    justify-content: center;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-li {
-    display: block;
-    flex: 0 1 auto; /* Default */
-    list-style-type: none;
-
-}
-
-li span {
+.vertical {
   display: flex;
   flex-direction: column;
-
+  align-items: center;
 }
 
-li .dayIcon {
+.currentIcon {
+  padding: 0 15px;
+}
+
+.dayName {
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+}
+
+.forecast {
+  flex-grow: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.forecast > div {
+  padding-left: 15px;
 }
