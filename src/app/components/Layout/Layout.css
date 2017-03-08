@@ -62,11 +62,14 @@ input:checked + .slider:before {
 .temperature {
     font-size: 25px;
     padding-left: 20px;
-    padding-bottom:5px;
 }
 
 .scales {
-    padding-top: 5px;
+    font-size: 25px;
+    padding-left: 10px;
+}
+
+.colourScheme {
     font-size: 25px;
     padding-left: 10px;
 }

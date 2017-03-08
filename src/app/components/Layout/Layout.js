@@ -80,6 +80,15 @@ class Layout extends React.Component {
           </label>
           <span>  Miles</span>
         </div>
+
+        <div className={cx(s.colourScheme)}>
+          <span>Light </span>
+          <label className={cx(s.switch)}>
+            <input type="checkbox" />
+            <div className={cx(s.sliderRound, s.slider)} />
+          </label>
+          <span> Dark</span>
+        </div>
         </Modal>
       </div>
     );
