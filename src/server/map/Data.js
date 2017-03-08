@@ -28,7 +28,6 @@ class Data {
 
     this.layers = {};
     this.sources = {};
-    this.cache = [];
 
     const fnt = pureimage.registerFont('public/server/SourceSansPro-Regular.ttf', 'Source Sans Pro');
     fnt.loadSync();
@@ -47,11 +46,6 @@ class Data {
     this.registerDataSource('gfs', new GfsDataSource());
     this.registerDataSource('hrrr', new HrrrDataSource());
     this.registerDataSource('lightning', new LightningDataSource());
-
-    this.load();
-    setInterval(() => {
-      this.load();
-    }, 60 * 60 * 1000); // Check for new data every hour
   }
 
   registerLayer(layerName, layer) {
