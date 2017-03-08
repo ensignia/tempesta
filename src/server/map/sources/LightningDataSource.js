@@ -57,15 +57,7 @@ class LightningDataSource extends DataSource {
     return true;
   }
 
-  /**
-   * From this.data, return the object matching the forecastHour and
-   * dataName, e.g. getData('probability', 0)
-   */
-  // getData() is exclusively for tile generating, tbh the whole data source/layer system is a bit brittle
-  getData(dataName, forecastHour) {
-    if (!this.loaded) throw new Error('Data not loaded yet!');
-    return this.data[forecastHour][dataName];
-  }
+
 
   // Used for live lightning
   getLightningBetween(sinceDate, toDate) {

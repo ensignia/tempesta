@@ -24,6 +24,7 @@ async function gribParser(filePath, options) {
 
 class DataSource {
   constructor() {
+    // as of 08/03/2017, the structure of data is data[forecastHour].layerName
     this.loaded = false;
     this.data = {};
     this.meta = null;

@@ -15,8 +15,10 @@ const DATA_DIR = path.join(__dirname, server.dataDirectory);
 const TILES_DIR = path.join(DATA_DIR, 'tiles');
 const GRIB_DIR = path.join(DATA_DIR, 'grib');
 
-/** Data objects track available data sources and data layers. Tile data
-requests are passed on to the appropriate Layer object. */
+/**
+ * Tracks layers and models, and dispatches tile requests. Periodically issues a call to
+ * load data.
+ */
 class Data {
   constructor() {
     this.registerLayer = this.registerLayer.bind(this);
@@ -83,7 +85,7 @@ class Data {
   }
 
   /** Passes the tile data request on to the correct Layer, returns
-  path to the output png file for the tile */
+   path to the output png file for the tile */
   async getTile(layerName, tileX, tileY, tileZ, options, req, res) {
     const layer = this.layers[layerName];
 
