@@ -8,10 +8,10 @@ export default {
   // Routes are evaluated in order
   children: [
     require('./home').default,
-    require('./about').default,
     require('./mock').default,
 
     // Wildcard routes last
+    require('./guide').default,
     require('./notFound').default,
   ],
 

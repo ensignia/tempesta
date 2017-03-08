@@ -2,15 +2,26 @@ import React from 'react';
 import Layout from '../../components/Layout/Layout.js';
 import Page from '../../components/Page/Page.js';
 
+/**
+ * List of available pages (markdown files in ./pages folder)
+ */
+const PAGES = [
+  'about',
+];
+
 export default {
 
-  path: '/about',
+  path: '/guide/:page',
 
-  async action() {
+  async action(context) {
+    const pageName = context.params.page;
+
+    if (!PAGES.includes(pageName)) return await context.next();
+
     const data = await new Promise((resolve) => {
       require.ensure([], require => {
-        resolve(require('./about.md'));
-      }, 'about');
+        resolve(require(`./pages/${pageName}.md`));
+      });
     });
 
     return {
