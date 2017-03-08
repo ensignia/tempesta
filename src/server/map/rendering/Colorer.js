@@ -24,12 +24,10 @@ class Colorer {
 
   render = function render(dataValue, normalizationRange, colorMap) {
     // normalize data
-    const normValue = dataValue >= normalizationRange ?
-                    1 : (dataValue / normalizationRange);
-    const scaleIndex = ~~(normValue * NUM_SHADES) - 1;
+    const normValue = dataValue >= normalizationRange ? 1 : (dataValue / normalizationRange);
     const opacityCoefficient = normValue > 0.8 ? 0.8 : normValue;
 
-    return this.colorScales[colorMap][scaleIndex] + (0xFF * opacityCoefficient);
+    return this.colorScales[colorMap][~~(normValue * NUM_SHADES) - 1] + (0xFF * opacityCoefficient);
   }
 
   drawVector(ctx, vectorData) {

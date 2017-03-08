@@ -1,7 +1,7 @@
 import path from 'path';
 import DataSource from './DataSource.js';
 import fetch from '../../../app/core/fetch';
-import { server } from '../../../config.js';
+import {server} from '../../../config.js';
 import { padLeft } from '../Util.js';
 
 const GFS_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/';
@@ -97,6 +97,7 @@ class GfsDataSource extends DataSource {
   }
 
   async download() {
+    /* eslint-disable max-len */
     console.log('Downloading GFS data');
     const available = await GfsDataSource.getAvailable();
 
@@ -150,6 +151,7 @@ class GfsDataSource extends DataSource {
       try {
         await this.parseData(forecastHour, filePath);
       } catch (e) {
+        console.log(e);
         console.log(`Error parsing GFS data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle}`);
         return false;
       }

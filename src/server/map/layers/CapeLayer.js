@@ -64,6 +64,7 @@ class CapeLayer extends Layer {
       }
     }
 
+
     await new Promise(resolve => {
       const output = new stream.PassThrough();
       output.pipe(fs.createWriteStream(tilePath));
