@@ -106,7 +106,9 @@ class Data {
     }
   }
 
-  /** Calls load() on every registered data source */
+  /** Called by master in index.js with a callback function. Executes the callback for
+   * every data source for which new data is downloaded, with source name and
+   * source metadata as arguments. */
   async download(callback) {
     Object.keys(this.sources).forEach(async (sourceName) => {
       if (await this.sources[sourceName].download()) {
@@ -115,6 +117,7 @@ class Data {
     });
   }
 
+  /** Called by worker in index.js whenever new data has been downloaded for sourceName. */
   load(sourceName, args) {
     if (this.getDataSource(sourceName) != null) {
       this.getDataSource(sourceName).load(args);

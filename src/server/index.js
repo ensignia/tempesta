@@ -54,6 +54,7 @@ if (cluster.isMaster) {
   const data = new Data();
 
   const downloadDataFn = () => {
+    // callback will be executed for all sources with newly downloaded data
     data.download((sourceName, meta) => {
       const loaded = { source: sourceName, args: meta };
       // Add new loaded data
@@ -99,6 +100,7 @@ if (cluster.isMaster) {
   const api = new ApiMiddleware();
   process.on('message', (message) => {
     if (message.type === 'loaded') {
+      // data source name, data source metadata
       api.data.load(message.source, message.args);
     }
   });
