@@ -39,7 +39,7 @@ class Header extends React.Component {
           neutral
           onClose={() => { actions.hideSettingsModal(); }}
         >
-          <Link className={s.helpButton} to="/guide">
+          <Link className={s.helpButton} to="/guide/about">
             <span name="guide">?</span>
           </Link>
 

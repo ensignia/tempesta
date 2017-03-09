@@ -85,7 +85,7 @@ class WeatherMap extends React.Component {
           className={s.modal}
           onClose={() => { actions.hideLayerModal(); }}
         >
-          <Link className={cx(s.helpButton)} to="/guide">
+          <Link className={cx(s.helpButton)} to="/guide/layers">
             <span name="guide">?</span>
           </Link>
           <Checkbox name="cape" label="Convective available potential energy" checked={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
@@ -99,7 +99,7 @@ class WeatherMap extends React.Component {
           className={s.modal}
           onClose={() => { actions.hideModelModal(); }}
         >
-          <Link className={cx(s.helpButton)} to="/guide">
+          <Link className={cx(s.helpButton)} to="/guide/models">
             <span name="guide">?</span>
           </Link>
           <Radio name="model" value="gfs" label="Global Forecast System" checked={mapActiveModel === 'gfs'} onChange={this.modelOnChange} />

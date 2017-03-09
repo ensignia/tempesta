@@ -7,6 +7,8 @@ import Page from '../../components/Page/Page.js';
  */
 const PAGES = [
   'about',
+  'models',
+  'layers'
 ];
 
 export default {
