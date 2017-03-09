@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import cx from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import moment from 'moment';
 import { connect } from '../store.js';
 import s from './MapControls.css';
 import Icon from '../Icon/Icon.js';
@@ -80,11 +81,15 @@ class MapControls extends React.Component {
     const { sliderValue, isPlaying, minValue, maxValue } = this.state;
     const { mapMeta, mapActiveModel } = this.props;
 
-    let dataDate = '';
+    let dateOutput = 'Loading...';
 
-    if (mapMeta !== null && mapMeta.sources[mapActiveModel] !== null) {
+    if (mapMeta !== null
+      && mapMeta.sources[mapActiveModel] !== null
+      && mapMeta.sources[mapActiveModel].latest != null) {
       const source = mapMeta.sources[mapActiveModel];
-      dataDate = source.latest !== null ? `${source.latest.day}` : '';
+      const dateString = `${source.latest.year}-${source.latest.month}-${source.latest.day} ${source.latest.modelCycle}`;
+      console.log(dateString);
+      dateOutput = moment(dateString, 'YYYY-MM-DD H').format('dddd, MMMM Do YYYY, HH:mm');
     }
 
     return (
@@ -97,10 +102,17 @@ class MapControls extends React.Component {
         />
         <div className={s.slider}>
           <div className={s.currentDate}>
-            {dataDate}
+            {dateOutput}
           </div>
 
-          <Slider name="mapAnimationBar" min={minValue} max={maxValue} value={sliderValue} onChange={this.handleChange} />
+          <Slider
+            name="mapAnimationBar"
+            min={minValue}
+            max={maxValue}
+            value={sliderValue}
+            onChange={this.handleChange}
+            onLabel={i => <div>{i}</div>}
+          />
         </div>
         <div className={s.speed}>
           <span>1x</span>

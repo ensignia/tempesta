@@ -18,11 +18,12 @@ class Slider extends React.Component {
     max: PropTypes.number,
     onChange: PropTypes.func,
     onChangeComplete: PropTypes.func,
+    onLabel: PropTypes.func,
   };
 
   static defaultProps = {
     min: 0,
-    max: 100,
+    max: 1,
     step: 1,
     value: 0,
   }
@@ -107,11 +108,22 @@ class Slider extends React.Component {
   }
 
   render() {
-    const { name, value, min, max } = this.props;
+    const { name, value, min, max, onLabel } = this.props;
 
     const position = this.getPositionFromValue(value);
     const fillStyle = { width: `${position}px` };
     const handleStyle = { left: `${position}px` };
+
+    const labels = [];
+    if (onLabel) {
+      for (let i = min; i <= max; i += 1) {
+        const el = onLabel(i);
+        if (el != null) {
+          console.log('hi');
+          labels.push(<div className={s.label} style={{ left: `${this.getPositionFromValue(i)}px` }} >{el}</div>);
+        }
+      }
+    }
 
     return (
       <label className={s.sliderLabel} htmlFor={this.sliderId}>
@@ -136,6 +148,9 @@ class Slider extends React.Component {
             onTouchEnd={this.handleEnd}
             style={handleStyle}
           />
+        </div>
+        <div className={s.labels}>
+          {labels}
         </div>
       </label>
     );

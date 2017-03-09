@@ -43,6 +43,10 @@ class DataSource {
         if (parseInt(stat.size, 10) === parseInt(response.headers.get('Content-Length'), 10)) return output;
       }
 
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(response.statusText);
+      }
+
       const dest = fs.createWriteStream(output);
       response.body.pipe(dest);
 
