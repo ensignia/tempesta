@@ -12,6 +12,12 @@
 /*
  * Base styles
  * ========================================================================== */
+body {
+  font-family: var(--font-family-base);
+  font-size: 0.875em;
+}
+
+
 .page {
   min-height: 100%;
 }
@@ -32,6 +38,11 @@
 
 .content {
   flex: auto;
+}
+
+.vertical-center {
+  display: flex;
+  align-items: center;
 }
 
 .clearfix::after {

@@ -126,10 +126,8 @@ class MapControls extends React.Component {
             onLabel={i => <div>{`+${i}`}</div>}
           />
         </div>
-        <Link className={s.link} to="#" onClick={() => { actions.showSpeedModal(); }}>
-          <div className={s.speed}>
-            <span>{mapActiveSpeed}x</span>
-          </div>
+        <Link className={s.speed} to="#" onClick={() => { actions.showSpeedModal(); }}>
+          <span>{mapActiveSpeed}x</span>
         </Link>
       </div>
     );

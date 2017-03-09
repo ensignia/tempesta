@@ -7,6 +7,11 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  position: relative;
+}
+
+.play {
+  @extend .vertical-center;
 }
 
 .playButton {
@@ -15,40 +20,29 @@
 }
 
 .slider {
+  @extend .vertical-center;
+  /*flex-direction: column;*/
   flex-grow: 1;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.play {
-  align-items: center;
-  display: flex;
-  padding: 10px;
 }
 
 .speed {
+  @extend .vertical-center;
+  justify-content: center;
   font-weight: bold;
-  font-size: 25px;
-  align-items: center;
-  display: flex;
-  padding: 10px;
+  width: 36px;
   color: black;
+  text-align: center;
+  text-decoration: none;
 }
 
 .speed span {
   display: inline-block;
-  align-items: center;
+  font-size: 1.714em;
 }
 
 .currentDate {
-  display: inline-block;
-  align-items: center;
-}
-
-.link {
-  display: inline-block;
-  padding: 3px 8px;
-  text-align: center;
-  text-decoration: none;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }

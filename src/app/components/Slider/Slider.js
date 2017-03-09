@@ -101,7 +101,7 @@ class Slider extends React.Component {
     const handleStyle = { left: `${position}px` };
 
     const labels = [];
-    if (onLabel) {
+    if (onLabel && this.sliderEl && this.handleEl) {
       for (let i = min; i <= max; i += 1) {
         const el = onLabel(i);
         if (el != null) {
