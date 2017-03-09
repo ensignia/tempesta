@@ -65,18 +65,18 @@ class DataSource {
   }
 
   /** HELPER: Parses a grib file into useful data */
-  static async parseGribFile(filePath, options) {
+  static async parseGribFile(filePath, options, parseHeader) {
     const gribJson = await gribParser(filePath, {
       names: true, // (default false): Return descriptive names too
       data: true, // (default false): Return data, not just headers
       ...options,
     });
 
-    return gribJson.map((data) => DataSource.parseGribData(data));
+    return gribJson.map((data) => DataSource.parseGribData(data, parseHeader));
   }
 
   /** HELPER: Parses a block of grib2 data into a 2D array of data points */
-  static parseGribData(data) {
+  static parseGribData(data, parseHeader) {
     const header = data.header;
     const oLatitude = header.la1;             // grid origin (e.g. 0.0E, 90.0N)
     const oLongitude = header.lo1;

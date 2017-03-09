@@ -91,13 +91,12 @@ class MapView extends React.Component {
     this.loadMeta();
 
     // Render markers on map
-    fetch(`/api/lightning/${(new Date()).getTime()}`)
+    fetch(`/api/lightning/${(new Date()).getTime() - 120000}`) // last 2 minutes for demo purposes fixme
       .then((response) => {
         console.log(`LIGHTNING: server response -> ${response.ok} ${response.status}`);
         return response.json();
       })
       .then((response) => {
-        console.log(response);
         const strikes = [];
         for (let i = 0; i < response.data.length; i += 1) {
           strikes.push(<Marker key={`${response.data[i].latitude}-${response.data[i].longitude}`}
