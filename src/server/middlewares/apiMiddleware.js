@@ -13,15 +13,19 @@ export default class ApiMiddleware {
     this.router = Router();
     this.data = new Data();
 
+    this.router.use((req, res, next) => {
+      if (toobusy()) {
+        res.status(503).send('Server too busy right now :(');
+      } else {
+        next();
+      }
+    });
+
     this.router.get('/map', (req, res) => {
       res.status(200).json(this.data.getMeta());
     });
 
     this.router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
-      if (toobusy()) {
-        return res.status(503).send('Server too busy right now :(');
-      }
-
       try {
         // path to tile image
         await this.data.getTile(
@@ -69,11 +73,11 @@ export default class ApiMiddleware {
      * as the since attribute, therefore it should be assumed one is inclusive (to) and the other
      * exclusive (since)
      */
-    this.router.get('/lightning', (req, res) => {
+    this.router.get('/lightning/:since', (req, res) => {
       try {
         const lightningDataSource = this.data.getDataSource('lightning');
         const to = new Date();
-        const since = new Date(parseInt(req.query.since, 10)) || to;
+        const since = new Date(parseInt(req.params.since, 10)) || to;
 
         res.status(200).json({
           meta: { since, to },

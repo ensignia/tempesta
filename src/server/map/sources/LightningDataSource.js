@@ -127,15 +127,14 @@ class LightningDataSource extends DataSource {
     try {
       const lightningArray = [];
 
-      const startMinute = ~~((sinceDate.getTime() % 60000) / 1000);
-      const endMinute = ~~((toDate.getTime() % 60000) / 1000);
+      // const startMinute = ~~((sinceDate.getTime() % 60000) / 1000);
+      // const endMinute = ~~((toDate.getTime() % 60000) / 1000);
+      const startMinute = 5;
+      const endMinute = 55;
       console.log(`LIGHTNING: request -> minute ${startMinute}, minute ${endMinute}`);
+      // console.log(this.data);
 
-      for (let block = 0; block < this.data.length; block += 1) {
-        lightningArray.push.apply(lightningArray, this.data[block]);
-      }
-
-      /* first minute block
+      // first minute block
       for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
         if (this.data[startMinute][strike].time > sinceDate.getTime()) lightningArray.push(this.data[startMinute][strike]);
       }
@@ -144,12 +143,9 @@ class LightningDataSource extends DataSource {
         lightningArray.push.apply(lightningArray, this.data[block]);
       }
       // last minute block todo remove duplicated code
-      for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
+      for (let strike = 0; strike < this.data[endMinute].length; strike += 1) {
         if (this.data[endMinute][strike].time > sinceDate.getTime()) lightningArray.push(this.data[endMinute][strike]);
-      } */
-
-      console.log(lightningArray);
-
+      }
 
       return lightningArray;
     }
