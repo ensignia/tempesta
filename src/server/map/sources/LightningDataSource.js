@@ -18,7 +18,7 @@ class LightningDataSource extends DataSource {
     };
     this.data = [];                                                  // must contain 60 arrays of strikes
     this.random = {
-      generator: new seedrandom((new Date()).getTime()),             // todo make repeatable
+      generator: new seedrandom((new Date()).getDay()),             // todo make repeatable
       epicenters: [],
       stormdeath: STORM_DEATH,
       stormgenesis: STORM_GENESIS,
@@ -144,10 +144,11 @@ class LightningDataSource extends DataSource {
     try {
       const lightningArray = [];
 
-      const startMinute = ~~((sinceDate.getTime() - this.meta.start) / 60000);
+      let startMinute = ~~((sinceDate.getTime() - this.meta.start) / 60000);
+      if (startMinute < 0) startMinute = 0;
       const endMinute = ~~((toDate.getTime() - this.meta.start) / 60000);
 
-      // console.log(`LIGHTNING: request -> minute ${startMinute}, minute ${endMinute}`);
+      console.log(`LIGHTNING: request -> minute ${startMinute}, minute ${endMinute}`);
 
       // first minute block
       for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
