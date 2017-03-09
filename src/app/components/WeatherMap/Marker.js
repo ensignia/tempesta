@@ -14,6 +14,8 @@ class Marker extends React.Component {
     switch (type) {
       case 'LOCATION':
         return (<div className={s.locationIcon} />);
+      case 'LIGHTNING':
+        return (<div className={s.lightningIcon} />);
       default:
         return null;
     }

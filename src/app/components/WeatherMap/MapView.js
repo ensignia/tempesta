@@ -16,7 +16,7 @@ const DEFAULT_CENTER = {
   lat: 0.5,
   lng: 0.5,
 };
-const DEFAULT_ZOOM = 11;
+const DEFAULT_ZOOM = 3;
 
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
@@ -71,6 +71,7 @@ class MapView extends React.Component {
     this.state = {
       mapLoaded: false,
       shouldUpdateLocation: false,
+      lightning: [],
     };
 
     this.componentWillMount = this.componentWillMount.bind(this);
@@ -88,6 +89,24 @@ class MapView extends React.Component {
    */
   componentWillMount() {
     this.loadMeta();
+
+    // Render markers on map
+    fetch(`/api/lightning/${(new Date()).getTime()}`)
+      .then((response) => {
+        console.log(`LIGHTNING: server response -> ${response.ok} ${response.status}`);
+        return response.json();
+      })
+      .then((response) => {
+        console.log(response);
+        const strikes = [];
+        for (let i = 0; i < response.data.length; i += 1) {
+          strikes.push(<Marker key={`${response.data[i].latitude}-${response.data[i].longitude}`}
+                               type="LIGHTNING"
+                               lat={response.data[i].latitude}
+                               lng={response.data[i].longitude} />);
+        }
+        this.setState({lightning: strikes});
+      });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -265,12 +284,6 @@ class MapView extends React.Component {
   render() {
     const { className, location } = this.props;
 
-    // Render markers on map
-    const markersEl = [];
-    [].forEach((marker) => {
-      markersEl.push(<Marker key={`${marker.lat}-${marker.lng}`} lat={marker.lat} lng={marker.lng} />);
-    });
-
     return (
       <div className={className}>
         <GoogleMapReact
@@ -282,7 +295,7 @@ class MapView extends React.Component {
           onGoogleApiLoaded={this.onGoogleApiLoaded}
         >
           <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} />
-          {markersEl}
+          {this.state.lightning}
         </GoogleMapReact>
       </div>
     );

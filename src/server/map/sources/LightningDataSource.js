@@ -1,9 +1,9 @@
 import DataSource from './DataSource.js';
-var seedrandom = require('seedrandom');
+const seedrandom = require('seedrandom');
 
 const STORM_INTENSITY = 200;                    // maximum strikes per storm per hour
 const STORM_SPEED = 4;                          // maximum degrees of movement per hour
-const STORM_SPREAD = 3;                         // maximum degrees of strike y/x distance from epicenter
+const STORM_SPREAD = 5;                         // maximum degrees of strike y/x distance from epicenter
 const STORM_DEATH = 0.3;                        // probability per hour of a storm dying
 const STORM_GENESIS = 0.3;                      // probability per hour of a storm starting
 const STORM_MAXNUM = 6;
@@ -17,7 +17,7 @@ class LightningDataSource extends DataSource {
     };
     this.data = [];                             // must contain 60 arrays of strikes
     this.random = {
-      generator: new seedrandom(new Date().getDay()),
+      generator: new seedrandom('gooby'),
       epicenters: [],
       stormdeath: STORM_DEATH,
       stormgenesis: STORM_GENESIS,
@@ -82,8 +82,8 @@ class LightningDataSource extends DataSource {
         // storm genesis
         if (this.random.generator() < this.random.stormgenesis) {
           this.random.epicenters.push({
-            latitude: this.random.generator() * 180,
-            longitude: this.random.generator() * 360,
+            latitude: this.random.generator() * 90,
+            longitude: this.random.generator() * 180,
             speed: this.random.generator() * STORM_SPEED,
             intensity: this.random.generator() * STORM_INTENSITY,
             spread: this.random.generator() * STORM_SPREAD,
@@ -127,12 +127,17 @@ class LightningDataSource extends DataSource {
     try {
       const lightningArray = [];
 
-      const startMinute = ~~((sinceDate - this.meta.start) / 6000);
-      const endMinute = ~~((toDate - this.meta.end) / 6000);
+      const startMinute = ~~((sinceDate.getTime() % 60000) / 1000);
+      const endMinute = ~~((toDate.getTime() % 60000) / 1000);
+      console.log(`LIGHTNING: request -> minute ${startMinute}, minute ${endMinute}`);
 
-      // first minute block
+      for (let block = 0; block < this.data.length; block += 1) {
+        lightningArray.push.apply(lightningArray, this.data[block]);
+      }
+
+      /* first minute block
       for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
-        if (this.data[startMinute][strike].time > sinceDate) lightningArray.push(this.data[startMinute][strike]);
+        if (this.data[startMinute][strike].time > sinceDate.getTime()) lightningArray.push(this.data[startMinute][strike]);
       }
       // middle minute blocks
       for (let block = startMinute + 1; block < endMinute; block += 1) {
@@ -140,8 +145,11 @@ class LightningDataSource extends DataSource {
       }
       // last minute block todo remove duplicated code
       for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
-        if (this.data[endMinute][strike].time > sinceDate) lightningArray.push(this.data[endMinute][strike]);
-      }
+        if (this.data[endMinute][strike].time > sinceDate.getTime()) lightningArray.push(this.data[endMinute][strike]);
+      } */
+
+      console.log(lightningArray);
+
 
       return lightningArray;
     }
