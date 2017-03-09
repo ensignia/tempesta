@@ -90,6 +90,9 @@ class DataSource {
     const date = new Date(header.refTime);
     date.setHours(date.getHours() + header.forecastTime);
 
+    // console.log(`GRIB: parsed ->`);
+    // console.log(header);
+
     // TODO if the bounds are wrong, the scan mode might not be 000
     // Scan mode 000 assumed. Longitude increases from oLongitude and latitude
     // decreases from oLatitude. This implies origin at top left corner of
@@ -105,10 +108,6 @@ class DataSource {
       grid[y] = row;
     }
 
-    console.log(`Origin: ${oLatitude}, ${oLongitude}`);
-    console.log(`Angular grid resolution: ${angularDy}, ${angularDx}`);
-    console.log(`Number of data points: ${yNum}, ${xNum}`);
-    console.log(`Coverage bound: ${boundLatitude}, ${boundLongitude}`);
 
     function bilinearInterpolation(latitude, longitude) {
       /* eslint-disable brace-style */

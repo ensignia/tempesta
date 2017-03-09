@@ -70,9 +70,7 @@ class LightningDataSource extends DataSource {
 
       // flush and rebuild data array
       this.data = [];
-      for (let minute = 0; minute < 60; minute += 1) {
-        this.data.push([]);
-      }
+
       // console.log(`LIGHTNING: flushed old data -> ${this.data.length}`);
       // console.log(this.data);
 
@@ -106,7 +104,7 @@ class LightningDataSource extends DataSource {
 
           // generate strikes
           for (let strike = 0; strike < this.random.epicenters[epicenter].intensity / 60; strike += 1) {
-            this.data[minute].push({
+            this.data.push({
               latitude: this.random.epicenters[epicenter].latitude +=
                 (this.random.generator() * this.random.epicenters[epicenter].spread * 2)
                 - this.random.epicenters[epicenter].spread,
@@ -116,12 +114,12 @@ class LightningDataSource extends DataSource {
               time: new Date(this.meta.start + (minute * 60000) + (this.random.generator() * 60000)).getTime(),
             });
 
-            const lat = this.data[minute][strike].latitude;
-            const long = this.data[minute][strike].longitude;
+            const lat = this.data[this.data.length - 1].latitude;
+            const long = this.data[this.data.length - 1].longitude;
 
             // storm has walked out of map - fix and kill
             if (lat > 90 || lat < (-90) || long < (-180) || long > 180) {
-              this.data[minute].splice(strike, 1);
+              this.data.splice(this.data.length - 1, 1);
               this.random.epicenters.splice(epicenter, 1);
               epicenter -= 1;
               break;
@@ -153,28 +151,16 @@ class LightningDataSource extends DataSource {
    */
   getLightningBetween(sinceDate, toDate) {
     try {
-      const lightningArray = [];
-
       let startMinute = ~~((sinceDate.getTime() - this.meta.start) / 60000);
       if (startMinute < 0) startMinute = 0;
       const endMinute = ~~((toDate.getTime() - this.meta.start) / 60000);
 
       console.log(`LIGHTNING: request -> minute ${startMinute}, minute ${endMinute}`);
 
-      // first minute block
-      for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
-        if (this.data[startMinute][strike].time > sinceDate.getTime()) lightningArray.push(this.data[startMinute][strike]);
-      }
-      // middle minute blocks
-      for (let block = startMinute + 1; block < endMinute; block += 1) {
-        lightningArray.push.apply(lightningArray, this.data[block]);
-      }
-      // last minute block todo remove duplicated code
-      for (let strike = 0; strike < this.data[endMinute].length; strike += 1) {
-        if (this.data[endMinute][strike].time > sinceDate.getTime()) lightningArray.push(this.data[endMinute][strike]);
-      }
-
-      return lightningArray;
+      return this.data.filter((item) => {
+        if (item.time > sinceDate && item.time < toDate) return true;
+        return false;
+      });
     }
     catch (e) {
       if (!this.loaded) console.log('Lightning data not yet loaded!');
