@@ -8,12 +8,41 @@ function initialize() {
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
 
+    temperatureUnits: 'celcius',
+    units: 'metric',
+    theme: 'light',
+
     mapMeta: null,
     mapPlaybackIndex: 0,
     mapActiveLayers: ['cape'],
     mapActiveModel: 'gfs',
   };
 }
+
+/**
+ * Settings
+ */
+function setTemperatureUnits(state, temperatureUnits) {
+  return {
+    ...state,
+    temperatureUnits,
+  };
+}
+
+function setUnits(state, units) {
+  return {
+    ...state,
+    units,
+  };
+}
+
+function setTheme(state, theme) {
+  return {
+    ...state,
+    theme,
+  };
+}
+
 
 /**
  * Map meta
@@ -162,4 +191,7 @@ export default {
   setActiveModel,
   setActiveLayers,
   setMapPlaybackIndex,
+  setTemperatureUnits,
+  setUnits,
+  setTheme,
 };

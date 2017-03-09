@@ -282,7 +282,7 @@ class MapView extends React.Component {
   }
 
   render() {
-    const { className, location } = this.props;
+    const { className, location, locationStatus } = this.props;
 
     return (
       <div className={className}>
@@ -294,7 +294,7 @@ class MapView extends React.Component {
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={this.onGoogleApiLoaded}
         >
-          <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} />
+          {locationStatus !== 'UNKNOWN' ? <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} /> : null}
           {this.state.lightning}
         </GoogleMapReact>
       </div>

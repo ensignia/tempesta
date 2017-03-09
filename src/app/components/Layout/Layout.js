@@ -7,15 +7,17 @@ import mdl from 'material-design-lite/material.css';
 import { connect } from '../store.js';
 import s from './Layout.css';
 import Header from '../Header/Header.js';
+<<<<<<< a5f8709ae5cefe876b69a87ea04d2ed9818b3bda
 import Modal from '../Modal/Modal.js';
 import Link from '../Link/Link.js';
+=======
+>>>>>>> Made seperate slider
 
 class Layout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
-    locationStatus: PropTypes.string.isRequired,
-    showSettingsModal: PropTypes.bool.isRequired,
     actions: PropTypes.object.isRequired,
+    locationStatus: PropTypes.string.isRequired,
   };
 
   constructor() {
@@ -50,52 +52,13 @@ class Layout extends React.Component {
   }
 
   render() {
-    const { actions, showSettingsModal } = this.props;
+    const { children } = this.props;
     return (
       <div className={cx(s.page, s.container)}>
         <Header />
         <main className={cx(s.content, s.container)}>
-          {this.props.children}
+          {children}
         </main>
-
-        <Modal
-          title="Settings"
-          isOpen={showSettingsModal}
-          className={s.modal}
-          onClose={() => { actions.hideSettingsModal(); }}
-        >
-
-        <Link className={cx(s.helpButton)} to="/guide">
-          <span name="guide">?</span>
-        </Link>
-
-        <div className={cx(s.temperature)}>
-          <span>°C  </span>
-          <label className={cx(s.switch)}>
-            <input type="checkbox" />
-            <div className={cx(s.sliderRound, s.slider)} />
-          </label>
-          <span>  °F</span>
-        </div>
-
-        <div className={cx(s.scales)}>
-          <span>Metric  </span>
-          <label className={cx(s.switch)}>
-            <input type="checkbox" />
-            <div className={cx(s.sliderRound, s.slider)} />
-          </label>
-          <span>  Imperial</span>
-        </div>
-
-        <div className={cx(s.colourScheme)}>
-          <span>Light </span>
-          <label className={cx(s.switch)}>
-            <input type="checkbox" />
-            <div className={cx(s.sliderRound, s.slider)} />
-          </label>
-          <span> Dark</span>
-        </div>
-        </Modal>
       </div>
     );
   }
@@ -103,5 +66,4 @@ class Layout extends React.Component {
 
 export default connect((state) => ({
   locationStatus: state.locationStatus,
-  showSettingsModal: state.showSettingsModal,
 }))(withStyles(normalize, mdl, s)(Layout));

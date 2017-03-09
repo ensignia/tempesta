@@ -19,7 +19,7 @@ class MapControls extends React.Component {
     super();
 
     this.state = {
-      maxValue: 100,
+      maxValue: 1,
       sliderValue: 0,
       isPlaying: false,
     };
