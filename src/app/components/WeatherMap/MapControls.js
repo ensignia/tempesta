@@ -88,7 +88,6 @@ class MapControls extends React.Component {
       && mapMeta.sources[mapActiveModel].latest != null) {
       const source = mapMeta.sources[mapActiveModel];
       const dateString = `${source.latest.year}-${source.latest.month}-${source.latest.day} ${source.latest.modelCycle}`;
-      console.log(dateString);
       dateOutput = moment(dateString, 'YYYY-MM-DD H').format('dddd, MMMM Do YYYY, HH:mm');
     }
 
@@ -111,7 +110,7 @@ class MapControls extends React.Component {
             max={maxValue}
             value={sliderValue}
             onChange={this.handleChange}
-            onLabel={i => <div>{i}</div>}
+            onLabel={i => <div>{`+${i}`}</div>}
           />
         </div>
         <div className={s.speed}>

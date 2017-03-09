@@ -119,7 +119,6 @@ class Slider extends React.Component {
       for (let i = min; i <= max; i += 1) {
         const el = onLabel(i);
         if (el != null) {
-          console.log('hi');
           labels.push(<div className={s.label} style={{ left: `${this.getPositionFromValue(i)}px` }} >{el}</div>);
         }
       }
