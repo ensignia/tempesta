@@ -24,6 +24,7 @@ class MapControls extends React.Component {
       maxValue: 1,
       sliderValue: 0,
       isPlaying: false,
+      playbackSpeed: 1,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -33,11 +34,16 @@ class MapControls extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { mapActiveModel, mapMeta } = nextProps;
+    const { mapActiveModel, mapMeta, mapActiveSpeed } = nextProps;
 
     if (mapMeta !== null && mapMeta.sources[mapActiveModel] !== null) {
       const source = mapMeta.sources[mapActiveModel];
       this.setState({ maxValue: source.forecastHours / source.forecastHourStep });
+    }
+
+    if (this.state.playbackSpeed !== mapActiveSpeed) {
+      this.setState({ playbackSpeed: mapActiveSpeed });
+      if (this.state.isPlaying) this.playAnimation();
     }
   }
 
@@ -55,11 +61,13 @@ class MapControls extends React.Component {
    * Plays animation of current layers
    */
   playAnimation() {
+    if (this.state.isPlaying) this.pauseAnimation();
+
     this.animation = setInterval(() => {
       const { sliderValue, maxValue } = this.state;
 
       this.handleChange((sliderValue + 1) % (maxValue + 1));
-    }, 2000);
+    }, 3000 * (1 / this.state.playbackSpeed));
 
     this.setState({ isPlaying: true });
   }
