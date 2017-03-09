@@ -32,30 +32,20 @@ class Slider extends React.Component {
     super();
 
     this.sliderId = `slider-${id()}`;
-    this.state = {
-      grab: 0,
-    };
 
     this.getPositionFromValue = this.getPositionFromValue.bind(this);
     this.getValueFromPosition = this.getValueFromPosition.bind(this);
-    this.handleUpdate = this.handleUpdate.bind(this);
     this.handleStart = this.handleStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleEnd = this.handleEnd.bind(this);
   }
 
-  componentDidMount() {
-    window.addEventListener('resize', this.handleUpdate);
-    this.handleUpdate();
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleUpdate);
-  }
-
   getPositionFromValue = (value) => {
-    const { limit } = this.state;
     const { min, max } = this.props;
+    const sliderPos = this.sliderEl ? this.sliderEl.offsetWidth : 0;
+    const handlePos = this.handleEl ? this.handleEl.offsetWidth : 0;
+
+    const limit = sliderPos - handlePos;
     const percentage = (value - min) / (max - min);
     const pos = Math.round(percentage * limit);
 
@@ -63,24 +53,17 @@ class Slider extends React.Component {
   }
 
   getValueFromPosition = (pos) => {
-    const { limit } = this.state;
     const { min, max, step } = this.props;
+    const sliderPos = this.sliderEl ? this.sliderEl.offsetWidth : 0;
+    const handlePos = this.handleEl ? this.handleEl.offsetWidth : 0;
+
+    const limit = sliderPos - handlePos;
     const percentage = (Math.min(Math.max(pos, 0), limit) / (limit || 1));
     const baseVal = step * Math.round(percentage * ((max - min) / step));
 
     const value = Math.min(Math.max(baseVal + min, min), max);
 
     return value;
-  }
-
-  handleUpdate() {
-    const sliderPos = this.sliderEl.offsetWidth;
-    const handlePos = this.handleEl.offsetWidth;
-
-    this.setState({
-      limit: sliderPos - handlePos,
-      grab: handlePos / 2,
-    });
   }
 
   handleStart() {
@@ -91,12 +74,15 @@ class Slider extends React.Component {
   handleDrag(e) {
     e.stopPropagation();
     e.preventDefault();
-    const { grab } = this.state;
+
     const { onChange } = this.props;
+
+    const grab = this.handleEl.offsetWidth / 2;
     const coordinate = !e.touches ? e.clientX : e.touches[0].clientX;
     const direction = this.sliderEl.getBoundingClientRect().left;
     const pos = coordinate - direction - grab;
     const value = this.getValueFromPosition(pos);
+
     if (onChange) onChange(value);
   }
 
