@@ -2,34 +2,48 @@ function initialize() {
   return {
     showLayerModal: false,
     showModelModal: false,
+    showSettingsModal: false,
     showWeatherOverview: false,
+
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
-    mapAnimationStatus: 'PAUSED',
+
+    mapMeta: null,
+    mapPlaybackIndex: 0,
+    mapActiveLayers: ['cape'],
+    mapActiveModel: 'gfs',
   };
 }
 
 /**
- * Map animation
+ * Map meta
  */
-function setMapAnimationStatus(state, mapAnimationStatus) {
-  switch (mapAnimationStatus) {
-    case 'PLAYING':
-    case 'PAUSED':
-      return {
-        ...state,
-        mapAnimationStatus,
-      };
-    default:
-      return state;
-  }
+function setMapMeta(state, mapMeta) {
+  return {
+    ...state,
+    mapMeta,
+  };
 }
 
-function toggleAnimationStatus(state) {
-  if (state.mapAnimationStatus === 'PLAYING') {
-    return setMapAnimationStatus(state, 'PAUSED');
-  }
-  return setMapAnimationStatus(state, 'PLAYING');
+function setActiveModel(state, mapActiveModel) {
+  return {
+    ...state,
+    mapActiveModel,
+  };
+}
+
+function setActiveLayers(state, mapActiveLayers) {
+  return {
+    ...state,
+    mapActiveLayers,
+  };
+}
+
+function setMapPlaybackIndex(state, mapPlaybackIndex) {
+  return {
+    ...state,
+    mapPlaybackIndex,
+  };
 }
 
 /**
@@ -61,10 +75,28 @@ function requestLocation(state) {
 }
 
 /**
+ * Settings Modal
+ */
+function showSettingsModal(state) {
+  if (state.showModelModal || state.showLayerModal) return state;
+  return {
+    ...state,
+    showSettingsModal: true,
+  };
+}
+
+function hideSettingsModal(state) {
+  return {
+    ...state,
+    showSettingsModal: false,
+  };
+}
+
+/**
  * Layer Modal
  */
 function showLayerModal(state) {
-  if (state.showModelModal) return state;
+  if (state.showModelModal || state.showSettingsModal) return state;
   return {
     ...state,
     showLayerModal: true,
@@ -82,7 +114,7 @@ function hideLayerModal(state) {
  * Model Modal
  */
 function showModelModal(state) {
-  if (state.showLayerModal) return state;
+  if (state.showLayerModal || state.showSettingsModal) return state;
   return {
     ...state,
     showModelModal: true,
@@ -119,11 +151,15 @@ export default {
   hideLayerModal,
   showModelModal,
   hideModelModal,
+  showSettingsModal,
+  hideSettingsModal,
   showWeatherOverview,
   hideWeatherOverview,
   updateLocation,
   setLocationStatus,
   requestLocation,
-  setMapAnimationStatus,
-  toggleAnimationStatus,
+  setMapMeta,
+  setActiveModel,
+  setActiveLayers,
+  setMapPlaybackIndex,
 };

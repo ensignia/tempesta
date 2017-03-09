@@ -3,14 +3,14 @@ import cx from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from '../store.js';
 import s from './MapControls.css';
-import Link from '../Link/Link.js';
 import Icon from '../Icon/Icon.js';
 import Slider from '../Slider/Slider.js';
 
 class MapControls extends React.Component {
 
   static propTypes = {
-    mapAnimationStatus: PropTypes.string,
+    mapActiveModel: PropTypes.string,
+    mapMeta: PropTypes.object,
     actions: PropTypes.object,
   };
 
@@ -18,36 +18,89 @@ class MapControls extends React.Component {
     super();
 
     this.state = {
+      maxValue: 100,
       sliderValue: 0,
+      isPlaying: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.playAnimation = this.playAnimation.bind(this);
+    this.pauseAnimation = this.pauseAnimation.bind(this);
+    this.toggleAnimation = this.toggleAnimation.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { mapActiveModel, mapMeta } = nextProps;
+
+    if (mapMeta !== null && mapMeta.sources[mapActiveModel] !== null) {
+      const source = mapMeta.sources[mapActiveModel];
+      this.setState({ maxValue: source.forecastHours / source.forecastHourStep });
+    }
   }
 
   handleChange(value) {
+    const { actions } = this.props;
+
+    if (value !== this.state.sliderValue) actions.setMapPlaybackIndex(value);
+
     this.setState({
       sliderValue: value,
     });
   }
 
+  /**
+   * Plays animation of current layers
+   */
+  playAnimation() {
+    this.animation = setInterval(() => {
+      const { sliderValue, maxValue } = this.state;
+
+      this.handleChange((sliderValue + 1) % (maxValue + 1));
+    }, 2000);
+
+    this.setState({ isPlaying: true });
+  }
+
+  /**
+   * Stops all animation, position in animation is still stored
+   */
+  pauseAnimation() {
+    clearInterval(this.animation);
+    this.setState({ isPlaying: false });
+  }
+
+  toggleAnimation() {
+    const { isPlaying } = this.state;
+
+    if (isPlaying) this.pauseAnimation();
+    else this.playAnimation();
+  }
+
   render() {
-    const { sliderValue } = this.state;
-    const { actions, mapAnimationStatus } = this.props;
+    const { sliderValue, isPlaying, minValue, maxValue } = this.state;
+    const { mapMeta, mapActiveModel } = this.props;
+
+    let dataDate = '';
+
+    if (mapMeta !== null && mapMeta.sources[mapActiveModel] !== null) {
+      const source = mapMeta.sources[mapActiveModel];
+      dataDate = source.latest !== null ? `${source.latest.day}` : '';
+    }
 
     return (
       <div className={cx(s.mapControls)}>
         <Icon
           className={s.playButton}
-          name={mapAnimationStatus === 'PLAYING' ? 'pause' : 'play_arrow'}
-          onClick={actions.toggleAnimationStatus}
+          name={isPlaying ? 'pause' : 'play_arrow'}
+          onClick={this.toggleAnimation}
           size={48}
         />
         <div className={s.slider}>
           <div className={s.currentDate}>
-              current date
+            {dataDate}
           </div>
 
-          <Slider name="mapAnimationBar" min={0} max={100} value={sliderValue} onChange={this.handleChange} />
+          <Slider name="mapAnimationBar" min={minValue} max={maxValue} value={sliderValue} onChange={this.handleChange} />
         </div>
         <div className={s.speed}>
           <span>1x</span>
@@ -58,5 +111,6 @@ class MapControls extends React.Component {
 }
 
 export default connect((state) => ({
-  mapAnimationStatus: state.mapAnimationStatus,
+  mapActiveModel: state.mapActiveModel,
+  mapMeta: state.mapMeta,
 }))(withStyles(s)(MapControls));

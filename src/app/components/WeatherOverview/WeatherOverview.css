@@ -1,41 +1,44 @@
 @import '../variables.css';
 
 .weatherOverview {
-  height: 48px;
-  background: #333;
-  box-shadow: inset 0px -5px 10px 0px rgba(51,51,51,1);
+  height: 56px;
+  background: #1b1b1b;
+  box-shadow: inset 0 -5px 10px 0 rgba(0, 0, 0, 0.9);
+  padding: 0 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+}
+
+.current {
+  color: #fff;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.currentIcon {
+  padding: 0 15px;
+}
+
+.dayName {
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+}
+
+.forecast {
+  flex-grow: 1;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+.forecast > div {
+  padding-left: 15px;
 }
-
-.Current{
-  
-}
-
-li {
-    float: left;
-    display: block;
-    text-align: center;
-    line-height: 48px;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-li div{
-  position: relative;
-}
-
-li div span{
-  display: block;
-  /*position: absolute;*/
-}
-
-/*RECOLOUR ICONS*/

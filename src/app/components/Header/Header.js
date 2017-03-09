@@ -19,7 +19,6 @@ class Header extends React.Component {
       <div className={s.header}>
         <Collapse
           isOpened={showWeatherOverview}
-          fixedHeight={50}
           keepCollapsedContent
         >
           <WeatherOverview />

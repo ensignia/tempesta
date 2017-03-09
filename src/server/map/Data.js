@@ -9,20 +9,16 @@ import GfsDataSource from './sources/GfsDataSource.js';
 import HrrrDataSource from './sources/HrrrDataSource.js';
 import LightningDataSource from './sources/LightningDataSource.js';
 import { server } from '../../config.js';
+import { fsExists } from './Util.js';
 
 const DATA_DIR = path.join(__dirname, server.dataDirectory);
 const TILES_DIR = path.join(DATA_DIR, 'tiles');
 const GRIB_DIR = path.join(DATA_DIR, 'grib');
 
-/** Checks if file exists. Returns promise */
-function fsExists(file) {
-  return new Promise(resolve => {
-    fs.access(file, fs.F_OK, error => resolve(!error));
-  });
-}
-
-/** Data objects track available data sources and data layers. Tile data
-requests are passed on to the appropriate Layer object. */
+/**
+ * Tracks layers and models, and dispatches tile requests. Periodically issues a call to
+ * load data.
+ */
 class Data {
   constructor() {
     this.registerLayer = this.registerLayer.bind(this);
@@ -32,7 +28,6 @@ class Data {
 
     this.layers = {};
     this.sources = {};
-    this.cache = [];
 
     const fnt = pureimage.registerFont('public/server/SourceSansPro-Regular.ttf', 'Source Sans Pro');
     fnt.loadSync();
@@ -49,13 +44,8 @@ class Data {
     this.registerLayer('wind', new WindLayer(this));
     this.registerLayer('lightningProbability', new LightningProbabilityLayer(this));
     this.registerDataSource('gfs', new GfsDataSource());
-    // this.registerDataSource('hrrr', new HrrrDataSource());
-    // this.registerDataSource('lightning', new LightningDataSource());
-
-    this.load();
-    setInterval(() => {
-      this.load();
-    }, 60 * 60 * 1000); // Check for new data every hour
+    this.registerDataSource('hrrr', new HrrrDataSource());
+    this.registerDataSource('lightning', new LightningDataSource());
   }
 
   registerLayer(layerName, layer) {
@@ -76,7 +66,10 @@ class Data {
       sources[sourceName] = this.sources[sourceName].getMeta();
     });
 
-    const layers = Object.keys(this.layers);
+    const layers = {};
+    Object.keys(this.layers).forEach((layerName) => {
+      layers[layerName] = this.layers[layerName].getMeta();
+    });
 
     return {
       sources,
@@ -89,7 +82,7 @@ class Data {
   }
 
   /** Passes the tile data request on to the correct Layer, returns
-  path to the output png file for the tile */
+   path to the output png file for the tile */
   async getTile(layerName, tileX, tileY, tileZ, options, req, res) {
     const layer = this.layers[layerName];
 
@@ -116,13 +109,18 @@ class Data {
     }
   }
 
-  /** Calls load() on every registered data source */
+  /** Called by master in index.js with a callback function. Executes the callback for
+   * every data source for which new data is downloaded, with source name and
+   * source metadata as arguments. */
   async download(callback) {
     Object.keys(this.sources).forEach(async (sourceName) => {
-      if (await this.sources[sourceName].download()) callback(sourceName, this.sources[sourceName].getMeta());
+      if (await this.sources[sourceName].download()) {
+        callback(sourceName, this.sources[sourceName].getMeta());
+      }
     });
   }
 
+  /** Called by worker in index.js whenever new data has been downloaded for sourceName. */
   load(sourceName, args) {
     if (this.getDataSource(sourceName) != null) {
       this.getDataSource(sourceName).load(args);

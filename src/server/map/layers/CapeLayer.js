@@ -11,6 +11,12 @@ class CapeLayer extends Layer {
     forecastHour: 0,
   }
 
+  getMeta() {
+    return {
+      supportedSources: ['gfs', 'hrrr'],
+    };
+  }
+
   getOptions(options_) {
     const options = {
       ...CapeLayer.defaultOptions,
@@ -19,7 +25,7 @@ class CapeLayer extends Layer {
 
     options.source = options.source.toLowerCase();
 
-    if (!['gfs', 'hrrr'].includes(options.source)) {
+    if (!this.getMeta().supportedSources.includes(options.source)) {
       throw new Error(`Source ${options.source} for CapeLayer is invalid`);
     }
 
@@ -35,7 +41,9 @@ class CapeLayer extends Layer {
   }
 
   getPath(tileX, tileY, tileZ, options) {
-    return Layer.getFullPath(`cape-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+    const source = this.getData().getDataSource(options.source);
+    const latest = source.getMeta().latest || {};
+    return Layer.getFullPath(`cape-${options.source}-${latest.year}-${latest.month}-${latest.day}-${latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
   async generateTile(tilePath, tileX, tileY, tileZ, options, res) {

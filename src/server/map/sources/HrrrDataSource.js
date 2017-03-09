@@ -2,21 +2,11 @@ import path from 'path';
 import DataSource from './DataSource.js';
 import fetch from '../../../app/core/fetch';
 import { server } from '../../../config.js';
+import { padLeft } from '../Util.js';
 
 const HRRR_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/';
 
-function padLeft(number, zeroes, str) {
-  return Array((zeroes - String(number).length) + 1).join(str || '0') + number;
-}
-
-
 class HrrrDataSource extends DataSource {
-  constructor() {
-    super();
-    this.data = {};
-    this.meta = null;
-  }
-
   /**
    * Gets the HRRR url formatted
    * year, month, day and modelCycle (modelCycle may be 00-23)
@@ -28,11 +18,8 @@ class HrrrDataSource extends DataSource {
     return `${HRRR_BASE_URL}hrrr.${padLeft(year, 4)}${padLeft(month, 2)}${padLeft(day, 2)}/hrrr.t${padLeft(modelCycle, 2)}z.wrfsfcf${padLeft(forecastHour, 2)}.grib2`;
   }
 
-  static async download(year, month, day, modelCycle, forecastHour, forceDownload = false) {
-    const url = HrrrDataSource.getURL(year, month, day, modelCycle, forecastHour);
-    const output = path.join(__dirname, server.dataDirectory, `grib/hrrr-${year}-${month}-${day}-${modelCycle}-${forecastHour}.grib2`);
-
-    return await DataSource.downloadURL(url, output, forceDownload);
+  static getPath(year, month, day, modelCycle, forecastHour) {
+    return path.join(__dirname, server.dataDirectory, `grib/hrrr-${year}-${month}-${day}-${modelCycle}-${forecastHour}.grib2`);
   }
 
   static async getAvailable() {
@@ -129,9 +116,8 @@ class HrrrDataSource extends DataSource {
     };
   }
 
-  async load() {
-    console.log('Loading HRRR Data');
-
+  async download() {
+    console.log('Downloading HRRR Data');
     const available = await HrrrDataSource.getAvailable();
 
     // Use latest data
@@ -146,36 +132,48 @@ class HrrrDataSource extends DataSource {
       return false;
     }
 
-    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
-      console.log(`Loading HRRR data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
-      let filePath = await HrrrDataSource.download(
-            latest.year,
-            latest.month,
-            latest.day,
-            latest.modelCycle,
-            forecastHour);
+    // for every available hour, download data and place in this.data[hour]
+    for (let forecastHour = 0;
+      forecastHour <= this.getForecastHours();
+      forecastHour += this.getForecastHourStep()) {
+      console.log(`Downloading HRRR data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
+      const url = HrrrDataSource.getURL(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
+      const output = HrrrDataSource.getPath(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
+      await DataSource.downloadURL(url, output);
+      console.log('Downloaded');
+    }
+
+    this.meta = latest;
+
+    return true;
+  }
+
+  async load(args) {
+    console.log('Parsing HRRR Data');
+
+    for (let forecastHour = 0;
+      forecastHour <= this.getForecastHours();
+      forecastHour += this.getForecastHourStep()) {
+      console.log(`Loading HRRR data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle} and forecast hour +${forecastHour}`);
+
+      const filePath = HrrrDataSource.getPath(
+        args.latest.year,
+        args.latest.month,
+        args.latest.day,
+        args.latest.modelCycle,
+        forecastHour);
 
       try {
         await this.parseData(forecastHour, filePath);
       } catch (e) {
-        if (e.message.includes('NullPointerException')) { // Failed likely due to corrupt data
-          console.log(`Failed HRRR data for ${latest.day}/${latest.month} - cycle ${latest.modelCycle} - hour +${forecastHour}: Retrying with forced download`);
-          // Try again but force a download
-          filePath = await HrrrDataSource.download(
-            latest.year,
-            latest.month,
-            latest.day,
-            latest.modelCycle,
-            forecastHour,
-            true);
-
-          await this.parseData(forecastHour, filePath);
-        }
+        console.log(`Error parsing HRRR data for ${args.latest.day}/${args.latest.month} - cycle ${args.latest.modelCycle}`);
+        console.log(e);
+        return false;
       }
     }
 
     console.log('Loaded HRRR Data');
-    this.meta = latest;
+    this.meta = args.latest;
     this.loaded = true;
 
     return true;

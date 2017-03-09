@@ -11,12 +11,15 @@ import minimist from 'minimist';
 import cluster from 'cluster';
 import os from 'os';
 import frontendMiddleware from './middlewares/frontendMiddleware';
-import ApiMiddleware from './api.js';
+import ApiMiddleware from './middlewares/apiMiddleware.js';
 import Data from './map/Data.js';
 import { auth } from '../config';
+import { setHost } from '../app/core/fetch';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const argv = minimist(process.argv.slice(2));
+
+const DATA_REFRESH_RATE = 60 * 60 * 1000;
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -27,7 +30,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 
 if (cluster.isMaster) {
   // Is master
-  const numWorkers = os.cpus().length;
+  const numWorkers = isDev ? 1 : os.cpus().length;
   let workers = [];
   const loadedData = [];
 
@@ -50,15 +53,22 @@ if (cluster.isMaster) {
   });
 
   const data = new Data();
-  data.download((sourceName, meta) => {
-    const loaded = { source: sourceName, args: meta };
-    // Add new loaded data
-    loadedData.push(loaded);
-    // Notify all workers to parse data
-    workers.forEach((worker) => {
-      worker.send({ type: 'loaded', ...loaded });
+
+  const downloadDataFn = () => {
+    // callback will be executed for all sources with newly downloaded data
+    data.download((sourceName, meta) => {
+      const loaded = { source: sourceName, args: meta };
+      // Add new loaded data
+      loadedData.push(loaded);
+      // Notify all workers to parse data
+      workers.forEach((worker) => {
+        worker.send({ type: 'loaded', ...loaded });
+      });
     });
-  });
+  };
+
+  setInterval(downloadDataFn, DATA_REFRESH_RATE);
+  downloadDataFn();
 
   // TODO: Every hour replace loaded data with new data
 } else {
@@ -91,6 +101,7 @@ if (cluster.isMaster) {
   const api = new ApiMiddleware();
   process.on('message', (message) => {
     if (message.type === 'loaded') {
+      // data source name, data source metadata
       api.data.load(message.source, message.args);
     }
   });
@@ -106,13 +117,14 @@ if (cluster.isMaster) {
   // -----------------------------------------------------------------------------
   const host = argv.host || process.env.HOST || null;
   const port = argv.port || process.env.PORT || 3000;
+  const prettyHost = host || 'localhost';
+  setHost(`${prettyHost}:${port}`);
 
   app.listen(port, host, (err) => {
     if (err) {
       return console.error(err.message);
     }
 
-    const prettyHost = host || 'localhost';
     console.log(`The server is running at http://${prettyHost}:${port}/`);
   });
 }

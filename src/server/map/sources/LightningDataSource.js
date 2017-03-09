@@ -1,67 +1,155 @@
 import DataSource from './DataSource.js';
+var seedrandom = require('seedrandom');
 
+const STORM_INTENSITY = 200;                    // maximum strikes per storm per hour
+const STORM_SPEED = 4;                          // maximum degrees of movement per hour
+const STORM_SPREAD = 3;                         // maximum degrees of strike y/x distance from epicenter
+const STORM_DEATH = 0.3;                        // probability per hour of a storm dying
+const STORM_GENESIS = 0.3;                      // probability per hour of a storm starting
+const STORM_MAXNUM = 6;
 
 class LightningDataSource extends DataSource {
   constructor() {
     super();
-    this.data = {};
+    this.meta = {
+      start: 0,                                 // start of current block
+      end: 0,                                   // end of current block
+    };
+    this.data = [];                             // must contain 60 arrays of strikes
+    this.random = {
+      generator: new seedrandom(new Date().getDay()),
+      epicenters: [],
+      stormdeath: STORM_DEATH,
+      stormgenesis: STORM_GENESIS,
+    };
+    this.random.generator(); // not sure why this is needed
+
+    // todo make own method
+    for (let epicenter = 0; epicenter < this.random.generator() * STORM_MAXNUM; epicenter += 1) {
+      this.random.epicenters.push({
+        latitude: this.random.generator() * 180,
+        longitude: this.random.generator() * 360,
+        speed: this.random.generator() * STORM_SPEED,
+        intensity: this.random.generator() * STORM_INTENSITY,
+        spread: this.random.generator() * STORM_SPREAD,
+      })
+    }
   }
 
-  async load() {
-    console.log('Generating lighting Data');
-
-    // Generates a 1-dimensional array of lightning strike recors
-    function generateStrikeData() {
-      const lightningArray = {};
-      lightningArray.timestamp = new Date();
-
-      for (let i = 0; i < 100; i += 1) {
-        lightningArray[i] = { latitude: i, longitude: i + 1, striketime: new Date() };
-      }
-    }
-
-    // Generates a 360x720 map of lightning probability values.
-    function generateProbabilityMap() {
-      const probabilityArray = {};
-      probabilityArray.timestamp = new Date();
-
-      for (let i = 0; i < 360; i += 1) {
-        const row = {};
-        for (let j = 0; j < 720; j += 1) {
-          row[j] = { value: Math.random() };
-        }
-        probabilityArray[i] = row;
-      }
-    }
-
-
-    // TODO put this in loop for hours
-    this.data[0] = {
-      strikes: generateStrikeData(),
-      probability: generateProbabilityMap(),
+  getMeta() {
+    return {
+      // todo do i need to fix this?
+      latest: {},
     };
-
-    console.log('Generated lighting Data');
-    this.loaded = true;
-
-    return true;
   }
 
   /**
-   * From this.data, return the object matching the forecastHour and
-   * dataName, e.g. getData('probability', 0)
+   * Dummy method for compliance with datasource/datalayer system.
+   * @returns {boolean} true
    */
-  // getData() is exclusively for tile generating, tbh the whole data source/layer system is a bit brittle
-  getData(dataName, forecastHour) {
-    if (!this.loaded) throw new Error('Data not loaded yet!');
-    return this.data[forecastHour][dataName];
+  async download() {
+    return true; // Triggers a load(args) call on all workers
   }
 
-  // Used for live lightning
+  /**
+   * Generates an hour's worth of strikes, organized into blocks of length 1 minute.
+   *
+   * @param args metadata of this source as returned by getMeta
+   * @returns {boolean} true todo error handling
+   */
+  async load(args) {
+    console.log(`LIGHTNING: load -> ${this.random.epicenters.length} epicenters`);
+
+    try {
+      // move bounds forward by one hour
+      this.meta.start = this.meta.start + 3600000;
+      this.meta.end = this.meta.start + 3600000;
+
+      // flush and rebuild strike data array
+      this.data = [];
+      for (let i = 0; i < 60; i += 1) {
+        this.data[i] = [];
+      }
+
+      // for each epicenter, generate new data
+      for (let epicenter = 0; epicenter < this.random.epicenters.length; epicenter += 1) {
+        // storm death
+        if (this.random.generator() < this.random.stormdeath) {
+          this.random.epicenters.splice(epicenter);
+          epicenter -= 1;
+          continue;
+        }
+        // storm genesis
+        if (this.random.generator() < this.random.stormgenesis) {
+          this.random.epicenters.push({
+            latitude: this.random.generator() * 180,
+            longitude: this.random.generator() * 360,
+            speed: this.random.generator() * STORM_SPEED,
+            intensity: this.random.generator() * STORM_INTENSITY,
+            spread: this.random.generator() * STORM_SPREAD,
+          });
+        }
+
+        // move storm epicenters fixme moves randomly and only in positive direction
+        this.random.epicenters[epicenter].latitude += (this.random.generator() * this.random.epicenters[epicenter].speed);
+        this.random.epicenters[epicenter].longitude += (this.random.generator() * this.random.epicenters[epicenter].speed);
+        // generate new strikes
+        for (let strike = 0; strike < this.random.epicenters[epicenter].intensity; strike += 1) {
+          const strikeTime = ~~(this.random.generator() * 3600000);
+          this.data[~~(strikeTime / 60000)].push({
+            latitude: this.random.epicenters[epicenter].latitude += (this.random.generator() * this.random.epicenters[epicenter].spread),
+            longitude: this.random.epicenters[epicenter].latitude += (this.random.generator() * this.random.epicenters[epicenter].spread),
+            time: strikeTime,
+          });
+        }
+      }
+
+      console.log(`LIGHTNING: loaded -> ${this.data.length} blocks, sample block length: ${this.data[0].length}`);
+      this.loaded = true;
+      return this.loaded;
+    }
+    catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
+
+  /**
+   * Used for live lightning, returns an array of lightning strikes with from a time range with
+   * millisecond precision
+   *
+   * @param sinceDate start of the range in milliseconds
+   * @param toDate end of the range in milliseconds
+   * @returns {Array} of form [{latitude, longitude, time}, ...]
+   */
   getLightningBetween(sinceDate, toDate) {
-    // TODO: Implement
-    return [];
+    try {
+      const lightningArray = [];
+
+      const startMinute = ~~((sinceDate - this.meta.start) / 6000);
+      const endMinute = ~~((toDate - this.meta.end) / 6000);
+
+      // first minute block
+      for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
+        if (this.data[startMinute][strike].time > sinceDate) lightningArray.push(this.data[startMinute][strike]);
+      }
+      // middle minute blocks
+      for (let block = startMinute + 1; block < endMinute; block += 1) {
+        lightningArray.push.apply(lightningArray, this.data[block]);
+      }
+      // last minute block todo remove duplicated code
+      for (let strike = 0; strike < this.data[startMinute].length; strike += 1) {
+        if (this.data[endMinute][strike].time > sinceDate) lightningArray.push(this.data[endMinute][strike]);
+      }
+
+      return lightningArray;
+    }
+    catch (e) {
+      if (!this.loaded) console.log('Lightning data not yet loaded!');
+      console.log(e);
+      return [];
+    }
   }
 }
-
 export default LightningDataSource;

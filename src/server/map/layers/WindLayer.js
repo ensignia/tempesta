@@ -11,6 +11,12 @@ class WindLayer extends Layer {
     forecastHour: 0,
   }
 
+  getMeta() {
+    return {
+      supportedSources: ['gfs'],
+    };
+  }
+
   getOptions(options_) {
     const options = {
       ...WindLayer.defaultOptions,
@@ -35,7 +41,9 @@ class WindLayer extends Layer {
   }
 
   getPath(tileX, tileY, tileZ, options) {
-    return Layer.getFullPath(`wind-${options.source}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+    const source = this.getData().getDataSource(options.source);
+    const latest = source.getMeta().latest || {};
+    return Layer.getFullPath(`wind-${options.source}-${latest.year}-${latest.month}-${latest.day}-${latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
   async generateTile(tilePath, tileX, tileY, tileZ, options, res) {

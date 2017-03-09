@@ -10,7 +10,7 @@
 import Promise from 'bluebird';
 import fetch, { Request, Headers, Response } from 'node-fetch';
 
-const host = "localhost";
+let host = 'localhost';
 
 fetch.Promise = Promise;
 Response.Promise = Promise;
@@ -31,4 +31,8 @@ function localFetch(url, options) {
   return fetch(localUrl(url), options);
 }
 
-export { localFetch as default, Request, Headers, Response };
+function setHost(host_) {
+  host = host_;
+}
+
+export { localFetch as default, Request, Headers, Response, setHost };

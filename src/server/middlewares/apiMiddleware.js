@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 import { Router } from 'express';
-import Data from './map/Data.js';
-import fetch from '../app/core/fetch';
-import { api } from '../config.js';
+import toobusy from 'toobusy-js';
+import Data from '../map/Data.js';
+import fetch from '../../app/core/fetch';
+import { api } from '../../config.js';
 
 const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
 
@@ -11,6 +12,14 @@ export default class ApiMiddleware {
   constructor() {
     this.router = Router();
     this.data = new Data();
+
+    this.router.use((req, res, next) => {
+      if (toobusy()) {
+        res.status(503).send('Server too busy right now :(');
+      } else {
+        next();
+      }
+    });
 
     this.router.get('/map', (req, res) => {
       res.status(200).json(this.data.getMeta());

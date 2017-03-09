@@ -1,22 +1,12 @@
 import path from 'path';
 import DataSource from './DataSource.js';
 import fetch from '../../../app/core/fetch';
-import { server } from '../../../config.js';
+import {server} from '../../../config.js';
+import {padLeft} from '../Util.js';
 
 const GFS_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/';
 
-function padLeft(number, zeroes, str) {
-  return Array((zeroes - String(number).length) + 1).join(str || '0') + number;
-}
-
-
 class GfsDataSource extends DataSource {
-  constructor() {
-    super();
-    this.data = {};
-    this.meta = null;
-  }
-
   /**
    * Gets the GFS url formatted
    * year, month, day and modelCycle (modelCycle may be 00, 06, 12, 18)
@@ -59,14 +49,27 @@ class GfsDataSource extends DataSource {
     return [];
   }
 
+  /**
+   * Gets the length of the animation in hours.
+   * @returns {number} 6 if development, 24 if production
+   */
   getForecastHours() {
     return process.env.NODE_ENV === 'production' ? 24 : 6;
   }
 
+  /**
+   * Gets the size of the time step for the weather animation.
+   * @returns {number}
+   */
   getForecastHourStep() {
     return 3;
   }
 
+  /**
+   * Returns weather display metadata.
+   *
+   * @returns {{forecastHours: number, forecastHourStep: number, latest: (*|latest|{})}}
+   */
   getMeta() {
     return {
       forecastHours: this.getForecastHours(),
@@ -75,6 +78,11 @@ class GfsDataSource extends DataSource {
     };
   }
 
+  /**
+   * For the given forecastHour, places all utilized GFS data into this.data[forecastHour].
+   * @param forecastHour forecast hour
+   * @param filePath path of grib2 file
+   */
   async parseData(forecastHour, filePath) {
     this.data[forecastHour] = {};
 
@@ -106,9 +114,15 @@ class GfsDataSource extends DataSource {
     };
   }
 
+  /**
+   * Downloads GFS data. Checks this.meta to ensure latest data isn't already present. If a new
+   * set of grib2 files is available (a new model run), every available hour file is downloaded.
+   * @returns {boolean} true if new data downloaded, false otherwise
+   */
   async download() {
     console.log('Downloading GFS data');
     const available = await GfsDataSource.getAvailable();
+
     // Use latest data
     const latest = available[available.length - 1];
 
@@ -122,7 +136,9 @@ class GfsDataSource extends DataSource {
     }
 
     // for every available hour, download data and place in this.data[hour]
-    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
+    for (let forecastHour = 0;
+         forecastHour <= this.getForecastHours();
+         forecastHour += this.getForecastHourStep()) {
       console.log(`Downloading GFS data for ${latest.day}/${latest.month} cycle ${latest.modelCycle} and forecast hour +${forecastHour}`);
       const url = GfsDataSource.getURL(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
       const output = GfsDataSource.getPath(latest.year, latest.month, latest.day, latest.modelCycle, forecastHour);
@@ -136,19 +152,33 @@ class GfsDataSource extends DataSource {
   }
 
   /**
-   * Returns true if loaded new data, false otherwise
+   * For new grib2 files, issues a parseData() call.
+   *
+   * @param args metadata on latest forecasts
+   * @returns {boolean} true if loaded new data, false otherwise
    */
   async load(args) {
     console.log('Parsing GFS Data');
 
     // for every available hour, download data and place in this.data[hour]
-    for (let forecastHour = 0; forecastHour <= this.getForecastHours(); forecastHour += this.getForecastHourStep()) {
+    for (let forecastHour = 0;
+         forecastHour <= this.getForecastHours();
+         forecastHour += this.getForecastHourStep()) {
       console.log(`Parsing GFS data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle} and forecast hour +${forecastHour}`);
-      const filePath = GfsDataSource.getPath(args.latest.year, args.latest.month, args.latest.day, args.latest.modelCycle, forecastHour);
+
+      const filePath = GfsDataSource.getPath(
+        args.latest.year,
+        args.latest.month,
+        args.latest.day,
+        args.latest.modelCycle,
+        forecastHour);
+
+      // todo this is what breaks
       try {
         await this.parseData(forecastHour, filePath);
       } catch (e) {
         console.log(`Error parsing GFS data for ${args.latest.day}/${args.latest.month} cycle ${args.latest.modelCycle}`);
+        console.log(e);
         return false;
       }
     }

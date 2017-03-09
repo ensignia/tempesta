@@ -39,7 +39,7 @@ class Navigation extends React.Component {
             <Icon name="timeline" />
             <span>Model</span>
           </Link>
-          <Link className={s.link} to="#">
+          <Link className={s.link} to="#" onClick={() => { actions.showSettingsModal(); }}>
             <Icon name="settings" />
             <span>Settings</span>
           </Link>

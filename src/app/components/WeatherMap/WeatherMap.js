@@ -14,16 +14,13 @@ class WeatherMap extends React.Component {
     className: PropTypes.string,
     showLayerModal: PropTypes.bool.isRequired,
     showModelModal: PropTypes.bool.isRequired,
+    mapActiveLayers: PropTypes.array,
+    mapActiveModel: PropTypes.string,
     actions: PropTypes.object,
   };
 
   constructor() {
     super();
-
-    this.state = {
-      layers: ['cape'],
-      model: 'gfs',
-    };
 
     this.layerOnChange = this.layerOnChange.bind(this);
     this.modelOnChange = this.modelOnChange.bind(this);
@@ -34,47 +31,49 @@ class WeatherMap extends React.Component {
   }
 
   layerOnChange(e) {
-    if (e.target.value && !this.state.layers.includes(e.target.name)) {
-      this.setState({ layers: this.state.layers.concat(e.target.name) });
+    const { actions } = this.props;
+    const { mapActiveLayers } = this.props;
+
+    if (e.target.value && !mapActiveLayers.includes(e.target.name)) {
+      actions.setActiveLayers(mapActiveLayers.concat(e.target.name));
     } else {
-      this.setState({ layers: this.state.layers.filter(l => l !== e.target.name) });
+      actions.setActiveLayers(mapActiveLayers.filter(l => l !== e.target.name));
     }
   }
 
   modelOnChange(e) {
-    if (this.state.model !== e.target.value) {
-      this.setState({ model: e.target.value });
+    const { actions } = this.props;
+    const { mapActiveModel } = this.props;
+
+    if (mapActiveModel !== e.target.value) {
+      actions.setActiveModel(e.target.value);
     }
   }
 
   render() {
-    const { actions, showLayerModal, showModelModal } = this.props;
+    const { actions, showLayerModal, showModelModal, mapActiveLayers, mapActiveModel } = this.props;
 
     return (
       <div className={cx(s.content, s.container)}>
-        <MapView
-          className={cx(s.content, s.container, s.mapView)}
-          layers={this.state.layers}
-          model={this.state.model}
-        />
+        <MapView className={cx(s.content, s.container, s.mapView)} />
         <MapControls />
         <Modal
           title="Layers"
           isOpen={showLayerModal}
           onClose={() => { actions.hideLayerModal(); }}
         >
-          <Checkbox name="cape" label="Show convective available potential energy" checked={this.state.layers.includes('cape')} onChange={this.layerOnChange} />
-          <Checkbox name="wind" label="Show wind and fronts" checked={this.state.layers.includes('wind')} onChange={this.layerOnChange} />
-          <Checkbox name="spc" label="Show storm prediction centre reports" checked={this.state.layers.includes('spc')} onChange={this.layerOnChange} />
-          <Checkbox name="lightning" label="Show lightning" checked={this.state.layers.includes('lightning')} onChange={this.layerOnChange} />
+          <Checkbox name="cape" label="Convective available potential energy" checked={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
+          <Checkbox name="wind" label="Wind vectors and wind fronts" checked={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
+          <Checkbox name="spc" label="Storm Prediction Centre reports" checked={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
+          <Checkbox name="lightning" label="Lightning radar" checked={mapActiveLayers.includes('lightning')} onChange={this.layerOnChange} />
         </Modal>
         <Modal
           title="Models"
           isOpen={showModelModal}
           onClose={() => { actions.hideModelModal(); }}
         >
-          <Radio name="model" value="gfs" label="Global Forecast System" checked={this.state.model === 'gfs'} onChange={this.modelOnChange} />
-          <Radio name="model" value="hrrr" label="HRRR" checked={this.state.model === 'hrrr'} onChange={this.modelOnChange} />
+          <Radio name="model" value="gfs" label="Global Forecast System" checked={mapActiveModel === 'gfs'} onChange={this.modelOnChange} />
+          <Radio name="model" value="hrrr" label="HRRR" checked={mapActiveModel === 'hrrr'} onChange={this.modelOnChange} />
         </Modal>
       </div>
     );
@@ -84,4 +83,6 @@ class WeatherMap extends React.Component {
 export default connect((state) => ({
   showLayerModal: state.showLayerModal,
   showModelModal: state.showModelModal,
+  mapActiveLayers: state.mapActiveLayers,
+  mapActiveModel: state.mapActiveModel,
 }))(withStyles(s)(WeatherMap));
