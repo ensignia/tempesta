@@ -53,17 +53,17 @@ class MapView extends React.Component {
     mapActiveLayers: PropTypes.array,
     mapActiveModel: PropTypes.string,
     className: PropTypes.string,
-    theme: PropTypes.array,
+    theme: PropTypes.string,
     actions: PropTypes.object,
   };
 
   static Theme = {
-    LIGHT: MapLightTheme,
-    DARK: MapDarkTheme,
+    light: MapLightTheme,
+    dark: MapDarkTheme,
   };
 
   static defaultProps = {
-    theme: MapView.Theme.LIGHT,
+    theme: 'light',
   };
 
   constructor(props) {
@@ -269,7 +269,7 @@ class MapView extends React.Component {
    */
   createMapOptions(maps) {
     return {
-      styles: this.props.theme,
+      styles: MapView.Theme[this.props.theme],
       zoomControl: true,
       zoomControlOptions: {
         position: maps.ControlPosition.RIGHT_TOP,
@@ -307,6 +307,7 @@ export default connect((state) => ({
   mapActiveModel: state.mapActiveModel,
   mapAnimationStatus: state.mapAnimationStatus,
   mapPlaybackIndex: state.mapPlaybackIndex,
+  theme: state.theme,
   location: state.location,
   locationStatus: state.locationStatus,
 }))(MapView);
