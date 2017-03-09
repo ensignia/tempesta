@@ -50,27 +50,27 @@ class Header extends React.Component {
             enabled={temperatureUnits === 'farenheit'}
             neutral
             onChange={(e) => {
-              console.log('changed' + e.target.value);
-              actions.setTemperatureUnits(e.target.value ? 'farenheit' : 'celsius');
+              actions.setTemperatureUnits(e.target.checked ? 'farenheit' : 'celsius');
             }}
           />
 
           <Switch
             name="units"
             label="Metric/Imperial"
-            enabled={units === 'metric'}
+            enabled={units === 'imperial'}
             neutral
             onChange={(e) => {
-              actions.setUnits(e.target.value ? 'metric' : 'imperial');
+              actions.setUnits(e.target.checked ? 'imperial' : 'metric');
             }}
           />
 
           <Switch
             name="theme"
             label="Light/Dark"
-            enabled={theme === 'light'}
+            enabled={theme === 'dark'}
+            neutral
             onChange={(e) => {
-              actions.setTheme(e.target.value ? 'light' : 'dark');
+              actions.setTheme(e.target.checked ? 'dark' : 'light');
             }}
           />
 
