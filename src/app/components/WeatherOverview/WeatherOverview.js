@@ -47,6 +47,7 @@ class WeatherOverview extends React.Component {
     const { daily, currently, hasData } = this.state;
     console.log(this.props.temperatureUnits);
     const units = this.props.temperatureUnits === 'farenheit' ? '°F' : '°C';
+    const temperature = this.props.temperatureUnits === 'farenheit' ? currently.temperature : (currently.temperature - 32) * (5 / 9);
     if (hasData) {
       const days = [];
       for (let i = 1; i <= Math.min(NUM_DAYS, daily.length); i += 1) {
@@ -64,7 +65,7 @@ class WeatherOverview extends React.Component {
         <div className={s.weatherOverview}>
           <div className={cx(s.current, s.vertical)}>
             <span className={s.dayName}>Today</span>
-            <span>{`${~~currently.temperature} ${units}`}</span>
+            <span>{`${~~temperature} ${units}`}</span>
           </div>
           <div className={s.currentIcon}>
             <img src={`/WeatherIcons/${currently.icon}.svg`} width="36" height="36" alt={currently.icon} />
