@@ -58,21 +58,15 @@ class LightningDataSource extends DataSource {
    * @returns {boolean} true todo error handling
    */
   async load(args) {
-    console.log(`LIGHTNING: load -> ${this.random.epicenters.length} epicenters`);
-    console.log(`LIGHTNING: epicenter sample ->`);
     console.log(this.random.epicenters[0]);
 
     try {
       // move bounds forward by one hour
       this.meta.start = this.meta.start + HOUR_MILLIS;
       this.meta.end = this.meta.start + HOUR_MILLIS;
-      // console.log(`LIGHTNING: new bounds -> ${this.meta.start}, ${this.meta.end}`);
 
       // flush and rebuild data array
       this.data = [];
-
-      // console.log(`LIGHTNING: flushed old data -> ${this.data.length}`);
-      // console.log(this.data);
 
       // for each minute block, generate data
       for (let minute = 0; minute < 60; minute += 1) {
@@ -128,8 +122,6 @@ class LightningDataSource extends DataSource {
         }
       }
 
-      // console.log(`LIGHTNING: loaded -> ${this.data.length} blocks, sample block length: ${this.data[0].length}`);
-      // console.log(this.data)
       this.loaded = true;
       return this.loaded;
 
@@ -154,8 +146,6 @@ class LightningDataSource extends DataSource {
       let startMinute = ~~((sinceDate.getTime() - this.meta.start) / 60000);
       if (startMinute < 0) startMinute = 0;
       const endMinute = ~~((toDate.getTime() - this.meta.start) / 60000);
-
-      console.log(`LIGHTNING: request -> minute ${startMinute}, minute ${endMinute}`);
 
       return this.data.filter((item) => {
         if (item.time > sinceDate && item.time < toDate) return true;
