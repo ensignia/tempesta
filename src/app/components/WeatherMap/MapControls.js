@@ -68,7 +68,7 @@ class MapControls extends React.Component {
       const { sliderValue, maxValue } = this.state;
 
       this.handleChange((sliderValue + 1) % (maxValue + 1));
-    }, 3000 * (1 / this.state.playbackSpeed));
+    }, 3000 / this.state.playbackSpeed);
 
     this.setState({ isPlaying: true });
   }
@@ -93,8 +93,6 @@ class MapControls extends React.Component {
     const { mapMeta, mapActiveModel, actions, mapActiveSpeed } = this.props;
 
     let dateOutput = 'Loading...';
-
-    console.log(mapActiveSpeed);
 
     if (mapMeta !== null
       && mapMeta.sources[mapActiveModel] !== null
