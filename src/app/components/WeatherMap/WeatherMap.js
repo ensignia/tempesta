@@ -60,7 +60,7 @@ class WeatherMap extends React.Component {
     const value = parseInt(e.target.value, 10);
 
     if (mapActiveSpeed !== value) {
-      actions.setActiveSpeed(value);
+      actions.setMapActiveSpeed(value);
     }
   }
 

@@ -85,6 +85,8 @@ class MapControls extends React.Component {
 
     let dateOutput = 'Loading...';
 
+    console.log(mapActiveSpeed);
+
     if (mapMeta !== null
       && mapMeta.sources[mapActiveModel] !== null
       && mapMeta.sources[mapActiveModel].latest != null) {
