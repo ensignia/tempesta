@@ -93,7 +93,7 @@ class MapView extends React.Component {
   componentWillMount() {
     this.loadMeta();
     this.fetchLightning();
-    this.lightningInterval = setInterval(this.fetchLightning, 60 * 1000);
+    this.lightningInterval = setInterval(this.fetchLightning, 20 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -150,7 +150,7 @@ class MapView extends React.Component {
 
     const lightningData = this.state.lightning
       .concat(json.data)
-      .map(lightning => { return { opacity: (lightning.opacity ? lightning.opacity - 0.2 : 1), ...lightning }; })
+      .map(lightning => { return { ...lightning, opacity: (lightning.opacity !== undefined ? lightning.opacity - 1 : 5) }; })
       .filter(lightning => lightning.opacity > 0);
 
     this.setState({ lightning: lightningData, lastLightning: json.meta.to });
@@ -291,7 +291,7 @@ class MapView extends React.Component {
       (<Marker
         key={`${lightning.time + ~~lightning.latitude + ~~lightning.longitude}`}
         type="LIGHTNING"
-        opacity={lightning.opacity}
+        opacity={lightning.opacity / 5}
         lat={lightning.latitude}
         lng={lightning.longitude}
       />),

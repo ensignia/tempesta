@@ -31,6 +31,7 @@ class MapControls extends React.Component {
     this.playAnimation = this.playAnimation.bind(this);
     this.pauseAnimation = this.pauseAnimation.bind(this);
     this.toggleAnimation = this.toggleAnimation.bind(this);
+    this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
