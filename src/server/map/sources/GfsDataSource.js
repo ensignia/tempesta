@@ -135,10 +135,17 @@ class GfsDataSource extends DataSource {
       surfaceValue: 100000,
     }, GfsDataSource.parseGfsBody);
 
+    const tempData = await DataSource.parseGribFile(filePath, {
+      category: 0,
+      parameter: 0,
+    }, GfsDataSource.parseGfsBody);
+    console.log(tempData);
+
     this.data[forecastHour] = {
       cape: capeData[0],
       windU: windUData[0],
       windV: windVData[0],
+      temperature: tempData[0],
     };
   }
 

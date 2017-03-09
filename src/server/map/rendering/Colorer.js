@@ -1,6 +1,6 @@
 import colormap from 'colormap';
 
-const NUM_SHADES = 40;
+const NUM_SHADES = 80;
 
 class Colorer {
   constructor() {
@@ -22,11 +22,14 @@ class Colorer {
     }
   }
 
-  render = function render(dataValue, normalizationRange, colorMap) {
+  render = function render(dataValue, normalizationRange, colorMap, fixedAlpha) {
     // normalize data
     const normValue = dataValue >= normalizationRange ? 1 : (dataValue / normalizationRange);
     const scaleIndex = ~~(normValue * NUM_SHADES) - 1;
-    const opacityCoefficient = normValue > 0.8 ? 0.8 : normValue;
+    let opacityCoefficient = 0;
+
+    if (fixedAlpha !== undefined) opacityCoefficient = fixedAlpha;
+    else opacityCoefficient = normValue > 0.8 ? 0.8 : normValue;
 
     return this.colorScales[colorMap][scaleIndex] + (0xFF * opacityCoefficient);
   }

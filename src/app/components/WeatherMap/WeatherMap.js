@@ -90,6 +90,7 @@ class WeatherMap extends React.Component {
           </Link>
           <Checkbox name="cape" label="Convective available potential energy" checked={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
           <Checkbox name="wind" label="Wind vectors and wind fronts" checked={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
+          <Checkbox name="temperature" label="Temperature" checked={mapActiveLayers.includes('temperature')} onChange={this.layerOnChange} />
           <Checkbox name="spc" label="Storm Prediction Centre reports" checked={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
           <Checkbox name="lightning" label="Lightning radar" checked={mapActiveLayers.includes('lightning')} onChange={this.layerOnChange} />
         </Modal>

@@ -58,8 +58,6 @@ class LightningDataSource extends DataSource {
    * @returns {boolean} true todo error handling
    */
   async load(args) {
-    console.log(this.random.epicenters[0]);
-
     try {
       // move bounds forward by one hour
       this.meta.start = this.meta.start + HOUR_MILLIS;
@@ -143,10 +141,6 @@ class LightningDataSource extends DataSource {
    */
   getLightningBetween(sinceDate, toDate) {
     try {
-      let startMinute = ~~((sinceDate.getTime() - this.meta.start) / 60000);
-      if (startMinute < 0) startMinute = 0;
-      const endMinute = ~~((toDate.getTime() - this.meta.start) / 60000);
-
       return this.data.filter((item) => {
         if (item.time > sinceDate && item.time < toDate) return true;
         return false;
