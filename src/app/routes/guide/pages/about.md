@@ -2,45 +2,52 @@
 title: About Us
 component: ContentPage
 ---
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean consequat
-tortor fermentum mi fermentum dignissim. Nullam vel ipsum ut ligula elementum
-lobortis. Maecenas aliquam, massa laoreet lacinia pretium, nisi urna venenatis
-tortor, nec imperdiet tellus libero efficitur metus. Fusce semper posuere
-ligula, et facilisis metus bibendum interdum. Mauris at mauris sit amet sem
-pharetra commodo a eu leo. Nam at est non risus cursus maximus. Nam feugiat
-augue libero, id consectetur tortor bibendum non. Quisque nec fringilla lorem.
-Nullam efficitur vulputate mauris, nec maximus leo dignissim id.
 
-In hac habitasse platea dictumst. Duis sagittis dui ac ex suscipit maximus.
-Morbi pellentesque venenatis felis sed convallis. Nulla varius, nibh vitae
-placerat tempus, mauris sem elementum ipsum, eget sollicitudin nisl est vel
-purus. Fusce malesuada odio velit, non cursus leo fermentum id. Cras pharetra
-sodales fringilla. Etiam quis est a dolor egestas pellentesque. Maecenas non
-scelerisque purus, congue cursus arcu. Donec vel dapibus mi. Mauris maximus
-posuere placerat. Sed et libero eu nibh tristique mollis a eget lectus. Donec
-interdum augue sollicitudin vehicula hendrerit. Vivamus justo orci, molestie
-ac sollicitudin ac, lobortis at tellus. Etiam rhoncus ullamcorper risus eu
-tempor. Sed porttitor, neque ac efficitur gravida, arcu lacus pharetra dui, in
-consequat elit tellus auctor nulla. Donec placerat elementum diam, vitae
-imperdiet lectus luctus at.
+Your time is up, my time is now
+You can't see me, my time is now
+It's the franchise, boy I'm shinin' now
+You can't see me, my time is now!
 
-Nullam eu feugiat mi. Quisque nec tristique nisl, dignissim dictum leo. Nam
-non quam nisi. Donec rutrum turpis ac diam blandit, id pulvinar mauris
-suscipit. Pellentesque tincidunt libero ultricies risus iaculis, sit amet
-consequat velit blandit. Fusce quis varius nulla. Nullam nisi nisi, suscipit
-ut magna quis, feugiat porta nibh. Sed id enim lectus. Suspendisse elementum
-justo sapien, sit amet consequat orci accumsan et. Aliquam ornare ullamcorper
-sem sed finibus. Nullam ac lacus pulvinar, egestas felis ut, accumsan est.
+In case you forgot or fell off I'm still hot - knock your shell off
+My money stack fat plus I can't turn the swell off
+The franchise, doin' big bid'ness, I live this
+It's automatic I win this - oh you hear those horns, you finished
+A soldier, and I stay under you fightin'
+Plus I'm stormin' on you chumps like I'm thunder and lightning
+Ain't no way you breakin' me kid, I'm harder than nails
+Plus I keep it on lock, like I'm part of the jail
+I'm slaughtering stale, competition, I got the whole block wishing
+they could run with my division but they gone fishing-with no bait, kid your boy hold weight
+I got my soul straight, I brush your mouth like Colgate
+In any weather I'm never better your boy's so hot
+you'll never catch me in the next man's sweater
+If they hate, let 'em hate, I drop ya whole clan
+Lay yo' ass down for the three second tan
 
-Pellentesque sagittis vehicula sem quis luctus. Proin sodales magna in lorem
-hendrerit aliquam. Integer eu varius orci. Vestibulum ante ipsum primis in
-faucibus orci luctus et ultrices posuere cubilia Curae; Vestibulum ante ipsum
-primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut at mauris
-nibh. Suspendisse maximus ac eros at vestibulum.
+Yeah, uh
+It's gonna be what it's gonna be
+Five pounds of courage buddy, bass tint pants with a gold T
+Uh - it's a war dance and victory step
+A raw stance is a gift, when you insist it's my rep
+John Cena, Trademarc, you all are so-so
+And talk about the bread you make but don't know the recipe for dough though
+Aimin' guns in all your photos, that's a no-no
+When this pop, you'll liplock, your big talk's a blatant no-show
+See what happens when the ice age melt
+You see monetary status is not what matters, but it helps
+I rock a timepiece by Benny if any
+The same reason y'all could love me is the same reason y'all condemn me
+A man's measured by the way that he thinks
+Not clothing lines, ice links, leather and minks
+I spent 20 plus years seekin' knowledge of self
+So for now Marc Predka's livin' life for wealth
 
-Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque egestas
-tortor et dui consequat faucibus. Nunc vitae odio ornare, venenatis ligula a,
-vulputate nisl. Aenean congue varius ex, sit amet bibendum odio posuere at.
-Nulla facilisi. In finibus, nulla vitae tincidunt ornare, sapien nulla
-fermentum mauris, sed consectetur tortor arcu eget arcu. Vestibulum vel quam
-enim.
+Your time is up, my time is now
+You can't see me, my time is now
+It's the franchise, boy I'm shinin' now
+You can't see me, my time is now!
+
+Your time is up, my time is now
+You can't see me, my time is now
+It's the franchise, boy I'm shinin' now
+You can't see me, my time is now!

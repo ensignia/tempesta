@@ -3,3 +3,17 @@
 .mapView div {
   @extend .content;
 }
+
+.helpButton {
+  position: absolute;
+  z-index: 1000;
+  top: 24px;
+  right: 24px;
+  font-size: 40px;
+  color: black;
+  text-decoration:  none;
+}
+
+.modal {
+  position: relative;
+}

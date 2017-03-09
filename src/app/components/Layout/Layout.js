@@ -8,6 +8,7 @@ import { connect } from '../store.js';
 import s from './Layout.css';
 import Header from '../Header/Header.js';
 import Modal from '../Modal/Modal.js';
+import Link from '../Link/Link.js';
 
 class Layout extends React.Component {
   static propTypes = {
@@ -60,8 +61,13 @@ class Layout extends React.Component {
         <Modal
           title="Settings"
           isOpen={showSettingsModal}
+          className={s.modal}
           onClose={() => { actions.hideSettingsModal(); }}
         >
+
+        <Link className={cx(s.helpButton)} to="/guide">
+          <span name="guide">?</span>
+        </Link>
 
         <div className={cx(s.temperature)}>
           <span>°C  </span>

@@ -8,6 +8,7 @@ import MapControls from './MapControls.js';
 import Modal from '../Modal/Modal.js';
 import Checkbox from '../Checkbox/Checkbox.js';
 import Radio from '../Radio/Radio.js';
+import Link from '../Link/Link.js';
 
 class WeatherMap extends React.Component {
   static propTypes = {
@@ -60,8 +61,12 @@ class WeatherMap extends React.Component {
         <Modal
           title="Layers"
           isOpen={showLayerModal}
+          className={s.modal}
           onClose={() => { actions.hideLayerModal(); }}
         >
+          <Link className={cx(s.helpButton)} to="/guide">
+            <span name="guide">?</span>
+          </Link>
           <Checkbox name="cape" label="Convective available potential energy" checked={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
           <Checkbox name="wind" label="Wind vectors and wind fronts" checked={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
           <Checkbox name="spc" label="Storm Prediction Centre reports" checked={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
@@ -70,8 +75,12 @@ class WeatherMap extends React.Component {
         <Modal
           title="Models"
           isOpen={showModelModal}
+          className={s.modal}
           onClose={() => { actions.hideModelModal(); }}
         >
+          <Link className={cx(s.helpButton)} to="/guide">
+            <span name="guide">?</span>
+          </Link>
           <Radio name="model" value="gfs" label="Global Forecast System" checked={mapActiveModel === 'gfs'} onChange={this.modelOnChange} />
           <Radio name="model" value="hrrr" label="HRRR" checked={mapActiveModel === 'hrrr'} onChange={this.modelOnChange} />
         </Modal>
