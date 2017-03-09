@@ -131,9 +131,9 @@ class DataSource {
       const x = grib2long * (xNum / 360);
 
       // enclosing data points in grid scale lat/long (y1 is north )
-      const y1 = y | 0;
+      const y1 = ~~y;
       const y0 = y === y1 ? y1 : y1 + 1;
-      const x0 = x | 0;
+      const x0 = ~~x;
       const x1 = x === x0 ? x0 : x0 + 1;
 
       // no interpolation
@@ -146,7 +146,7 @@ class DataSource {
       }
       // south -> north
       else if (x1 === x0) {
-        return grid[y0][x0] + ((y - y0) * (grid[y1][x0] - grid[y0][x0]));
+        return grid[y0][x0] + ((y0 - y) * (grid[y1][x0] - grid[y0][x0]));
       }
       // west -> east, south -> north
       const y1x = grid[y1][x0] + ((x - x0) * (grid[y1][x1] - grid[y1][x0]));
