@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import { Router } from 'express';
+import {Router} from 'express';
 import toobusy from 'toobusy-js';
 import Data from '../map/Data.js';
 import fetch from '../../app/core/fetch';
-import { api } from '../../config.js';
+import {api} from '../../config.js';
 
 const DARK_SKY_BASE_URL = 'https://api.darksky.net/forecast/';
 
@@ -13,19 +13,15 @@ export default class ApiMiddleware {
     this.router = Router();
     this.data = new Data();
 
-    this.router.use((req, res, next) => {
-      if (toobusy()) {
-        res.status(503).send('Server too busy right now :(');
-      } else {
-        next();
-      }
-    });
-
     this.router.get('/map', (req, res) => {
       res.status(200).json(this.data.getMeta());
     });
 
-    this.router.get('/map/:layer/:z/:x/:y/tile.png', async (req, res) => {
+    this.router.get('/map/:layer/:z/:x/:y/tile.png', async(req, res) => {
+      if (toobusy()) {
+        return res.status(503).send('Server too busy right now :(');
+      }
+
       try {
         // path to tile image
         await this.data.getTile(
@@ -43,7 +39,7 @@ export default class ApiMiddleware {
       }
     });
 
-    this.router.get('/weather/:latitude,:longitude', async (req, res) => {
+    this.router.get('/weather/:latitude,:longitude', async(req, res) => {
       try {
         const response = await fetch(`${DARK_SKY_BASE_URL}${api.darksky}/${req.params.latitude},${req.params.longitude}?exclude=[minutely,hourly]`);
 
@@ -52,7 +48,7 @@ export default class ApiMiddleware {
       } catch (error) {
         console.log(error);
         // something went wrong
-        res.status(500).json({ error: 'Failed to get data' });
+        res.status(500).json({error: 'Failed to get data'});
       }
     });
 
@@ -80,7 +76,7 @@ export default class ApiMiddleware {
         const since = new Date(parseInt(req.params.since, 10)) || to;
 
         res.status(200).json({
-          meta: { since, to },
+          meta: {since, to},
           data: lightningDataSource.getLightningBetween(since, to),
         });
       } catch (error) {
