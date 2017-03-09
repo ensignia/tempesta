@@ -23,7 +23,6 @@ class Header extends React.Component {
   render() {
     const { actions, showWeatherOverview, showSettingsModal, temperatureUnits, units, theme } = this.props;
 
-    console.log(temperatureUnits);
     return (
       <div className={s.header}>
         <Collapse

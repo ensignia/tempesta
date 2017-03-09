@@ -71,10 +71,12 @@ class MapView extends React.Component {
     this.state = {
       mapLoaded: false,
       shouldUpdateLocation: false,
+      lastLightning: new Date().getTime() - (60 * 1000),
       lightning: [],
     };
 
     this.componentWillMount = this.componentWillMount.bind(this);
+    this.componentWillUnmount = this.componentWillUnmount.bind(this);
     this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
     this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
     this.loadMeta = this.loadMeta.bind(this);
@@ -82,6 +84,7 @@ class MapView extends React.Component {
     this.createOverlays = this.createOverlays.bind(this);
     this.updateOverlays = this.updateOverlays.bind(this);
     this.createMapOptions = this.createMapOptions.bind(this);
+    this.fetchLightning = this.fetchLightning.bind(this);
   }
 
   /**
@@ -89,23 +92,8 @@ class MapView extends React.Component {
    */
   componentWillMount() {
     this.loadMeta();
-
-    // Render markers on map
-    fetch(`/api/lightning/${(new Date()).getTime() - 120000}`) // last 2 minutes for demo purposes fixme
-      .then((response) => {
-        console.log(`LIGHTNING: server response -> ${response.ok} ${response.status}`);
-        return response.json();
-      })
-      .then((response) => {
-        const strikes = [];
-        for (let i = 0; i < response.data.length; i += 1) {
-          strikes.push(<Marker key={`${response.data[i].latitude}-${response.data[i].longitude}`}
-                               type="LIGHTNING"
-                               lat={response.data[i].latitude}
-                               lng={response.data[i].longitude} />);
-        }
-        this.setState({lightning: strikes});
-      });
+    this.fetchLightning();
+    this.lightningInterval = setInterval(this.fetchLightning, 60 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -123,6 +111,10 @@ class MapView extends React.Component {
 
       this.setState({ shouldUpdateLocation: false });
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.lightningInterval);
   }
 
   onGoogleApiLoaded(google) {
@@ -149,6 +141,19 @@ class MapView extends React.Component {
     this.props.actions.setMapMeta(json);
 
     this.updateOverlays(this.props);
+  }
+
+  async fetchLightning() {
+    // Render markers on map
+    const response = await fetch(`/api/lightning/${this.state.lastLightning}`); // last 2 minutes for demo purposes fixme
+    const json = await response.json();
+
+    const lightningData = this.state.lightning
+      .concat(json.data)
+      .map(lightning => { return { opacity: (lightning.opacity ? lightning.opacity - 0.2 : 1), ...lightning }; })
+      .filter(lightning => lightning.opacity > 0);
+
+    this.setState({ lightning: lightningData, lastLightning: json.meta.to });
   }
 
   /**
@@ -282,6 +287,16 @@ class MapView extends React.Component {
   render() {
     const { className, location, locationStatus } = this.props;
 
+    const strikes = this.state.lightning.map((lightning) =>
+      (<Marker
+        key={`${lightning.time + ~~lightning.latitude + ~~lightning.longitude}`}
+        type="LIGHTNING"
+        opacity={lightning.opacity}
+        lat={lightning.latitude}
+        lng={lightning.longitude}
+      />),
+    );
+
     return (
       <div className={className}>
         <GoogleMapReact
@@ -293,7 +308,7 @@ class MapView extends React.Component {
           onGoogleApiLoaded={this.onGoogleApiLoaded}
         >
           {locationStatus !== 'UNKNOWN' ? <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} /> : null}
-          {this.state.lightning}
+          {strikes}
         </GoogleMapReact>
       </div>
     );

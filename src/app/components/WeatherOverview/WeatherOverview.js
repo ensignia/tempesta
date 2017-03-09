@@ -45,7 +45,6 @@ class WeatherOverview extends React.Component {
 
   render() {
     const { daily, currently, hasData } = this.state;
-    console.log(this.props.temperatureUnits);
     const units = this.props.temperatureUnits === 'farenheit' ? '°F' : '°C';
     const temperature = this.props.temperatureUnits === 'farenheit' ? currently.temperature : (currently.temperature - 32) * (5 / 9);
     if (hasData) {

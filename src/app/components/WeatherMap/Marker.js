@@ -6,16 +6,17 @@ import s from './Marker.css';
 class Marker extends React.Component {
   static propTypes = {
     type: PropTypes.string,
+    opacity: PropTypes.number,
   };
 
   render() {
-    const { type } = this.props;
+    const { type, opacity } = this.props;
 
     switch (type) {
       case 'LOCATION':
         return (<div className={s.locationIcon} />);
       case 'LIGHTNING':
-        return (<div className={s.lightningIcon} />);
+        return (<div className={s.lightningIcon} style={{ opacity }} />);
       default:
         return null;
     }

@@ -76,7 +76,7 @@ export default class ApiMiddleware {
         const since = new Date(parseInt(req.params.since, 10)) || to;
 
         res.status(200).json({
-          meta: {since, to},
+          meta: { since: since.getTime(), to: to.getTime() },
           data: lightningDataSource.getLightningBetween(since, to),
         });
       } catch (error) {
