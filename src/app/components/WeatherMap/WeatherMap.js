@@ -15,8 +15,10 @@ class WeatherMap extends React.Component {
     className: PropTypes.string,
     showLayerModal: PropTypes.bool.isRequired,
     showModelModal: PropTypes.bool.isRequired,
+    showSpeedModal: PropTypes.bool.isRequired,
     mapActiveLayers: PropTypes.array,
     mapActiveModel: PropTypes.string,
+    mapActiveSpeed: PropTypes.number,
     actions: PropTypes.object,
   };
 
@@ -25,6 +27,7 @@ class WeatherMap extends React.Component {
 
     this.layerOnChange = this.layerOnChange.bind(this);
     this.modelOnChange = this.modelOnChange.bind(this);
+    this.speedOnChange = this.speedOnChange.bind(this);
   }
 
   componentWillMount() {
@@ -51,8 +54,26 @@ class WeatherMap extends React.Component {
     }
   }
 
+  speedOnChange(e) {
+    const { actions } = this.props;
+    const { mapActiveSpeed } = this.props;
+    const value = parseInt(e.target.value, 10);
+
+    if (mapActiveSpeed !== value) {
+      actions.setActiveSpeed(value);
+    }
+  }
+
   render() {
-    const { actions, showLayerModal, showModelModal, mapActiveLayers, mapActiveModel } = this.props;
+    const {
+      actions,
+      showLayerModal,
+      showModelModal,
+      showSpeedModal,
+      mapActiveLayers,
+      mapActiveModel,
+      mapActiveSpeed,
+    } = this.props;
 
     return (
       <div className={cx(s.content, s.container)}>
@@ -84,6 +105,15 @@ class WeatherMap extends React.Component {
           <Radio name="model" value="gfs" label="Global Forecast System" checked={mapActiveModel === 'gfs'} onChange={this.modelOnChange} />
           <Radio name="model" value="hrrr" label="HRRR" checked={mapActiveModel === 'hrrr'} onChange={this.modelOnChange} />
         </Modal>
+        <Modal
+          title="Map Speeds"
+          isOpen={showSpeedModal}
+          className={s.modal}
+          onClose={() => { actions.hideSpeedModal(); }}
+        >
+          <Radio name="speeds" value="1" label="1x" checked={mapActiveSpeed === 1} onChange={this.speedOnChange} />
+          <Radio name="speeds" value="2" label="2x" checked={mapActiveSpeed === 2} onChange={this.speedOnChange} />
+        </Modal>
       </div>
     );
   }
@@ -92,6 +122,8 @@ class WeatherMap extends React.Component {
 export default connect((state) => ({
   showLayerModal: state.showLayerModal,
   showModelModal: state.showModelModal,
+  showSpeedModal: state.showSpeedModal,
   mapActiveLayers: state.mapActiveLayers,
   mapActiveModel: state.mapActiveModel,
+  mapActiveSpeed: state.mapActiveSpeed,
 }))(withStyles(s)(WeatherMap));

@@ -33,6 +33,7 @@
   align-items: center;
   display: flex;
   padding: 10px;
+  color: black;
 }
 
 .speed span {
@@ -43,4 +44,11 @@
 .currentDate {
   display: inline-block;
   align-items: center;
+}
+
+.link {
+  display: inline-block;
+  padding: 3px 8px;
+  text-align: center;
+  text-decoration: none;
 }

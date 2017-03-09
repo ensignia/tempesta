@@ -38,12 +38,12 @@
   margin: 0;
   font-size: 40px;
   font-size: 2.5rem;
-  color: --text-color;
+  color: var(--text-color);
 }
 
 .content {
   padding: 20px 24px 24px 24px;
-  color: --text-color-secondary;
+  color: var(--text-color-secondary);
 }
 
 .actions {

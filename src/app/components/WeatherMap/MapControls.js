@@ -6,11 +6,13 @@ import { connect } from '../store.js';
 import s from './MapControls.css';
 import Icon from '../Icon/Icon.js';
 import Slider from '../Slider/Slider.js';
+import Link from '../Link/Link.js';
 
 class MapControls extends React.Component {
 
   static propTypes = {
     mapActiveModel: PropTypes.string,
+    mapActiveSpeed: PropTypes.number,
     mapMeta: PropTypes.object,
     actions: PropTypes.object,
   };
@@ -79,7 +81,7 @@ class MapControls extends React.Component {
 
   render() {
     const { sliderValue, isPlaying, minValue, maxValue } = this.state;
-    const { mapMeta, mapActiveModel } = this.props;
+    const { mapMeta, mapActiveModel, actions, mapActiveSpeed } = this.props;
 
     let dateOutput = 'Loading...';
 
@@ -115,9 +117,11 @@ class MapControls extends React.Component {
             onLabel={i => <div>{`+${i}`}</div>}
           />
         </div>
-        <div className={s.speed}>
-          <span>1x</span>
-        </div>
+        <Link className={s.link} to="#" onClick={() => { actions.showSpeedModal(); }}>
+          <div className={s.speed}>
+            <span>{mapActiveSpeed}x</span>
+          </div>
+        </Link>
       </div>
     );
   }
@@ -126,4 +130,5 @@ class MapControls extends React.Component {
 export default connect((state) => ({
   mapActiveModel: state.mapActiveModel,
   mapMeta: state.mapMeta,
+  mapActiveSpeed: state.mapActiveSpeed,
 }))(withStyles(s)(MapControls));

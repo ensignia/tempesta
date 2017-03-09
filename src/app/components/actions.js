@@ -4,6 +4,7 @@ function initialize() {
     showModelModal: false,
     showSettingsModal: false,
     showWeatherOverview: false,
+    showSpeedModal: false,
 
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
@@ -13,6 +14,7 @@ function initialize() {
     theme: 'light',
 
     mapMeta: null,
+    mapActiveSpeed: 1,
     mapPlaybackIndex: 0,
     mapActiveLayers: ['cape'],
     mapActiveModel: 'gfs',
@@ -41,6 +43,13 @@ function setTheme(state, theme) {
     ...state,
     theme,
   };
+}
+
+function setMapActiveSpeed(state, mapActiveSpeed) {
+  return {
+      ...state,
+      mapActiveSpeed,
+  }
 }
 
 
@@ -174,8 +183,27 @@ function hideWeatherOverview(state) {
   };
 }
 
+/**
+ * Speed Overview
+ */
+function showSpeedModal(state) {
+  return {
+    ...state,
+    showSpeedModal: true,
+  };
+}
+
+function hideSpeedModal(state) {
+  return {
+    ...state,
+    showSpeedModal: false,
+  };
+}
+
 export default {
   initialize,
+  showSpeedModal,
+  hideSpeedModal,
   showLayerModal,
   hideLayerModal,
   showModelModal,
@@ -194,4 +222,5 @@ export default {
   setTemperatureUnits,
   setUnits,
   setTheme,
+  setMapActiveSpeed,
 };
