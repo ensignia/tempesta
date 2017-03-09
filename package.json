@@ -1,6 +1,6 @@
 {
   "name": "tempesta",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "engines": {
     "node": ">=6.5",
@@ -29,6 +29,7 @@
     "material-design-icons": "^3.0.1",
     "material-design-lite": "^1.3.0",
     "minimist": "^1.2.0",
+    "moment": "^2.17.1",
     "node-fetch": "^1.6.3",
     "normalize.css": "^5.0.0",
     "offline-plugin": "^4.6.1",

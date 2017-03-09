@@ -94,14 +94,14 @@ class Data {
       // use client cache
     } else if (await this.isCached(tilePath)) {
       // is cached, send that
-      res.status(200).set({
+      res.set({
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600',
       });
       fs.createReadStream(tilePath).pipe(res);
     } else {
       // generate the tile
-      res.status(200).set({
+      res.set({
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600',
       });

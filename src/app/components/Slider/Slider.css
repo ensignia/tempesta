@@ -38,3 +38,12 @@
   background: var(--primary-color);
   z-index: 2;
 }
+
+.labels {
+  display: block;
+  position: relative;
+}
+
+.label {
+  position: absolute;
+}

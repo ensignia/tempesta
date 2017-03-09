@@ -1,8 +1,8 @@
 import path from 'path';
 import DataSource from './DataSource.js';
 import fetch from '../../../app/core/fetch';
-import {server} from '../../../config.js';
-import {padLeft} from '../Util.js';
+import { server } from '../../../config.js';
+import { padLeft } from '../Util.js';
 
 const GFS_BASE_URL = 'http://www.nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/';
 
@@ -124,7 +124,15 @@ class GfsDataSource extends DataSource {
     const available = await GfsDataSource.getAvailable();
 
     // Use latest data
-    const latest = available[available.length - 1];
+    let latest = available[available.length - 1];
+
+    const forecastZeroUrl = GfsDataSource.getURL(latest.year, latest.month, latest.day, latest.modelCycle, 0);
+    const response = await fetch(forecastZeroUrl);
+
+    if (response.status !== 200) {
+      latest = available[available.length - 2];
+      console.log('Latest data not yet available, downloading previous');
+    }
 
     if (this.meta &&
       this.meta.year === latest.year &&

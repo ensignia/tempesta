@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cx from 'classnames';
+import moment from 'moment';
 import { connect } from '../store.js';
 import s from './WeatherOverview.css';
 import fetch from '../../core/fetch';
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const NUM_DAYS = 4;
 
 class WeatherOverview extends React.Component {
@@ -39,8 +39,6 @@ class WeatherOverview extends React.Component {
     const response = await fetch(`api/weather/${coords.latitude},${coords.longitude}`);
     const json = await response.json();
 
-    console.log(json);
-
     this.setState({ daily: json.daily.data, currently: json.currently });
   }
 
@@ -51,7 +49,7 @@ class WeatherOverview extends React.Component {
       const days = [];
       for (let i = 1; i <= Math.min(NUM_DAYS, daily.length); i += 1) {
         const day = daily[i];
-        const dayName = DAY_NAMES[new Date(day.time * 1000).getDay()];
+        const dayName = moment(day.time).format('ddd');
 
         days.push(
           <div key={day.time} className={s.vertical}>
