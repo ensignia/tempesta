@@ -1,5 +1,5 @@
+import SeedRandom from 'seedrandom';
 import DataSource from './DataSource.js';
-const seedrandom = require('seedrandom');
 
 const STORM_INTENSITY = 350;                    // maximum strikes per storm per hour
 const STORM_SPEED = 4;                          // maximum degrees of movement per hour
@@ -18,7 +18,7 @@ class LightningDataSource extends DataSource {
     };
     this.data = [];                                                  // must contain 60 arrays of strikes
     this.random = {
-      generator: new seedrandom((new Date()).getDay()),             // todo make repeatable
+      generator: new SeedRandom((new Date()).getDay()),             // todo make repeatable
       epicenters: [],
       stormdeath: STORM_DEATH,
       stormgenesis: STORM_GENESIS,
@@ -32,7 +32,7 @@ class LightningDataSource extends DataSource {
         speed: this.random.generator() * STORM_SPEED,
         intensity: this.random.generator() * STORM_INTENSITY,
         spread: this.random.generator() * STORM_SPREAD,
-      })
+      });
     }
   }
 
@@ -68,8 +68,6 @@ class LightningDataSource extends DataSource {
 
       // for each minute block, generate data
       for (let minute = 0; minute < 60; minute += 1) {
-        // console.log(`LIGHTNING: generating data -> ${minute}`);
-
         // iterate over epicenters
         for (let epicenter = 0; epicenter < this.random.epicenters.length; epicenter += 1) {
           // epicenter death and birth todo better at end of loop?
@@ -145,8 +143,7 @@ class LightningDataSource extends DataSource {
         if (item.time > sinceDate && item.time < toDate) return true;
         return false;
       });
-    }
-    catch (e) {
+    } catch (e) {
       if (!this.loaded) console.log('Lightning data not yet loaded!');
       console.log(e);
       return [];

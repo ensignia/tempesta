@@ -1,4 +1,5 @@
 import React from 'react';
+import Layout from '../../components/Layout/Layout.js';
 import Page from '../../components/Page/Page.js';
 
 /**
@@ -7,7 +8,7 @@ import Page from '../../components/Page/Page.js';
 const PAGES = [
   'about',
   'models',
-  'layers'
+  'layers',
 ];
 
 export default {
@@ -27,7 +28,7 @@ export default {
 
     return {
       title: data.title,
-      component: <Page {...data} />,
+      component: <Layout isPage><Page {...data} /></Layout>,
     };
   },
 

@@ -18,10 +18,27 @@ class Header extends React.Component {
     temperatureUnits: PropTypes.string,
     units: PropTypes.string,
     theme: PropTypes.string,
+    isPage: PropTypes.boolean,
   };
 
   render() {
-    const { actions, showWeatherOverview, showSettingsModal, temperatureUnits, units, theme } = this.props;
+    const {
+      actions,
+      showWeatherOverview,
+      showSettingsModal,
+      temperatureUnits,
+      units,
+      theme,
+      isPage,
+    } = this.props;
+
+    if (isPage) {
+      return (
+        <div className={s.header}>
+          <Navigation isPage />
+        </div>
+      );
+    }
 
     return (
       <div className={s.header}>

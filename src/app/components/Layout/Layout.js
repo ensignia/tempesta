@@ -14,6 +14,7 @@ class Layout extends React.Component {
     children: PropTypes.node.isRequired,
     actions: PropTypes.object.isRequired,
     locationStatus: PropTypes.string.isRequired,
+    isPage: PropTypes.boolean,
   };
 
   constructor() {
@@ -48,10 +49,10 @@ class Layout extends React.Component {
   }
 
   render() {
-    const { children } = this.props;
+    const { children, isPage } = this.props;
     return (
       <div className={cx(s.page, s.container)}>
-        <Header />
+        <Header isPage={isPage} />
         <main className={cx(s.content, s.container)}>
           {children}
         </main>

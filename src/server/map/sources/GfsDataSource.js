@@ -139,7 +139,6 @@ class GfsDataSource extends DataSource {
       category: 0,
       parameter: 0,
     }, GfsDataSource.parseGfsBody);
-    console.log(tempData);
 
     this.data[forecastHour] = {
       cape: capeData[0],
