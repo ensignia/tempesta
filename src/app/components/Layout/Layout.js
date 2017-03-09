@@ -7,11 +7,7 @@ import mdl from 'material-design-lite/material.css';
 import { connect } from '../store.js';
 import s from './Layout.css';
 import Header from '../Header/Header.js';
-<<<<<<< a5f8709ae5cefe876b69a87ea04d2ed9818b3bda
-import Modal from '../Modal/Modal.js';
-import Link from '../Link/Link.js';
-=======
->>>>>>> Made seperate slider
+
 
 class Layout extends React.Component {
   static propTypes = {

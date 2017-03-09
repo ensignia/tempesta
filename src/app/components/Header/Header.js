@@ -46,10 +46,10 @@ class Header extends React.Component {
           <Switch
             name="temperatureUnits"
             label="°C/°F"
-            enabled={temperatureUnits === 'celsius'}
+            enabled={temperatureUnits === 'farenheit'}
             onChange={(e) => {
               console.log('changed' + e.target.value);
-              actions.setTemperatureUnits(e.target.value ? 'celsius' : 'farenheit');
+              actions.setTemperatureUnits(e.target.value ? 'farenheit' : 'celsius');
             }}
           />
 

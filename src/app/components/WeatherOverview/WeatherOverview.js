@@ -13,6 +13,7 @@ class WeatherOverview extends React.Component {
     className: PropTypes.string,
     location: PropTypes.object,
     locationStatus: PropTypes.string,
+    temperatureUnits: PropTypes.string,
   };
 
   constructor() {
@@ -44,7 +45,8 @@ class WeatherOverview extends React.Component {
 
   render() {
     const { daily, currently, hasData } = this.state;
-
+    console.log(this.props.temperatureUnits);
+    const units = this.props.temperatureUnits === 'farenheit' ? '°F' : '°C';
     if (hasData) {
       const days = [];
       for (let i = 1; i <= Math.min(NUM_DAYS, daily.length); i += 1) {
@@ -62,7 +64,7 @@ class WeatherOverview extends React.Component {
         <div className={s.weatherOverview}>
           <div className={cx(s.current, s.vertical)}>
             <span className={s.dayName}>Today</span>
-            <span>{`${~~currently.temperature} °C`}</span>
+            <span>{`${~~currently.temperature} ${units}`}</span>
           </div>
           <div className={s.currentIcon}>
             <img src={`/WeatherIcons/${currently.icon}.svg`} width="36" height="36" alt={currently.icon} />
@@ -85,4 +87,5 @@ class WeatherOverview extends React.Component {
 export default connect((state) => ({
   location: state.location,
   locationStatus: state.locationStatus,
+  temperatureUnits: state.temperatureUnits,
 }))(withStyles(s)(WeatherOverview));

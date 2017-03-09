@@ -8,7 +8,7 @@ function initialize() {
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
 
-    temperatureUnits: 'celcius',
+    temperatureUnits: 'celsius',
     units: 'metric',
     theme: 'light',
 
