@@ -275,8 +275,7 @@ class MapView extends React.Component {
         position: maps.ControlPosition.RIGHT_TOP,
       },
       disableDefaultUI: true,
-      minZoom: 2,
-      minZoomOverride: true,
+      minZoom: 3,
     };
   }
 
