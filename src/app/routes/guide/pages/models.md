@@ -26,13 +26,7 @@ In general, this is where the convective outlooks from the SPC will aid you -- a
 
 Notably, the GFS helps to be a judgement tool of the performance of other models. By comparing the models, you can see how well each is doing relative to the others. Low variability between different models is a good sign the computers are doing well forecasting a situation.
 
-The heart of most discussions will be the NAM, or North American Mesoscale Model. Like the GFS, it is run four times a day. It is actually a specific set of assumptions and formulas running through the WRF, the weather research and forecast model. Lots of different model set ups exist for the WRF, but the NAM is by far the most common you will encounter and use.
-
-The NAM provides an 84 hour forecast -- 3 and a half days out. So it is a mid-range model. It also only is run for North America. This allows it to have higher spatial resolution, which is useful in identifying conditions that lead to mesoscale phenomena like severe weather. In general, this is where most of your forecasting will be done, and it will be the model most discussions are based around.
-
-The NAM has its quirks and can make mistakes, so leaning on it exclusively is a dangerous possibility. This is where experts and discussion come into play.
-
-The final model we are going to discuss is the High Resolution Rapid Refresh, or HRRR. As you might have guessed, this model has the highest resolution, temporally and spatially, of the three. It produces a run every hour, and forecasts for the next 16 hours in one hour increments (and for some parameters every 15 minutes!). It also has extremely high spatial resolution, on the order of 4km. The HRRR is in part another form of the WRF.
+The other model we are going to discuss is the High Resolution Rapid Refresh, or HRRR. As you might have guessed, this model has the highest resolution, temporally and spatially, of the three. It produces a run every hour, and forecasts for the next 16 hours in one hour increments (and for some parameters every 15 minutes!). It also has extremely high spatial resolution, on the order of 4km. The HRRR is in part another form of the WRF.
 
 The HRRR is extra cool in that it takes in radar data as the heart of it's modeling, and resolves data at the scale of individual storms itself. This makes it very different from the NAM and the GFS.
 
@@ -44,24 +38,12 @@ A note about time in meteorology. Often, the features we study cover many time z
 
 It is the same time GMT at all points across the globe. So if it is 18Z, it is 18Z in Russia, the US, and Uganda, everywhere. This is very helpful, but it isn't the most intuitive. Complicating things more, it is always in 24 hour format, which you probably don't use daily. Further, things like daylight savings time add another twist.
 
-To get your local time, you add or subtract a number of hours. Here in the US, we subtract. In central standard time, the time used across most of tornado alley, we subtract 6 hours or 5 hours if daylight savings time is in effect.
+To get your local time, you add or subtract a number of hours. In the US, we subtract. In central standard time, the time used across most of tornado alley, we subtract 6 hours or 5 hours if daylight savings time is in effect.
 
 This is a little counter-intuitive, but it is imperative to using models well, since all the timestamps on models are in UTC. With a little practice, it will come naturally. If how I said it is confusing, a quick Google search should clear things up for you.
 
-There are lots of other models, but for our purposes, these are the ones we will most likely use. The good news is that all are freely available online.
+There are lots of other models, but this app uses these two.
 
-The website I like to use for the GFS and NAM output is twisterdata.com. This is another one of the sites you want to bookmark.
-
-There are several things I like about the site
-
-    Very clean, visually appealing outputs
-    One click to produce a model sounding at any given location
-    Set up by chasers for chasers
-    easy to compare models
-
-Other people use the College of DuPage's site, Nexlab. You can access it here: http://weather.cod.edu/forecast/. It is also very good, but I learned using twisterdata, so I'm more comfortable there. Take a look at both sites, and figure out which you prefer!
-
-For the HRRR, the website of the model itself is the best choice. http://ruc.noaa.gov/hrrr/ Go ahead and bookmark those too.
 
 Glossary of terms used
 

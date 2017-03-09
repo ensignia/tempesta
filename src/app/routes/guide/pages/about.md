@@ -1,21 +1,18 @@
 ---
-title: About Us
+title: Stormchasing Guide
 component: ContentPage
 ---
-This is the first in a series of discussions about chasing. They are meant to be accessible to people completely new to chasing, and provide an agar for veteran chasers to share their knowledge. Terms in bold are meteorologically significant, and defined in a glossary at the bottom of the post. Because chasing is anchored in the physical, real world examples will be used whenever possible. For today's reading, we'll be using the May 24th 2011 tornado outbreak for examples.
+This is the first in a series of discussions about chasing, meant to be accessible to people completely new to chasing. Meteorologically significant terms are defined in a glossary at the bottom of the page. Because chasing is anchored in the physical, real world examples will be used whenever possible. For today's reading, we'll be using the May 24th 2011 tornado outbreak for examples.
 
 There can be no place to start a discussion on chasing besides understanding what professional meteorologists see in any given situation; their expertise, education, and experience gives them an edge over all but the best storm chasers in understanding the synoptic set up.
 
 When it comes to severe convection the most widely used website, and the most important to understand, is the Storm Prediction Center, or the SPC. They employ the premier scientists that deal with severe weather, and their entire job is to monitor the United States for severe weather setups, and issue forecasts in the form of convective outlooks, mesoscale discussions, and watches.
 
 Let's take a brief look at their website. You can access it at spc.noaa.gov, and you should memorize or bookmark this address -- you're going to use it a lot.
-
 http://i.imgur.com/2rU4T.png
 
 Anyway, for now just click around and become familiar with the interface. Right now, because it is winter, there isn't a lot going on.
-
 Nonetheless, let's familiarize ourselves with the three main products of the SPC using a simple case study.
-
 Well start with the product with which you are most likely familiar: watches.
 
 The SPC is the only entity which issues severe weather watches in the US. For our purposes, we are only concerned with severe thunderstorm and tornado watches.

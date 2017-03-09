@@ -1,5 +1,4 @@
 import React from 'react';
-import Layout from '../../components/Layout/Layout.js';
 import Page from '../../components/Page/Page.js';
 
 /**
@@ -28,7 +27,7 @@ export default {
 
     return {
       title: data.title,
-      component: <Layout><Page {...data} /></Layout>,
+      component: <Page {...data} />,
     };
   },
 

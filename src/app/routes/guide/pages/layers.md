@@ -2,6 +2,7 @@
 title: Layers
 component: ContentPage
 ---
+/*Wind Sheer*/
 It may seem odd that we are starting with forecasting in a discussion of chasing -- why not talk about storm structure or how to chase first?
 
 The rationale that the underlying themes we will cover over the next few posts are the theoretical framework from which we understand tornadoes and other severe phenomena. Covering how to decide which days will produce severe weather helps us to understand what makes severe storms severe.
@@ -54,12 +55,7 @@ Discrete supercell A type of thunderstorm which is dominated by a deep, persiste
 
 
 
-
-
-
-
-
-
+/*CAPE*/
 This starts the next major section of Chasing 101. So far, we have effectively covered an introduction to the wind environment, looking at shear, hodographs, and helicity. This is the major ingredient in why some storms are severe and some are just garden-variety thunderstorms.
 
 Still, winds alone do not make a thunderstorm, let alone a supercell, so we turn our attention towards instability. These next few sections will help us understand and predict convection -- thunderstorms -- created by thermodynamic processes. Normally, we call this convective instability
