@@ -75,9 +75,6 @@ class MapView extends React.Component {
       lightning: [],
     };
 
-    this.componentWillMount = this.componentWillMount.bind(this);
-    this.componentWillUnmount = this.componentWillUnmount.bind(this);
-    this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
     this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
     this.loadMeta = this.loadMeta.bind(this);
     this.createLayerHelper = this.createLayerHelper.bind(this);
@@ -90,7 +87,7 @@ class MapView extends React.Component {
   /**
    * On mounted, load meta data
    */
-  componentWillMount() {
+  componentDidMount() {
     this.loadMeta();
     this.fetchLightning();
     this.lightningInterval = setInterval(this.fetchLightning, 20 * 1000);

@@ -24,8 +24,10 @@
 .switchLabel .switch {
   position: relative;
   display: inline-block;
-  transition: transform 0.2s ease;
+  transition: transform 0.1s ease;
   pointer-events: none;
+  min-width: 30px;
+  min-height: 17px;
   width: 30px;
   height: 17px;
 }
@@ -69,5 +71,5 @@
 }
 
 .switchLabel input:checked + .switch .slider::before {
-  transform: translateX(14px);
+  transform: translateX(13px);
 }

@@ -6,7 +6,7 @@ import s from './WeatherMap.css';
 import MapView from './MapView.js';
 import MapControls from './MapControls.js';
 import Modal from '../Modal/Modal.js';
-import Checkbox from '../Checkbox/Checkbox.js';
+import Switch from '../Switch/Switch.js';
 import Radio from '../Radio/Radio.js';
 import Link from '../Link/Link.js';
 
@@ -30,7 +30,7 @@ class WeatherMap extends React.Component {
     this.speedOnChange = this.speedOnChange.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.actions.requestLocation();
   }
 
@@ -38,9 +38,9 @@ class WeatherMap extends React.Component {
     const { actions } = this.props;
     const { mapActiveLayers } = this.props;
 
-    if (e.target.value && !mapActiveLayers.includes(e.target.name)) {
+    if (e.target.checked && !mapActiveLayers.includes(e.target.name)) {
       actions.setActiveLayers(mapActiveLayers.concat(e.target.name));
-    } else {
+    } else if (mapActiveLayers.includes(e.target.name)) {
       actions.setActiveLayers(mapActiveLayers.filter(l => l !== e.target.name));
     }
   }
@@ -88,11 +88,11 @@ class WeatherMap extends React.Component {
           <Link className={cx(s.helpButton)} to="/guide/layers">
             <span name="guide">?</span>
           </Link>
-          <Checkbox name="cape" label="Convective available potential energy" checked={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
-          <Checkbox name="wind" label="Wind vectors and wind fronts" checked={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
-          <Checkbox name="temperature" label="Temperature" checked={mapActiveLayers.includes('temperature')} onChange={this.layerOnChange} />
-          <Checkbox name="spc" label="Storm Prediction Centre reports" checked={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
-          <Checkbox name="lightning" label="Lightning radar" checked={mapActiveLayers.includes('lightning')} onChange={this.layerOnChange} />
+          <Switch name="cape" label="Convective available potential energy" enabled={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
+          <Switch name="wind" label="Wind vectors and wind fronts" enabled={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
+          <Switch name="temperature" label="Temperature" enabled={mapActiveLayers.includes('temperature')} onChange={this.layerOnChange} />
+          <Switch name="spc" label="Storm Prediction Centre reports" enabled={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
+          <Switch name="lightning" label="Lightning radar" enabled={mapActiveLayers.includes('lightning')} onChange={this.layerOnChange} />
         </Modal>
         <Modal
           title="Models"
