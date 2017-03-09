@@ -47,9 +47,9 @@ function setTheme(state, theme) {
 
 function setMapActiveSpeed(state, mapActiveSpeed) {
   return {
-      ...state,
-      mapActiveSpeed,
-  }
+    ...state,
+    mapActiveSpeed,
+  };
 }
 
 
@@ -116,7 +116,7 @@ function requestLocation(state) {
  * Settings Modal
  */
 function showSettingsModal(state) {
-  if (state.showModelModal || state.showLayerModal) return state;
+  if (state.showModelModal || state.showLayerModal || state.showSpeedModal) return state;
   return {
     ...state,
     showSettingsModal: true,
@@ -134,7 +134,7 @@ function hideSettingsModal(state) {
  * Layer Modal
  */
 function showLayerModal(state) {
-  if (state.showModelModal || state.showSettingsModal) return state;
+  if (state.showModelModal || state.showSettingsModal || state.showSpeedModal) return state;
   return {
     ...state,
     showLayerModal: true,
@@ -152,7 +152,7 @@ function hideLayerModal(state) {
  * Model Modal
  */
 function showModelModal(state) {
-  if (state.showLayerModal || state.showSettingsModal) return state;
+  if (state.showLayerModal || state.showSettingsModal || state.showSpeedModal) return state;
   return {
     ...state,
     showModelModal: true,
@@ -187,6 +187,7 @@ function hideWeatherOverview(state) {
  * Speed Overview
  */
 function showSpeedModal(state) {
+  if (state.showModelModal || state.showLayerModal || state.showSettingsModal) return state;
   return {
     ...state,
     showSpeedModal: true,

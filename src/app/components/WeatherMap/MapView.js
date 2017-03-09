@@ -282,9 +282,9 @@ class MapView extends React.Component {
   }
 
   render() {
-    const { className, location, locationStatus } = this.props;
+    const { className, location, locationStatus, mapActiveLayers } = this.props;
 
-    const strikes = this.state.lightning.map((lightning) =>
+    const strikes = mapActiveLayers.includes('lightning') ? this.state.lightning.map((lightning) =>
       (<Marker
         key={`${lightning.time + ~~lightning.latitude + ~~lightning.longitude}`}
         type="LIGHTNING"
@@ -292,7 +292,7 @@ class MapView extends React.Component {
         lat={lightning.latitude}
         lng={lightning.longitude}
       />),
-    );
+    ) : null;
 
     return (
       <div className={className}>
