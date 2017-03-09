@@ -49,7 +49,7 @@ class WeatherOverview extends React.Component {
       const days = [];
       for (let i = 1; i <= Math.min(NUM_DAYS, daily.length); i += 1) {
         const day = daily[i];
-        const dayName = moment(day.time).format('ddd');
+        const dayName = moment(parseInt(day.time * 1000, 10)).format('ddd');
 
         days.push(
           <div key={day.time} className={s.vertical}>
