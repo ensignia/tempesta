@@ -93,12 +93,14 @@ class MapControls extends React.Component {
 
     return (
       <div className={cx(s.mapControls)}>
-        <Icon
-          className={s.playButton}
-          name={isPlaying ? 'pause' : 'play_arrow'}
-          onClick={this.toggleAnimation}
-          size={48}
-        />
+        <div className={s.play}>
+          <Icon
+            className={s.playButton}
+            name={isPlaying ? 'pause' : 'play_arrow'}
+            onClick={this.toggleAnimation}
+            size={36}
+          />
+        </div>
         <div className={s.slider}>
           <div className={s.currentDate}>
             {dateOutput}

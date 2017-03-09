@@ -21,9 +21,15 @@
   flex-direction: column;
 }
 
+.play {
+  align-items: center;
+  display: flex;
+  padding: 10px;
+}
+
 .speed {
   font-weight: bold;
-  font-size: 2.1em;
+  font-size: 25px;
   align-items: center;
   display: flex;
   padding: 10px;
@@ -38,4 +44,3 @@
   display: inline-block;
   align-items: center;
 }
-
