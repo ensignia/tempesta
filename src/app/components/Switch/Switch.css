@@ -43,6 +43,11 @@
   border-radius: 16px;
 }
 
+.switch .slider.sliderNeutral {
+  background-color: var(--primary-color);
+  box-shadow: 0 0 1px var(--primary-color);
+}
+
 .switch .slider::before {
   position: absolute;
   content: '';

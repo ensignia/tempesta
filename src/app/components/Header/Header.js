@@ -37,6 +37,7 @@ class Header extends React.Component {
           title="Settings"
           isOpen={showSettingsModal}
           className={s.modal}
+          neutral
           onClose={() => { actions.hideSettingsModal(); }}
         >
           <Link className={s.helpButton} to="/guide">
@@ -47,6 +48,7 @@ class Header extends React.Component {
             name="temperatureUnits"
             label="°C/°F"
             enabled={temperatureUnits === 'farenheit'}
+            neutral
             onChange={(e) => {
               console.log('changed' + e.target.value);
               actions.setTemperatureUnits(e.target.value ? 'farenheit' : 'celsius');
@@ -57,6 +59,7 @@ class Header extends React.Component {
             name="units"
             label="Metric/Imperial"
             enabled={units === 'metric'}
+            neutral
             onChange={(e) => {
               actions.setUnits(e.target.value ? 'metric' : 'imperial');
             }}

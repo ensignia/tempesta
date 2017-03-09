@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cx from 'classnames';
 import s from './Switch.css';
 
 let currentId = 1;
@@ -14,6 +15,7 @@ class Switch extends React.Component {
     name: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     enabled: PropTypes.bool,
+    neutral: PropTypes.bool,
     onChange: PropTypes.func,
   };
 
@@ -24,14 +26,19 @@ class Switch extends React.Component {
   }
 
   render() {
-    const { name, label, enabled } = this.props;
+    const { name, label, enabled, neutral } = this.props;
+
+    const sliderClasses = cx({
+      [s.slider]: true,
+      [s.sliderNeutral]: neutral,
+    });
 
     return (
       <label className={s.switchLabel} htmlFor={this.switchId}>
         <span>{label}</span>
         <input name={name} type="checkbox" id={this.switchId} checked={enabled} onChange={this.props.onChange} />
         <div className={s.switch}>
-          <div className={s.slider} />
+          <div className={sliderClasses} />
         </div>
       </label>
     );
