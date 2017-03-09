@@ -14,7 +14,7 @@ class Layout extends React.Component {
     children: PropTypes.node.isRequired,
     actions: PropTypes.object.isRequired,
     locationStatus: PropTypes.string.isRequired,
-    isPage: PropTypes.boolean,
+    isPage: PropTypes.bool,
   };
 
   constructor() {

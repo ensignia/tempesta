@@ -1,4 +1,9 @@
+import store from 'store';
+
 function initialize() {
+  const settingsData = store.get('settings') || {};
+  const mapSettingsData = store.get('map_settings') || {};
+
   return {
     showLayerModal: false,
     showModelModal: false,
@@ -9,16 +14,31 @@ function initialize() {
     location: { latitude: -1, longitude: -1 },
     locationStatus: 'UNKNOWN',
 
-    temperatureUnits: 'celsius',
-    units: 'metric',
-    theme: 'light',
+    temperatureUnits: settingsData.temperatureUnits || 'celsius',
+    units: settingsData.units || 'metric',
+    theme: settingsData.theme || 'light',
+
+    mapActiveSpeed: mapSettingsData.mapActiveSpeed || 1,
+    mapActiveLayers: mapSettingsData.mapActiveLayers || ['cape'],
+    mapActiveModel: mapSettingsData.mapActiveModel || 'gfs',
 
     mapMeta: null,
-    mapActiveSpeed: 1,
     mapPlaybackIndex: 0,
-    mapActiveLayers: ['cape'],
-    mapActiveModel: 'gfs',
   };
+}
+
+function save(state) {
+  store.set('settings', {
+    temperatureUnits: state.temperatureUnits,
+    units: state.units,
+    theme: state.theme,
+  });
+
+  store.set('map_settings', {
+    mapActiveSpeed: state.mapActiveSpeed,
+    mapActiveModel: state.mapActiveModel,
+    mapActiveLayers: state.mapActiveLayers,
+  });
 }
 
 /**
@@ -203,6 +223,7 @@ function hideSpeedModal(state) {
 
 export default {
   initialize,
+  save,
   showSpeedModal,
   hideSpeedModal,
   showLayerModal,

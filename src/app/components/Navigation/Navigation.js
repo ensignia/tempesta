@@ -12,7 +12,7 @@ class Navigation extends React.Component {
     showWeatherOverview: PropTypes.bool,
     actions: PropTypes.object,
     locationStatus: PropTypes.string,
-    isPage: PropTypes.boolean,
+    isPage: PropTypes.bool,
   };
 
   render() {

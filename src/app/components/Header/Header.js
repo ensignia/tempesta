@@ -18,7 +18,7 @@ class Header extends React.Component {
     temperatureUnits: PropTypes.string,
     units: PropTypes.string,
     theme: PropTypes.string,
-    isPage: PropTypes.boolean,
+    isPage: PropTypes.bool,
   };
 
   render() {
