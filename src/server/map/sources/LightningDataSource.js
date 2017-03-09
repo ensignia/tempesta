@@ -115,6 +115,17 @@ class LightningDataSource extends DataSource {
                 - this.random.epicenters[epicenter].spread,
               time: new Date(this.meta.start + (minute * 60000) + (this.random.generator() * 60000)).getTime(),
             });
+
+            const lat = this.data[minute][strike].latitude;
+            const long = this.data[minute][strike].longitude;
+
+            // storm has walked out of map - fix and kill
+            if (lat > 90 || lat < (-90) || long < (-180) || long > 180) {
+              this.data[minute].splice(strike, 1);
+              this.random.epicenters.splice(epicenter, 1);
+              epicenter -= 1;
+              break;
+            }
           }
         }
       }
