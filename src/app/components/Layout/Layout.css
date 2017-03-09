@@ -1,2 +1,19 @@
 @import '../global.css';
 
+.main {
+  overflow-y: scroll;
+}
+
+.main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: #eee;
+}
+
+.main::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: #888;
+}

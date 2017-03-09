@@ -50,10 +50,17 @@ class Layout extends React.Component {
 
   render() {
     const { children, isPage } = this.props;
+
+    const mainClasses = cx({
+      [s.content]: true,
+      [s.container]: true,
+      [s.main]: !!isPage,
+    });
+
     return (
       <div className={cx(s.page, s.container)}>
         <Header isPage={isPage} />
-        <main className={cx(s.content, s.container)}>
+        <main className={mainClasses}>
           {children}
         </main>
       </div>
