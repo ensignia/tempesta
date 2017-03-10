@@ -1,6 +1,10 @@
 @import '../global.css';
 
-.mapView div {
+.mapView {
+  position: relative;
+}
+
+.mapView div:first-child {
   @extend .content;
 }
 

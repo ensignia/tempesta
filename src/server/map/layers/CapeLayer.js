@@ -3,6 +3,7 @@ import pureimage from 'pureimage';
 import fs from 'fs';
 import stream from 'stream';
 import Layer from './Layer.js';
+import { padLeft } from '../Util.js';
 
 class CapeLayer extends Layer {
 
@@ -14,6 +15,11 @@ class CapeLayer extends Layer {
   getMeta() {
     return {
       supportedSources: ['gfs', 'hrrr'],
+      scale: {
+        colors: this.colorer.getScale('jet').map((color) => `${color.substring(1)}00`),
+        minValue: 0,
+        maxValue: 2500,
+      },
     };
   }
 
@@ -59,13 +65,15 @@ class CapeLayer extends Layer {
     const image = pureimage.make(Layer.TILE_SIZE, Layer.TILE_SIZE);
     const ctx = image.getContext('2d');
 
+    const maxValue = this.getMeta().scale.maxValue;
+
     for (let yPixel = 0; yPixel < Layer.TILE_SIZE; yPixel += 1) {
       for (let xPixel = 0; xPixel < Layer.TILE_SIZE; xPixel += 1) {
         const pixelLatitude = topLatitude - (angularPixelHeight * yPixel);
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
         const pixelValue = data.bilinearInterpolation(pixelLatitude, pixelLongitude);
-        const val = this.colorer.render(pixelValue, 2500, 'jet');
+        const val = this.colorer.render(pixelValue, maxValue, 'jet');
         ctx.compositePixel(xPixel, yPixel, val);
       }
     }

@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react';
 import GoogleMapReact from 'google-map-react';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './MapView.css';
 import Marker from './Marker.js';
+import ColorScale from './ColorScale.js';
 import { connect } from '../store.js';
 import MapDarkTheme from './config/MapDarkTheme.json';
 import MapLightTheme from './config/MapLightTheme.json';
@@ -282,7 +285,7 @@ class MapView extends React.Component {
   }
 
   render() {
-    const { className, location, locationStatus, mapActiveLayers } = this.props;
+    const { className, location, locationStatus, mapActiveLayers, mapMeta } = this.props;
 
     const strikes = mapActiveLayers.includes('lightning') ? this.state.lightning.map((lightning) =>
       (<Marker
@@ -293,6 +296,13 @@ class MapView extends React.Component {
         lng={lightning.longitude}
       />),
     ) : null;
+
+    const scales = mapMeta ? mapActiveLayers.map((layerName) => {
+      if (!mapMeta.layers[layerName].scale) return null;
+
+      const { colors, minValue, maxValue } = mapMeta.layers[layerName].scale;
+      return <ColorScale layerName={layerName} colors={colors} width={160} height={10} minValue={minValue} maxValue={maxValue} />;
+    }) : null;
 
     return (
       <div className={className}>
@@ -307,6 +317,9 @@ class MapView extends React.Component {
           {locationStatus !== 'UNKNOWN' ? <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} /> : null}
           {strikes}
         </GoogleMapReact>
+        <div className={s.scales}>
+          {scales !== null && scales.length > 0 ? scales[0] : null}
+        </div>
       </div>
     );
   }
@@ -321,4 +334,4 @@ export default connect((state) => ({
   theme: state.theme,
   location: state.location,
   locationStatus: state.locationStatus,
-}))(MapView);
+}))(withStyles(s)(MapView));

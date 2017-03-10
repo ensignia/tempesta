@@ -4,25 +4,29 @@ const NUM_SHADES = 0;
 
 class Colorer {
   constructor() {
-    /* eslint-disable no-restricted-syntax */
-    /* eslint-disable no-bitwise */
-    this.colorScales = {
+    this.colorScalesHex = {
       jet: colormap({ colormap: 'jet', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
       rainbow: colormap({ colormap: 'rainbow', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
       plasma: colormap({ colormap: 'plasma', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
       hsv: colormap({ colormap: 'hsv', nshades: NUM_SHADES, format: 'hex', alpha: 1 }),
     };
-    for (const scale in this.colorScales) {
-      if (Object.prototype.hasOwnProperty.call(this.colorScales, scale)) {
-        for (let i = 0; i < this.colorScales[scale].length; i += 1) {
-          this.colorScales[scale][i] =
-              (parseInt(this.colorScales[scale][i].substring(1), 16) * 256) & 0xFFFFFF00;
-        }
+    this.colorScales = {};
+
+    Object.keys(this.colorScalesHex).forEach((scaleName) => {
+      const scale = this.colorScalesHex[scaleName];
+      const res = [];
+      for (let i = 0; i < scale.length; i += 1) {
+        res[i] = (parseInt(scale[i].substring(1), 16) * 256) & 0xFFFFFF00;
       }
-    }
+      this.colorScales[scaleName] = res;
+    });
   }
 
-  render = function render(dataValue, normalizationRange, colorMap, fixedAlpha) {
+  getScale(colorMap) {
+    return this.colorScalesHex[colorMap];
+  }
+
+  render(dataValue, normalizationRange, colorMap, fixedAlpha) {
     // normalize data
     const normValue = dataValue >= normalizationRange ? 1 : (dataValue / normalizationRange);
     const scaleIndex = ~~(normValue * NUM_SHADES) - 1;
