@@ -79,19 +79,10 @@ class DataSource {
   /** HELPER: Parses a block of grib2 data into a 2D array of data points */
   static parseGribData(data, parserFunction) {
     const header = data.header;
-    const oLatitude = header.la1;             // grid origin (e.g. 0.0E, 90.0N)
-    const oLongitude = header.lo1;
-    const angularDy = header.dy;              // angular displacement of grid points in degrees
-    const angularDx = header.dx;
-    const yNum = header.ny;                   // number of grid points N-S and W-E (e.g., 144 x 73)
-    const xNum = header.nx;
-    const date = new Date(header.refTime);
-    date.setHours(date.getHours() + header.forecastTime);
-
     const body = parserFunction(data);
-    const boundLatitude = body.boundLatitude;
-    const boundLongitude = body.boundLongitude;
+    const info = body.info;
     const grid = body.grid;
+
 
     function bilinearInterpolation(latitude, longitude) {
       /* eslint-disable brace-style */
@@ -103,14 +94,14 @@ class DataSource {
       const grib2long = longitude + 180;
 
       // check lat/lon is within coverage bounds
-      if (grib2lat < oLatitude || grib2lat > boundLatitude
-        || grib2long < oLongitude || grib2long > boundLongitude) {
+      /* if (grib2lat < info.oLatitude || grib2lat > info.boundLatitude
+        || grib2long < info.oLongitude || grib2long > info.boundLongitude) {
         return 0;
-      }
+      } */
 
       // precise lat/long in grid scale
-      const y = (grib2lat - 90) * (yNum / 180);
-      const x = grib2long * (xNum / 360);
+      const y = (grib2lat - 90) * (info.yNum / 180);
+      const x = grib2long * (info.xNum / 360);
 
       // enclosing data points in grid scale lat/long (y1 is north )
       const y1 = ~~y;
@@ -137,6 +128,17 @@ class DataSource {
 
       return yx;
     }
+
+      const oLatitude = info.oLatitude;
+      const oLongitude = info.oLongitude;
+      const angularDy = info.angularDy;
+      const angularDx = info.angularDx;
+      const yNum = info.yNum;
+      const xNum = info.xNum;
+      const boundLatitude = info.boundLatitude;
+      const boundLongitude = info.boundLongitude;
+      const date = info.date;
+
 
     return {
       header,

@@ -1,12 +1,12 @@
 import SeedRandom from 'seedrandom';
 import DataSource from './DataSource.js';
 
-const STORM_INTENSITY = 350;                    // maximum strikes per storm per hour
-const STORM_SPEED = 4;                          // maximum degrees of movement per hour
-const STORM_SPREAD = 5;                         // maximum degrees of strike y/x distance from epicenter
+const STORM_INTENSITY = 5000;                   // maximum strikes per storm per hour
+const STORM_SPEED = 0.5;                          // maximum degrees of movement per hour
+const STORM_SPREAD = 2;                         // maximum degrees of strike y/x distance from epicenter
 const STORM_DEATH = 0.3;                        // probability per hour of a storm dying
 const STORM_GENESIS = 0.3;                      // probability per hour of a storm starting
-const STORM_MAXNUM = 6;                         // maximum number of storms on map
+const STORM_MAXNUM = 9;                         // maximum number of storms on map
 const HOUR_MILLIS = 3600000;                    // milliseconds in an hour
 
 class LightningDataSource extends DataSource {
@@ -18,7 +18,7 @@ class LightningDataSource extends DataSource {
     };
     this.data = [];                                                  // must contain 60 arrays of strikes
     this.random = {
-      generator: new SeedRandom((new Date()).getDay()),             // todo make repeatable
+      generator: new SeedRandom("gooby"),             // todo make repeatable
       epicenters: [],
       stormdeath: STORM_DEATH,
       stormgenesis: STORM_GENESIS,
@@ -109,7 +109,7 @@ class LightningDataSource extends DataSource {
 
             // storm has walked out of map - fix and kill
             if (lat > 90 || lat < (-90) || long < (-180) || long > 180) {
-              this.data.splice(this.data.length - 1, 1);
+              this.data.pop();
               this.random.epicenters.splice(epicenter, 1);
               epicenter -= 1;
               break;
