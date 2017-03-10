@@ -19,7 +19,7 @@ const DEFAULT_CENTER = {
   lat: 0.5,
   lng: 0.5,
 };
-const DEFAULT_ZOOM = 3;
+const DEFAULT_ZOOM = 8;
 
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
@@ -58,6 +58,7 @@ class MapView extends React.Component {
     className: PropTypes.string,
     theme: PropTypes.string,
     actions: PropTypes.object,
+    mapMeta: PropTypes.object,
   };
 
   static Theme = {
@@ -281,6 +282,7 @@ class MapView extends React.Component {
       },
       disableDefaultUI: true,
       minZoom: 3,
+      maxZoom: 11,
     };
   }
 

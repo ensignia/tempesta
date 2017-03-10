@@ -1,6 +1,6 @@
 import colormap from 'colormap';
 
-const NUM_SHADES = 0;
+const NUM_SHADES = 80;
 
 class Colorer {
   constructor() {

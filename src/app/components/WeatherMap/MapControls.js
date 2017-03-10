@@ -94,9 +94,11 @@ class MapControls extends React.Component {
 
     let dateOutput = 'Loading...';
 
-    if (mapMeta !== null
+    const hasLatest = mapMeta !== null
       && mapMeta.sources[mapActiveModel] !== null
-      && mapMeta.sources[mapActiveModel].latest != null) {
+      && mapMeta.sources[mapActiveModel].latest != null;
+
+    if (hasLatest) {
       const source = mapMeta.sources[mapActiveModel];
       const dateString = `${source.latest.year}-${source.latest.month}-${source.latest.day} ${source.latest.modelCycle}`;
       dateOutput = moment(dateString, 'YYYY-MM-DD H').format('dddd, MMMM Do YYYY, HH:mm');
@@ -123,7 +125,10 @@ class MapControls extends React.Component {
             max={maxValue}
             value={sliderValue}
             onChange={this.handleChange}
-            onLabel={i => <div>{`+${i}`}</div>}
+            onLabel={i => {
+              if (hasLatest) return (<div>{`+${i * (mapMeta.sources[mapActiveModel].forecastHourStep || 1)}`}</div>);
+              return null;
+            }}
           />
         </div>
         <Link className={s.speed} to="#" onClick={() => { actions.showSpeedModal(); }}>

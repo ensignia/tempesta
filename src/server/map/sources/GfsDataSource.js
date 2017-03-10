@@ -145,7 +145,7 @@ class GfsDataSource extends DataSource {
       parameter: 10,
       surfaceType: 100,
       surfaceValue: 10000,
-      }, GfsDataSource.parseGfsBody);
+    }, GfsDataSource.parseGfsBody);
 
     this.data[forecastHour] = {
       cape: capeData[0],
