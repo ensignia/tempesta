@@ -70,7 +70,7 @@ class TemperatureLayer extends Layer {
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
         const pixelValue = data.bilinearInterpolation(pixelLatitude, pixelLongitude);
-        const val = this.colorer.render(pixelValue - 220, 70, 'jet', 0.7);
+        const val = this.colorer.render(((pixelValue - 210) / 10) - 2, 4, 'rainbow', 0.7);
         ctx.compositePixel(xPixel, yPixel, val);
       }
     }
