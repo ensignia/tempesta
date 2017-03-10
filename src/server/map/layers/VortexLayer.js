@@ -65,7 +65,7 @@ class VortexLayer extends Layer {
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
         const pixelValue = data.bilinearInterpolation(pixelLatitude, pixelLongitude);
-        const val = this.colorer.render(Math.abs(pixelValue * 100000), 60, 'hsv', 0.75);
+        const val = this.colorer.render((pixelValue * 1000000) + 300, 600, 'rainbow', 0.75);
         ctx.compositePixel(xPixel, yPixel, val);
       }
     }

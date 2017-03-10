@@ -109,7 +109,7 @@ class LightningDataSource extends DataSource {
 
             // storm has walked out of map - fix and kill
             if (lat > 90 || lat < (-90) || long < (-180) || long > 180) {
-              this.data.splice(this.data.length - 1, 1);
+              this.data.pop();
               this.random.epicenters.splice(epicenter, 1);
               epicenter -= 1;
               break;

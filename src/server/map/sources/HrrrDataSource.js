@@ -72,14 +72,17 @@ class HrrrDataSource extends DataSource {
   }
 
   static parseHrrrrBody(data) {
-    const oLatitude = data.header.la1;             // grid origin (e.g. 0.0E, 90.0N)
-    const oLongitude = data.header.lo1;
-    const angularDy = data.header.dy;              // angular displacement of grid points in degrees
-    const angularDx = data.header.dx;
-    const yNum = data.header.ny;                   // number of grid points N-S and W-E (e.g., 144 x 73)
-    const xNum = data.header.nx;
-    const boundLat = oLatitude + ~~(yNum * angularDy);
-    const boundLong = oLongitude + ~~(xNum * angularDx);
+    const info = {
+      oLatitude: data.header.la1,             // grid origin (e.g. 0.0E, 90.0N)
+      oLongitude: data.header.lo1,
+      angularDy: data.header.dy,              // angular displacement of grid points in degrees
+      angularDx: data.header.dx,
+      yNum: data.header.ny,              // number of grid points N-S and W-E (e.g., 144 x 73)
+      xNum: data.header.nx,
+      boundLat: 20,
+      boundLong: -90,
+      date: null,
+    };
 
     // TODO if the bounds are wrong, the scan mode might not be 000
     // Scan mode 000 assumed. Longitude increases from oLongitude and latitude
@@ -88,15 +91,15 @@ class HrrrDataSource extends DataSource {
     // http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table3-4.shtml
     const gridResult = [];
     let index = 0;
-    for (let y = 0; y < yNum; y += 1) {
+    for (let y = 0; y < 720; y += 1) {
       const row = [];
-      for (let x = 0; x < xNum; x += 1, index += 1) {
-        row[x] = data.data[index];
+      for (let x = 0; x < 361; x += 1, index += 7) {
+        row[x] = data.data[index] + 1000;
       }
       gridResult[y] = row;
     }
 
-    return {boundLatitude: boundLat, boundLongitude: boundLong, grid: gridResult};
+    return {info: info, grid: gridResult};
   }
 
   getForecastHours() {

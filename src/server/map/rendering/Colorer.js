@@ -28,9 +28,14 @@ class Colorer {
 
   render(dataValue, normalizationRange, colorMap, fixedAlpha) {
     // normalize data
-    const normValue = dataValue >= normalizationRange ? 1 : (dataValue / normalizationRange);
-    const scaleIndex = ~~(normValue * NUM_SHADES) - 1;
+    let normValue = 0;
     let opacityCoefficient = 0;
+
+    if (dataValue >= normalizationRange) normValue = 1;
+    else if (dataValue < 0) normValue = 0;
+    else normValue = dataValue / normalizationRange;
+
+    const scaleIndex = ~~(normValue * NUM_SHADES) - 1;
 
     if (fixedAlpha !== undefined) opacityCoefficient = fixedAlpha;
     else opacityCoefficient = normValue > 0.8 ? 0.8 : normValue;
