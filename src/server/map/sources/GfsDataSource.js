@@ -140,11 +140,19 @@ class GfsDataSource extends DataSource {
       parameter: 0,
     }, GfsDataSource.parseGfsBody);
 
+    const vortexData = await DataSource.parseGribFile(filePath, {
+      category: 2,
+      parameter: 10,
+      surfaceType: 100,
+      surfaceValue: 10000,
+      }, GfsDataSource.parseGfsBody);
+
     this.data[forecastHour] = {
       cape: capeData[0],
       windU: windUData[0],
       windV: windVData[0],
       temperature: tempData[0],
+      vorticity: vortexData[0],
     };
   }
 

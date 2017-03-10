@@ -91,6 +91,7 @@ class WeatherMap extends React.Component {
           <Switch name="cape" label="Convective available potential energy" enabled={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
           <Switch name="wind" label="Wind vectors and wind fronts" enabled={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
           <Switch name="temperature" label="Temperature" enabled={mapActiveLayers.includes('temperature')} onChange={this.layerOnChange} />
+          <Switch name="vorticity" label="Absolute vorticity" enabled={mapActiveLayers.includes('vorticity')} onChange={this.layerOnChange} />
           <Switch name="spc" label="Storm Prediction Centre reports" enabled={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
           <Switch name="lightning" label="Lightning radar" enabled={mapActiveLayers.includes('lightning')} onChange={this.layerOnChange} />
         </Modal>
