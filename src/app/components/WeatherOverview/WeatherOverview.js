@@ -36,6 +36,7 @@ class WeatherOverview extends React.Component {
     }
   }
 
+  // Set location for weather overview and import weather data from json file
   async getData(coords) {
     const response = await fetch(`api/weather/${coords.latitude},${coords.longitude}`);
     const json = await response.json();
@@ -43,6 +44,7 @@ class WeatherOverview extends React.Component {
     this.setState({ daily: json.daily.data, currently: json.currently });
   }
 
+  // Sets temperature based on settings and generates forecast and day name from data point
   render() {
     const { daily, currently, hasData } = this.state;
     const units = this.props.temperatureUnits === 'farenheit' ? '°F' : '°C';
