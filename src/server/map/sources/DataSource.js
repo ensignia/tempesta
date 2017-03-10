@@ -30,6 +30,7 @@ class DataSource {
     this.meta = null;
   }
 
+
   /** HELPER: Download data from url into output if not exists */
   static async downloadURL(url, output) {
     try {
@@ -98,7 +99,6 @@ class DataSource {
       // translate server standard lat/lon to grib2 header coordinates
       // see map/readme.md for rationale
       // assumes grib2 uses coordinate system rooted at top-left (90,0)
-      // TODO move conversion to its own method
       const grib2lat = (-latitude) + 180;
       const grib2long = longitude + 180;
 

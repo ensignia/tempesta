@@ -13,7 +13,7 @@ class HrrrDataSource extends DataSource {
    * are when the model was run
    * forecastHour is the prediction for up to 18 hours from the time the model was run (00-18)
    */
-   // Data available http://www.nco.ncep.noaa.gov/pmb/products/hrrr/hrrr.t00z.wrfsfcf00.grib2.shtml
+  // Data available http://www.nco.ncep.noaa.gov/pmb/products/hrrr/hrrr.t00z.wrfsfcf00.grib2.shtml
   static getURL(year, month, day, modelCycle, forecastHour) {
     return `${HRRR_BASE_URL}hrrr.${padLeft(year, 4)}${padLeft(month, 2)}${padLeft(day, 2)}/hrrr.t${padLeft(modelCycle, 2)}z.wrfsfcf${padLeft(forecastHour, 2)}.grib2`;
   }
