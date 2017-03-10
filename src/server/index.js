@@ -49,7 +49,10 @@ if (cluster.isMaster) {
   cluster.on('exit', (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
     workers = workers.filter(w => w !== worker);
-    cluster.fork();
+
+    setTimeout(() => {
+      cluster.fork();
+    }, 10 * 1000); // Wait 10 seconds before attempting fork
   });
 
   const data = new Data();

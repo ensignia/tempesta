@@ -23,12 +23,18 @@ export default class ApiMiddleware {
       }
 
       try {
+        const z = parseInt(req.params.z, 10);
+
+        if (z < 3 || z > 11) { // TODO: Should be specified by meta
+          throw new Error('Zoom level not supported');
+        }
+
         // path to tile image
         await this.data.getTile(
           req.params.layer.toLowerCase(),
           parseInt(req.params.x, 10),
           parseInt(req.params.y, 10),
-          parseInt(req.params.z, 10),
+          z,
           req.query,
           req,
           res);
