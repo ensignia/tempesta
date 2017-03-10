@@ -65,18 +65,18 @@ class DataSource {
   }
 
   /** HELPER: Parses a grib file into useful data */
-  static async parseGribFile(filePath, options) {
+  static async parseGribFile(filePath, options, parserFunction) {
     const gribJson = await gribParser(filePath, {
       names: true, // (default false): Return descriptive names too
       data: true, // (default false): Return data, not just headers
       ...options,
     });
 
-    return gribJson.map((data) => DataSource.parseGribData(data));
+    return gribJson.map((data) => DataSource.parseGribData(data, parserFunction));
   }
 
   /** HELPER: Parses a block of grib2 data into a 2D array of data points */
-  static parseGribData(data) {
+  static parseGribData(data, parserFunction) {
     const header = data.header;
     const oLatitude = header.la1;             // grid origin (e.g. 0.0E, 90.0N)
     const oLongitude = header.lo1;
@@ -84,31 +84,13 @@ class DataSource {
     const angularDx = header.dx;
     const yNum = header.ny;                   // number of grid points N-S and W-E (e.g., 144 x 73)
     const xNum = header.nx;
-    const boundLatitude = oLatitude + ~~(yNum * angularDy);
-    const boundLongitude = oLongitude + ~~(xNum * angularDx);
-
     const date = new Date(header.refTime);
     date.setHours(date.getHours() + header.forecastTime);
 
-    // TODO if the bounds are wrong, the scan mode might not be 000
-    // Scan mode 000 assumed. Longitude increases from oLongitude and latitude
-    // decreases from oLatitude. This implies origin at top left corner of
-    // coverage area. Values stored in row order.
-    // http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table3-4.shtml
-    const grid = [];
-    let index = 0;
-    for (let y = 0; y < yNum; y += 1) {
-      const row = [];
-      for (let x = 0; x < xNum; x += 1, index += 1) {
-        row[x] = data.data[index];
-      }
-      grid[y] = row;
-    }
-
-    console.log(`Origin: ${oLatitude}, ${oLongitude}`);
-    console.log(`Angular grid resolution: ${angularDy}, ${angularDx}`);
-    console.log(`Number of data points: ${yNum}, ${xNum}`);
-    console.log(`Coverage bound: ${boundLatitude}, ${boundLongitude}`);
+    const body = parserFunction(data);
+    const boundLatitude = body.boundLatitude;
+    const boundLongitude = body.boundLongitude;
+    const grid = body.grid;
 
     function bilinearInterpolation(latitude, longitude) {
       /* eslint-disable brace-style */
@@ -131,24 +113,24 @@ class DataSource {
       const x = grib2long * (xNum / 360);
 
       // enclosing data points in grid scale lat/long (y1 is north )
-      const y1 = y | 0;
+      const y1 = ~~y;
       const y0 = y === y1 ? y1 : y1 + 1;
-      const x0 = x | 0;
+      const x0 = ~~x;
       const x1 = x === x0 ? x0 : x0 + 1;
 
       // no interpolation
       if (y1 === y0 && x1 === x0) {
         return grid[y][x];
       }
-      // west -> east
+      // linear west -> east
       else if (y1 === y0) {
         return grid[y0][x0] + ((x - x0) * (grid[y0][x1] - grid[y0][x0]));
       }
-      // south -> north
+      // linear south -> north
       else if (x1 === x0) {
-        return grid[y0][x0] + ((y - y0) * (grid[y1][x0] - grid[y0][x0]));
+        return grid[y0][x0] + ((y0 - y) * (grid[y1][x0] - grid[y0][x0]));
       }
-      // west -> east, south -> north
+      // bilinear (west -> east) -> north
       const y1x = grid[y1][x0] + ((x - x0) * (grid[y1][x1] - grid[y1][x0]));
       const y0x = grid[y0][x0] + ((x - x0) * (grid[y0][x1] - grid[y0][x0]));
       const yx = y0x + ((y - y0) * ((y1x - y0x) / (y1 - y0)));

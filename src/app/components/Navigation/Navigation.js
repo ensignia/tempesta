@@ -12,10 +12,24 @@ class Navigation extends React.Component {
     showWeatherOverview: PropTypes.bool,
     actions: PropTypes.object,
     locationStatus: PropTypes.string,
+    isPage: PropTypes.bool,
   };
 
   render() {
-    const { actions, showWeatherOverview, locationStatus } = this.props;
+    const { actions, showWeatherOverview, locationStatus, isPage } = this.props;
+
+    if (isPage) {
+      return (
+        <div className={cx(s.navigation, this.props.className)} role="navigation">
+          <Link
+            className={cx(s.link, s.icon)}
+            to="/"
+          >
+            <Icon name={'arrow_back'} />
+          </Link>
+        </div>
+      );
+    }
 
     return (
       <div className={cx(s.navigation, this.props.className)} role="navigation">

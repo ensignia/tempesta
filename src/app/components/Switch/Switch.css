@@ -1,0 +1,75 @@
+@import '../global.css';
+
+.switchLabel {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5em 0;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.switchLabel span {
+  display: inline-block;
+  font-size: 1.1em;
+  padding-right: 1em;
+  user-select: none;
+}
+
+/* Hide default HTML checkbox */
+.switchLabel input {
+  display: none;
+}
+
+.switchLabel .switch {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.1s ease;
+  pointer-events: none;
+  min-width: 30px;
+  min-height: 17px;
+  width: 30px;
+  height: 17px;
+}
+
+/* The slider */
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 16px;
+}
+
+.switch .slider.sliderNeutral {
+  background-color: var(--primary-color);
+  box-shadow: 0 0 1px var(--primary-color);
+}
+
+.switch .slider::before {
+  position: absolute;
+  content: '';
+  height: 13px;
+  width: 13px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.switchLabel input:checked + .switch .slider {
+  background-color: var(--primary-color);
+}
+
+.switchLabel input:focus + .switch .slider {
+  box-shadow: 0 0 1px var(--primary-color);
+}
+
+.switchLabel input:checked + .switch .slider::before {
+  transform: translateX(13px);
+}

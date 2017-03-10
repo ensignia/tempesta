@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react';
 import GoogleMapReact from 'google-map-react';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './MapView.css';
 import Marker from './Marker.js';
+import ColorScale from './ColorScale.js';
 import { connect } from '../store.js';
 import MapDarkTheme from './config/MapDarkTheme.json';
 import MapLightTheme from './config/MapLightTheme.json';
@@ -16,7 +19,7 @@ const DEFAULT_CENTER = {
   lat: 0.5,
   lng: 0.5,
 };
-const DEFAULT_ZOOM = 11;
+const DEFAULT_ZOOM = 3;
 
 // Normalizes the coords that tiles repeat across the x axis (horizontally)
 // like the standard Google map tiles.
@@ -53,17 +56,17 @@ class MapView extends React.Component {
     mapActiveLayers: PropTypes.array,
     mapActiveModel: PropTypes.string,
     className: PropTypes.string,
-    theme: PropTypes.array,
+    theme: PropTypes.string,
     actions: PropTypes.object,
   };
 
   static Theme = {
-    LIGHT: MapLightTheme,
-    DARK: MapDarkTheme,
+    light: MapLightTheme,
+    dark: MapDarkTheme,
   };
 
   static defaultProps = {
-    theme: MapView.Theme.LIGHT,
+    theme: 'light',
   };
 
   constructor(props) {
@@ -71,23 +74,26 @@ class MapView extends React.Component {
     this.state = {
       mapLoaded: false,
       shouldUpdateLocation: false,
+      lastLightning: new Date().getTime() - (60 * 1000),
+      lightning: [],
     };
 
-    this.componentWillMount = this.componentWillMount.bind(this);
-    this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
     this.onGoogleApiLoaded = this.onGoogleApiLoaded.bind(this);
     this.loadMeta = this.loadMeta.bind(this);
     this.createLayerHelper = this.createLayerHelper.bind(this);
     this.createOverlays = this.createOverlays.bind(this);
     this.updateOverlays = this.updateOverlays.bind(this);
     this.createMapOptions = this.createMapOptions.bind(this);
+    this.fetchLightning = this.fetchLightning.bind(this);
   }
 
   /**
    * On mounted, load meta data
    */
-  componentWillMount() {
+  componentDidMount() {
     this.loadMeta();
+    this.fetchLightning();
+    this.lightningInterval = setInterval(this.fetchLightning, 20 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -105,6 +111,10 @@ class MapView extends React.Component {
 
       this.setState({ shouldUpdateLocation: false });
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.lightningInterval);
   }
 
   onGoogleApiLoaded(google) {
@@ -131,6 +141,19 @@ class MapView extends React.Component {
     this.props.actions.setMapMeta(json);
 
     this.updateOverlays(this.props);
+  }
+
+  async fetchLightning() {
+    // Render markers on map
+    const response = await fetch(`/api/lightning/${this.state.lastLightning}`); // last 2 minutes for demo purposes fixme
+    const json = await response.json();
+
+    const lightningData = this.state.lightning
+      .concat(json.data)
+      .map(lightning => { return { ...lightning, opacity: (lightning.opacity !== undefined ? lightning.opacity - 1 : 5) }; })
+      .filter(lightning => lightning.opacity > 0);
+
+    this.setState({ lightning: lightningData, lastLightning: json.meta.to });
   }
 
   /**
@@ -251,25 +274,35 @@ class MapView extends React.Component {
    */
   createMapOptions(maps) {
     return {
-      styles: this.props.theme,
+      styles: MapView.Theme[this.props.theme],
       zoomControl: true,
       zoomControlOptions: {
         position: maps.ControlPosition.RIGHT_TOP,
       },
       disableDefaultUI: true,
-      minZoom: 2,
-      minZoomOverride: true,
+      minZoom: 3,
     };
   }
 
   render() {
-    const { className, location } = this.props;
+    const { className, location, locationStatus, mapActiveLayers, mapMeta } = this.props;
 
-    // Render markers on map
-    const markersEl = [];
-    [].forEach((marker) => {
-      markersEl.push(<Marker key={`${marker.lat}-${marker.lng}`} lat={marker.lat} lng={marker.lng} />);
-    });
+    const strikes = mapActiveLayers.includes('lightning') ? this.state.lightning.map((lightning) =>
+      (<Marker
+        key={`${lightning.time + ~~lightning.latitude + ~~lightning.longitude}`}
+        type="LIGHTNING"
+        opacity={lightning.opacity / 5}
+        lat={lightning.latitude}
+        lng={lightning.longitude}
+      />),
+    ) : null;
+
+    const scales = mapMeta ? mapActiveLayers.map((layerName) => {
+      if (!mapMeta.layers[layerName] || !mapMeta.layers[layerName].scale) return null;
+
+      const { colors, minValue, maxValue } = mapMeta.layers[layerName].scale;
+      return <ColorScale layerName={layerName} colors={colors} width={160} height={10} minValue={minValue} maxValue={maxValue} />;
+    }) : null;
 
     return (
       <div className={className}>
@@ -281,9 +314,12 @@ class MapView extends React.Component {
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={this.onGoogleApiLoaded}
         >
-          <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} />
-          {markersEl}
+          {locationStatus !== 'UNKNOWN' ? <Marker key="location" type="LOCATION" lat={location.latitude} lng={location.longitude} /> : null}
+          {strikes}
         </GoogleMapReact>
+        <div className={s.scales}>
+          {scales !== null && scales.length > 0 ? scales[0] : null}
+        </div>
       </div>
     );
   }
@@ -295,6 +331,7 @@ export default connect((state) => ({
   mapActiveModel: state.mapActiveModel,
   mapAnimationStatus: state.mapAnimationStatus,
   mapPlaybackIndex: state.mapPlaybackIndex,
+  theme: state.theme,
   location: state.location,
   locationStatus: state.locationStatus,
-}))(MapView);
+}))(withStyles(s)(MapView));

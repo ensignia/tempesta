@@ -1,6 +1,6 @@
 {
   "name": "tempesta",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "engines": {
     "node": ">=6.5",
@@ -44,6 +44,7 @@
     "react-motion": "^0.4.7",
     "seedrandom": "^2.4.2",
     "source-map-support": "^0.4.6",
+    "store": "^2.0.4",
     "toobusy-js": "^0.5.1",
     "universal-router": "^2.0.0",
     "whatwg-fetch": "^2.0.1"

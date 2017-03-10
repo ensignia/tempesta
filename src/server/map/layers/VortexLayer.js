@@ -3,36 +3,30 @@ import pureimage from 'pureimage';
 import fs from 'fs';
 import stream from 'stream';
 import Layer from './Layer.js';
-import { padLeft } from '../Util.js';
 
-class CapeLayer extends Layer {
+class VortexLayer extends Layer {
 
   static defaultOptions = {
     source: 'gfs',
     forecastHour: 0,
-  }
+  };
 
   getMeta() {
     return {
-      supportedSources: ['gfs', 'hrrr'],
-      scale: {
-        colors: this.colorer.getScale('jet').map((color) => `${color.substring(1)}00`),
-        minValue: 0,
-        maxValue: 2500,
-      },
+      supportedSources: ['gfs'],
     };
   }
 
   getOptions(options_) {
     const options = {
-      ...CapeLayer.defaultOptions,
+      ...VortexLayer.defaultOptions,
       ...options_,
     };
 
     options.source = options.source.toLowerCase();
 
     if (!this.getMeta().supportedSources.includes(options.source)) {
-      throw new Error(`Source ${options.source} for CapeLayer is invalid`);
+      throw new Error(`Source ${options.source} for VortexLayer is invalid`);
     }
 
     const source = this.getData().getDataSource(options.source);
@@ -49,11 +43,11 @@ class CapeLayer extends Layer {
   getPath(tileX, tileY, tileZ, options) {
     const source = this.getData().getDataSource(options.source);
     const latest = source.getMeta().latest || {};
-    return Layer.getFullPath(`cape-${options.source}-${latest.year}-${latest.month}-${latest.day}-${latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
+    return Layer.getFullPath(`vorticity-${options.source}-${latest.year}-${latest.month}-${latest.day}-${latest.modelCycle}-${options.forecastHour}-${tileX}-${tileY}-${tileZ}.png`);
   }
 
   async generateTile(tilePath, tileX, tileY, tileZ, options, res) {
-    const data = this.getData().getDataSource(options.source).getData('cape', options.forecastHour);
+    const data = this.getData().getDataSource(options.source).getData('vorticity', options.forecastHour);
 
     const { // Use object destructuring, only get what you need :)
       leftLongitude,
@@ -65,15 +59,13 @@ class CapeLayer extends Layer {
     const image = pureimage.make(Layer.TILE_SIZE, Layer.TILE_SIZE);
     const ctx = image.getContext('2d');
 
-    const maxValue = this.getMeta().scale.maxValue;
-
     for (let yPixel = 0; yPixel < Layer.TILE_SIZE; yPixel += 1) {
       for (let xPixel = 0; xPixel < Layer.TILE_SIZE; xPixel += 1) {
         const pixelLatitude = topLatitude - (angularPixelHeight * yPixel);
         const pixelLongitude = leftLongitude + (angularPixelWidth * xPixel);
 
         const pixelValue = data.bilinearInterpolation(pixelLatitude, pixelLongitude);
-        const val = this.colorer.render(pixelValue, maxValue, 'jet');
+        const val = this.colorer.render(Math.abs(pixelValue * 100000), 60, 'hsv', 0.75);
         ctx.compositePixel(xPixel, yPixel, val);
       }
     }
@@ -87,4 +79,4 @@ class CapeLayer extends Layer {
   }
 }
 
-export default CapeLayer;
+export default VortexLayer;

@@ -21,6 +21,7 @@ class Store {
     const nextState = this.actions[action](this.state, ...args);
     if (!Object.is(nextState, this.state)) {
       this.state = nextState;
+      this.actions.save(this.state);
       this.listeners.forEach(listener => listener());
     }
   }
@@ -53,7 +54,7 @@ export function connect(mapStateToProps) {
         store: PropTypes.object.isRequired,
       };
 
-      componentWillMount() {
+      componentDidMount() {
         this.removeListener = this.context.store.subscribe(() => {
           this.forceUpdate();
         });

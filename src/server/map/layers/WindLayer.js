@@ -14,6 +14,11 @@ class WindLayer extends Layer {
   getMeta() {
     return {
       supportedSources: ['gfs'],
+      scale: {
+        colors: this.colorer.getScale('jet').map((color) => `${color.substring(1)}00`),
+        minValue: 0,
+        maxValue: 300,
+      },
     };
   }
 

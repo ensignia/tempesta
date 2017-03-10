@@ -71,6 +71,34 @@ class HrrrDataSource extends DataSource {
     return [];
   }
 
+  static parseHrrrrBody(data) {
+    const oLatitude = data.header.la1;             // grid origin (e.g. 0.0E, 90.0N)
+    const oLongitude = data.header.lo1;
+    const angularDy = data.header.dy;              // angular displacement of grid points in degrees
+    const angularDx = data.header.dx;
+    const yNum = data.header.ny;                   // number of grid points N-S and W-E (e.g., 144 x 73)
+    const xNum = data.header.nx;
+    const boundLat = oLatitude + ~~(yNum * angularDy);
+    const boundLong = oLongitude + ~~(xNum * angularDx);
+
+    // TODO if the bounds are wrong, the scan mode might not be 000
+    // Scan mode 000 assumed. Longitude increases from oLongitude and latitude
+    // decreases from oLatitude. This implies origin at top left corner of
+    // coverage area. Values stored in row order.
+    // http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table3-4.shtml
+    const gridResult = [];
+    let index = 0;
+    for (let y = 0; y < yNum; y += 1) {
+      const row = [];
+      for (let x = 0; x < xNum; x += 1, index += 1) {
+        row[x] = data.data[index];
+      }
+      gridResult[y] = row;
+    }
+
+    return {boundLatitude: boundLat, boundLongitude: boundLong, grid: gridResult};
+  }
+
   getForecastHours() {
     return process.env.NODE_ENV === 'production' ? 10 : 2;
   }
@@ -93,21 +121,21 @@ class HrrrDataSource extends DataSource {
       parameter: 6, // Grib2 parameter number, equals to --fp 7
       surfaceType: 1, // Grib2 surface type, equals to --fs 103
       //surfaceValue: 10, // Grib2 surface value, equals to --fv 10
-    });
+    }, HrrrDataSource.parseHrrrrBody);
 
     const windUData = await DataSource.parseGribFile(filePath, {
       category: 2, // Grib2 category number, equals to --fc 1
       parameter: 2, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
       surfaceType: 100, // Isobar surface
       surfaceValue: 100000,
-    });
+    }, HrrrDataSource.parseHrrrrBody);
 
     const windVData = await DataSource.parseGribFile(filePath, {
       category: 2, // Grib2 category number, equals to --fc 1
       parameter: 3, // 2 U-wind, 3 V-wind, 192 Vert speed sheer
       surfaceType: 100, // Isobar surface
       surfaceValue: 100000,
-    });
+    }, HrrrDataSource.parseHrrrrBody);
 
     this.data[forecastHour] = {
       cape: capeData[0],

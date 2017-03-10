@@ -14,7 +14,7 @@ class Page extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           {title && <h1>{title}</h1>}
-          <div dangerouslySetInnerHTML={{ __html: html }} />
+          <div className={s.content} dangerouslySetInnerHTML={{ __html: html }} />
         </div>
       </div>
     );

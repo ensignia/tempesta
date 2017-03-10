@@ -108,7 +108,7 @@ class Modal extends React.Component {
             onClick={this.onClose}
             ref={(el) => { this.overlayEl = el; }}
           >
-            <div className={cx(s.modal, ...(className || {}))}>
+            <div className={cx(s.modal, className)}>
               <h4 className={s.title}>{title}</h4>
               <div className={s.content}>
                 {children}

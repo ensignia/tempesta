@@ -5,6 +5,8 @@ import fs from 'fs-extra';
 import CapeLayer from './layers/CapeLayer.js';
 import WindLayer from './layers/WindLayer.js';
 import LightningProbabilityLayer from './layers/LightningProbabilityLayer.js';
+import TemperatureLayer from './layers/TemperatureLayer.js';
+import VortexLayer from './layers/VortexLayer.js'
 import GfsDataSource from './sources/GfsDataSource.js';
 import HrrrDataSource from './sources/HrrrDataSource.js';
 import LightningDataSource from './sources/LightningDataSource.js';
@@ -43,6 +45,8 @@ class Data {
     this.registerLayer('cape', new CapeLayer(this));
     this.registerLayer('wind', new WindLayer(this));
     this.registerLayer('lightningProbability', new LightningProbabilityLayer(this));
+    this.registerLayer('temperature', new TemperatureLayer(this));
+    this.registerLayer('vorticity', new VortexLayer(this));
     this.registerDataSource('gfs', new GfsDataSource());
     this.registerDataSource('hrrr', new HrrrDataSource());
     this.registerDataSource('lightning', new LightningDataSource());
