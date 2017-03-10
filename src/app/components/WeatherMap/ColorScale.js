@@ -16,8 +16,8 @@ class ColorScale extends React.Component {
     colors: PropTypes.array,
     minValue: PropTypes.number,
     maxValue: PropTypes.number,
-    width: PropTypes.width,
-    height: PropTypes.height,
+    width: PropTypes.number,
+    height: PropTypes.number,
     className: PropTypes.string,
   };
 

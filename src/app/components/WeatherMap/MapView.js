@@ -298,7 +298,7 @@ class MapView extends React.Component {
     ) : null;
 
     const scales = mapMeta ? mapActiveLayers.map((layerName) => {
-      if (!mapMeta.layers[layerName].scale) return null;
+      if (!mapMeta.layers[layerName] || !mapMeta.layers[layerName].scale) return null;
 
       const { colors, minValue, maxValue } = mapMeta.layers[layerName].scale;
       return <ColorScale layerName={layerName} colors={colors} width={160} height={10} minValue={minValue} maxValue={maxValue} />;
