@@ -32,20 +32,31 @@ class Slider extends React.Component {
     super();
 
     this.sliderId = `slider-${id()}`;
+    this.sliderPos = 0;
+    this.handlePos = 0;
 
     this.getPositionFromValue = this.getPositionFromValue.bind(this);
     this.getValueFromPosition = this.getValueFromPosition.bind(this);
+    this.updatePos = this.updatePos.bind(this);
     this.handleStart = this.handleStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleEnd = this.handleEnd.bind(this);
   }
 
+  componentDidMount() {
+    window.addEventListener('resize', this.updatePos);
+    this.updatePos();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updatePos);
+  }
+
   getPositionFromValue = (value) => {
     const { min, max } = this.props;
-    const sliderPos = this.sliderEl ? this.sliderEl.offsetWidth : 0;
-    const handlePos = this.handleEl ? this.handleEl.offsetWidth : 0;
+    this.updatePos();
 
-    const limit = sliderPos - handlePos;
+    const limit = this.sliderPos - this.handlePos;
     const percentage = (value - min) / (max - min);
     const pos = Math.round(percentage * limit);
 
@@ -54,16 +65,28 @@ class Slider extends React.Component {
 
   getValueFromPosition = (pos) => {
     const { min, max, step } = this.props;
-    const sliderPos = this.sliderEl ? this.sliderEl.offsetWidth : 0;
-    const handlePos = this.handleEl ? this.handleEl.offsetWidth : 0;
+    this.updatePos();
 
-    const limit = sliderPos - handlePos;
+    const limit = this.sliderPos - this.handlePos;
     const percentage = (Math.min(Math.max(pos, 0), limit) / (limit || 1));
     const baseVal = step * Math.round(percentage * ((max - min) / step));
 
     const value = Math.min(Math.max(baseVal + min, min), max);
 
     return value;
+  }
+
+  updatePos() {
+    const newSliderPos = this.sliderEl ? this.sliderEl.offsetWidth : 0;
+    const newHandlePos = this.handleEl ? this.handleEl.offsetWidth : 0;
+
+    if (Math.abs(newSliderPos - this.sliderPos) > 2) {
+      this.sliderPos = newSliderPos;
+    }
+
+    if (Math.abs(newHandlePos - this.handlePos) > 2) {
+      this.handlePos = newHandlePos;
+    }
   }
 
   handleStart() {
@@ -77,7 +100,7 @@ class Slider extends React.Component {
 
     const { onChange } = this.props;
 
-    const grab = this.handleEl.offsetWidth / 2;
+    const grab = this.handlePos / 2;
     const coordinate = !e.touches ? e.clientX : e.touches[0].clientX;
     const direction = this.sliderEl.getBoundingClientRect().left;
     const pos = coordinate - direction - grab;
