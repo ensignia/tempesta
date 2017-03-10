@@ -1,6 +1,6 @@
 import colormap from 'colormap';
 
-const NUM_SHADES = 80;
+const NUM_SHADES = 0;
 
 class Colorer {
   constructor() {
@@ -16,7 +16,7 @@ class Colorer {
       if (Object.prototype.hasOwnProperty.call(this.colorScales, scale)) {
         for (let i = 0; i < this.colorScales[scale].length; i += 1) {
           this.colorScales[scale][i] =
-              (parseInt(this.colorScales[scale][i].substring(1), 16) << 8) & 0xFFFFFF00;
+              (parseInt(this.colorScales[scale][i].substring(1), 16) * 256) & 0xFFFFFF00;
         }
       }
     }
