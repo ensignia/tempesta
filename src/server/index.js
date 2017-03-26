@@ -30,7 +30,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 
 if (cluster.isMaster) {
   // Is master
-  const numWorkers = isDev ? 1 : os.cpus().length;
+  const numWorkers = isDev ? 1 : Math.min(os.cpus().length, 4);
   let workers = [];
   const loadedData = [];
 
