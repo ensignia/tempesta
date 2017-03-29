@@ -9,6 +9,7 @@ class Modal extends React.Component {
     isOpen: PropTypes.bool,
     className: PropTypes.string,
     children: PropTypes.node,
+    buttons: PropTypes.array,
     /**
     * Called whenever the modal closes
     */
@@ -25,6 +26,7 @@ class Modal extends React.Component {
 
   static defaultProps = {
     isOpen: false,
+    buttons: [],
   }
 
   static getBodyElement() {
@@ -98,7 +100,9 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { title, isOpen, className, children } = this.props;
+    const { title, isOpen, buttons, className, children } = this.props;
+
+    const buttonsEl = buttons.map((button) => (<button type="button" className={'mdl-button'} onClick={button.handler}>{button.text}</button>));
 
     if (isOpen) {
       return (
@@ -115,6 +119,7 @@ class Modal extends React.Component {
               </div>
               <div className={s.actions}>
                 <button type="button" className={'mdl-button close'} onClick={this.onApprove}>Done</button>
+                {buttonsEl}
               </div>
             </div>
           </div>

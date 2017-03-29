@@ -18,8 +18,10 @@ function initialize() {
     units: settingsData.units || 'metric',
     theme: settingsData.theme || 'light',
 
+    mapDefaultLayer: mapSettingsData.mapDefaultLayer || 'cape',
+
     mapActiveSpeed: mapSettingsData.mapActiveSpeed || 1,
-    mapActiveLayers: mapSettingsData.mapActiveLayers || ['cape'],
+    mapActiveLayer: mapSettingsData.mapDefaultLayer || 'cape',
     mapActiveModel: mapSettingsData.mapActiveModel || 'gfs',
 
     mapMeta: null,
@@ -37,7 +39,7 @@ function save(state) {
   store.set('map_settings', {
     mapActiveSpeed: state.mapActiveSpeed,
     mapActiveModel: state.mapActiveModel,
-    mapActiveLayers: state.mapActiveLayers,
+    mapDefaultLayer: state.mapDefaultLayer,
   });
 }
 
@@ -90,10 +92,17 @@ function setActiveModel(state, mapActiveModel) {
   };
 }
 
-function setActiveLayers(state, mapActiveLayers) {
+function setActiveLayer(state, mapActiveLayer) {
   return {
     ...state,
-    mapActiveLayers,
+    mapActiveLayer,
+  };
+}
+
+function setDefaultLayer(state, mapDefaultLayer) {
+  return {
+    ...state,
+    mapDefaultLayer,
   };
 }
 
@@ -239,7 +248,8 @@ export default {
   requestLocation,
   setMapMeta,
   setActiveModel,
-  setActiveLayers,
+  setActiveLayer,
+  setDefaultLayer,
   setMapPlaybackIndex,
   setTemperatureUnits,
   setUnits,

@@ -6,7 +6,6 @@ import s from './WeatherMap.css';
 import MapView from './MapView.js';
 import MapControls from './MapControls.js';
 import Modal from '../Modal/Modal.js';
-import Switch from '../Switch/Switch.js';
 import Radio from '../Radio/Radio.js';
 import Link from '../Link/Link.js';
 
@@ -16,7 +15,7 @@ class WeatherMap extends React.Component {
     showLayerModal: PropTypes.bool.isRequired,
     showModelModal: PropTypes.bool.isRequired,
     showSpeedModal: PropTypes.bool.isRequired,
-    mapActiveLayers: PropTypes.array,
+    mapActiveLayer: PropTypes.string,
     mapActiveModel: PropTypes.string,
     mapActiveSpeed: PropTypes.number,
     actions: PropTypes.object,
@@ -36,12 +35,10 @@ class WeatherMap extends React.Component {
 
   layerOnChange(e) {
     const { actions } = this.props;
-    const { mapActiveLayers } = this.props;
+    const { mapActiveLayer } = this.props;
 
-    if (e.target.checked && !mapActiveLayers.includes(e.target.name)) {
-      actions.setActiveLayers(mapActiveLayers.concat(e.target.name));
-    } else if (mapActiveLayers.includes(e.target.name)) {
-      actions.setActiveLayers(mapActiveLayers.filter(l => l !== e.target.name));
+    if (mapActiveLayer !== e.target.value) {
+      actions.setActiveLayer(e.target.value);
     }
   }
 
@@ -70,10 +67,12 @@ class WeatherMap extends React.Component {
       showLayerModal,
       showModelModal,
       showSpeedModal,
-      mapActiveLayers,
+      mapActiveLayer,
       mapActiveModel,
       mapActiveSpeed,
     } = this.props;
+
+    console.log(mapActiveLayer === 'cape');
 
     return (
       <div className={cx(s.content, s.container)}>
@@ -83,17 +82,25 @@ class WeatherMap extends React.Component {
           title="Layers"
           isOpen={showLayerModal}
           className={s.modal}
+          buttons={[
+            {
+              handler: () => {
+                actions.setDefaultLayer(mapActiveLayer);
+              },
+              text: 'Set as Default',
+            },
+          ]}
           onClose={() => { actions.hideLayerModal(); }}
         >
           <Link className={cx(s.helpButton)} to="/guide/layers">
             <span name="guide">?</span>
           </Link>
-          <Switch name="cape" label="Convective available potential energy" enabled={mapActiveLayers.includes('cape')} onChange={this.layerOnChange} />
-          <Switch name="wind" label="Wind vectors and wind fronts" enabled={mapActiveLayers.includes('wind')} onChange={this.layerOnChange} />
-          <Switch name="temperature" label="Temperature" enabled={mapActiveLayers.includes('temperature')} onChange={this.layerOnChange} />
-          <Switch name="vorticity" label="Absolute vorticity" enabled={mapActiveLayers.includes('vorticity')} onChange={this.layerOnChange} />
-          <Switch name="spc" label="Storm Prediction Centre reports" enabled={mapActiveLayers.includes('spc')} onChange={this.layerOnChange} />
-          <Switch name="lightning" label="Lightning radar" enabled={mapActiveLayers.includes('lightning')} onChange={this.layerOnChange} />
+          <Radio name="layer" value="cape" align="right" label="Convective available potential energy" checked={mapActiveLayer === 'cape'} onChange={this.layerOnChange} />
+          <Radio name="layer" value="wind" align="right" label="Wind vectors and wind fronts" checked={mapActiveLayer === 'wind'} onChange={this.layerOnChange} />
+          <Radio name="layer" value="temperature" align="right" label="Temperature" checked={mapActiveLayer === 'temperature'} onChange={this.layerOnChange} />
+          <Radio name="layer" value="vorticity" align="right" label="Absolute vorticity" checked={mapActiveLayer === 'vorticity'} onChange={this.layerOnChange} />
+          <Radio name="layer" value="spc" align="right" label="Storm Prediction Centre reports" checked={mapActiveLayer === 'spc'} onChange={this.layerOnChange} />
+          <Radio name="layer" value="lightning" align="right" label="Lightning radar" checked={mapActiveLayer === 'lightning'} onChange={this.layerOnChange} />
         </Modal>
         <Modal
           title="Models"
@@ -125,7 +132,7 @@ export default connect((state) => ({
   showLayerModal: state.showLayerModal,
   showModelModal: state.showModelModal,
   showSpeedModal: state.showSpeedModal,
-  mapActiveLayers: state.mapActiveLayers,
+  mapActiveLayer: state.mapActiveLayer,
   mapActiveModel: state.mapActiveModel,
   mapActiveSpeed: state.mapActiveSpeed,
 }))(withStyles(s)(WeatherMap));

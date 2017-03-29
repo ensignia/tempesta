@@ -9,7 +9,8 @@
   display: none;
 }
 
-.radio input:checked + span:before {
+.radio input:checked + span.left-align::before,
+.radio input:checked + span.right-align::after {
   background-color: var(--primary-color);
   box-shadow: inset white 0 0 0 2px;
 }
@@ -19,15 +20,20 @@
   font-size: 1.1em;
 }
 
-.radio span:before {
+.radio span.right-align {
+  justify-content: space-between;
+}
+
+.radio span.left-align::before,
+.radio span.right-align::after {
   border: 2px solid var(--primary-color);
   content: '';
   display: flex;
   height: 16px;
   width: 16px;
-  margin: 0 5px;
+  margin: 2px 5px;
   border-radius: 50%;
   box-sizing: border-box;
-  transition: all ease .200s;
+  transition: all ease 0.2s;
   box-shadow: inset white 0 0 0 10px;
 }

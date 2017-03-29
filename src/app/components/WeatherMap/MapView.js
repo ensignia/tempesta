@@ -53,7 +53,7 @@ class MapView extends React.Component {
     locationStatus: PropTypes.string,
     mapPlaybackIndex: PropTypes.number,
     mapAnimationStatus: PropTypes.string,
-    mapActiveLayers: PropTypes.array,
+    mapActiveLayer: PropTypes.string,
     mapActiveModel: PropTypes.string,
     className: PropTypes.string,
     theme: PropTypes.string,
@@ -248,7 +248,7 @@ class MapView extends React.Component {
    * Creates the overlays when meta and google map is loaded
    */
   updateOverlays(nextProps) {
-    const { mapActiveLayers, mapActiveModel, mapMeta, mapPlaybackIndex } = nextProps;
+    const { mapActiveLayer, mapActiveModel, mapMeta, mapPlaybackIndex } = nextProps;
 
     if (!mapMeta || !this.state.mapLoaded) return;
 
@@ -256,7 +256,7 @@ class MapView extends React.Component {
 
     // Activate correct layers in google maps overview
     this.state.overlays.forEach((overlay) => {
-      const isActive = mapActiveLayers.includes(overlay.layerName)
+      const isActive = mapActiveLayer === overlay.layerName
         && (!overlay.sourceName || overlay.sourceName === mapActiveModel);
 
       const overlayIndex = mapPlaybackIndex % overlay.mapLayers.length;
@@ -287,9 +287,9 @@ class MapView extends React.Component {
   }
 
   render() {
-    const { className, location, locationStatus, mapActiveLayers, mapMeta } = this.props;
+    const { className, location, locationStatus, mapActiveLayer, mapMeta } = this.props;
 
-    const strikes = mapActiveLayers.includes('lightning') ? this.state.lightning.map((lightning) =>
+    const strikes = mapActiveLayer === 'lightning' ? this.state.lightning.map((lightning) =>
       (<Marker
         key={`${lightning.time + ~~lightning.latitude + ~~lightning.longitude}`}
         type="LIGHTNING"
@@ -299,12 +299,13 @@ class MapView extends React.Component {
       />),
     ) : null;
 
-    const scales = mapMeta ? mapActiveLayers.map((layerName) => {
-      if (!mapMeta.layers[layerName] || !mapMeta.layers[layerName].scale) return null;
+    let scale = null;
+    if (mapMeta) {
+      if (!mapMeta.layers[mapActiveLayer] || !mapMeta.layers[mapActiveLayer].scale) return null;
 
-      const { colors, minValue, maxValue } = mapMeta.layers[layerName].scale;
-      return <ColorScale layerName={layerName} colors={colors} width={160} height={10} minValue={minValue} maxValue={maxValue} />;
-    }) : null;
+      const { colors, minValue, maxValue } = mapMeta.layers[mapActiveLayer].scale;
+      scale = <ColorScale layerName={mapActiveLayer} colors={colors} width={160} height={10} minValue={minValue} maxValue={maxValue} />;
+    }
 
     return (
       <div className={className}>
@@ -320,7 +321,7 @@ class MapView extends React.Component {
           {strikes}
         </GoogleMapReact>
         <div className={s.scales}>
-          {scales !== null && scales.length > 0 ? scales[0] : null}
+          {scale}
         </div>
       </div>
     );
@@ -329,7 +330,7 @@ class MapView extends React.Component {
 
 export default connect((state) => ({
   mapMeta: state.mapMeta,
-  mapActiveLayers: state.mapActiveLayers,
+  mapActiveLayer: state.mapActiveLayer,
   mapActiveModel: state.mapActiveModel,
   mapAnimationStatus: state.mapAnimationStatus,
   mapPlaybackIndex: state.mapPlaybackIndex,
