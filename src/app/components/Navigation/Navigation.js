@@ -57,6 +57,10 @@ class Navigation extends React.Component {
             <Icon name="settings" />
             <span>Settings</span>
           </Link>
+          <Link className={s.link} to="#">
+            <Icon name="import_contacts" />
+            <span>Guide</span>
+          </Link>
         </div>
 
         <Link className={cx(s.link, s.icon, { [s.pulse]: locationStatus !== 'DONE' })} to="#" onClick={() => { actions.requestLocation(); }}>
